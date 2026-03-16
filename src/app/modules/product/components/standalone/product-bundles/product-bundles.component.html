@@ -15,7 +15,7 @@
   @for (bundle of bundles(); track bundle.id) {
     <div class="col-12">
       <div id="bundle-card"
-        class="bundle-card card shadow-sm"
+        class="bundle-card card shadow"
         [class.selected]="selectedBundleId() === bundle.id"
         (click)="selectBundle(bundle)"
       >
