@@ -1,0 +1,17 @@
+<div id="checkout-steps" class="steps-container fade-in">
+    <div class="bg-steps">
+      <em [style.width.%]="progressPercentage"></em>
+    </div>
+    <ul class="steps-list">
+      <li
+        class="step-item"
+        *ngFor="let step of steps; let i = index"
+        [ngClass]="{ active: i <= currentStep }"
+      >
+        <div class="step-circle">
+          <span><i class="bi bi-{{step.icon}}"></i></span>
+        </div>
+        <span class="step-label">{{ step.label }}</span>
+      </li>
+    </ul>
+ </div>

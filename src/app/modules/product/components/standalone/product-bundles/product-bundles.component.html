@@ -1,0 +1,107 @@
+<div class="bundle">
+  <div class="bundles-container mt-5" *ngIf="bundles() && bundles().length > 0">
+  <div class="row">
+    <div class="col-12">
+      <h3 class="bundles-title color1 mb-4">
+        <i class="bi bi-gift me-2"></i> Ofertas Especiales
+      </h3>
+      <p class="bundles-subtitle color3 mb-4">
+        *Complementa tu compra con esta oferta especial
+      </p>
+    </div>
+  </div>
+
+  <div class="row g-3">
+  @for (bundle of bundles(); track bundle.id) {
+    <div class="col-12">
+      <div id="bundle-card"
+        class="bundle-card card shadow-sm"
+        [class.selected]="selectedBundleId() === bundle.id"
+        (click)="selectBundle(bundle)"
+      >
+        <div class="row g-0 align-items-center">
+
+          <!-- Imagen -->
+          <div class="col-4 col-md-2 text-center p-2">
+            <img
+              [src]="bundle.img"
+              [alt]="bundle.name_budle"
+              class="img-fluid bundle-img"
+              ImgBrokenDirective
+            />
+          </div>
+
+          <!-- Contenido -->
+          <div class="col-8 col-md-7 p-3">
+            <h5 class="bundle-title mb-1">
+              {{ bundle.name_budle }}
+            </h5>
+
+            <p class="bundle-description mb-2">
+              {{ bundle.desc }}
+            </p>
+
+            <small class="text-muted">
+              Lleva <b>{{ bundle.quantity }}</b> unidades
+            </small>
+
+            <!-- Precio -->
+            <div class="bundle-price mt-2">
+              @if (bundle.discount_type === 'free') {
+                <span class="current-price free">GRATIS</span>
+              } @else {
+                <span class="current-price">
+                  ${{ getFinalPrice(bundle) | number | comaToDot }}
+                </span>
+                <span class="old-price">
+                  ${{ bundle.selling_price }}
+                </span>
+              }
+            </div>
+          </div>
+
+          <!-- Badges -->
+          <div class="col-12 col-md-3 text-md-end p-3">
+            @if (bundle.discount_type === 'percentage') {
+              <span class="badge bg-success mb-1">
+                {{ bundle.percentage }}% OFF
+              </span>
+            }
+
+            @if (bundle.discount_type === 'free') {
+              <span class="badge bg-danger mb-1">
+                GRATIS
+              </span>
+            }
+
+            @if (bundle.discount_type === 'fixed') {
+              <span class="badge bg-warning text-dark mb-1">
+                -${{ getDiscountPrice(bundle) }}
+              </span>
+            }
+          </div>
+
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+  
+  @if (selectedBundleId()) {
+    <div class="row mt-4">
+      <div class="col-12 text-center">
+        <!--button class="btn btn-primary-c2 btn-lg" (click)="addBundleToCart()">
+          <i class="bi bi-bag-check me-2"></i> 
+          @if (isSelectedBundleFree()) {
+            Obtener Producto Gratis
+            } @else {
+            Añadir al Carrito
+            }
+        </button -->
+      </div>
+    </div>
+  }
+  (*) Puedes llevar solo una oferta por compra.
+</div>
+</div>

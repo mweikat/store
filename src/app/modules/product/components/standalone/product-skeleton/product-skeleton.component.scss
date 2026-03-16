@@ -1,0 +1,139 @@
+/* Estilos para el skeleton loader */
+.product-detail-container {
+  min-height: 600px;
+  padding: 0 15px; /* Padding para móviles */
+}
+
+.product-skeleton {
+  width: 100%;
+  display: flex;
+  flex-direction: column; /* Por defecto apilado en móvil */
+  gap: 30px;
+}
+
+/* Para desktop: lado a lado */
+@media (min-width: 768px) {
+  .product-skeleton {
+    flex-direction: row;
+  }
+  
+  .skeleton-gallery,
+  .skeleton-info {
+    flex: 1; /* Ocupan el mismo ancho */
+  }
+}
+
+.skeleton-gallery {
+  width: 100%;
+}
+
+.skeleton-info {
+  width: 100%;
+}
+
+.skeleton-image {
+  width: 100%;
+  height: 300px; /* Un poco más pequeño en móvil */
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* Altura de imagen ajustada para desktop */
+@media (min-width: 768px) {
+  .skeleton-image {
+    height: 400px;
+  }
+}
+
+.skeleton-thumbnails {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap; /* Permite que las miniaturas se envuelvan */
+  gap: 10px; /* Espacio entre miniaturas */
+}
+
+.skeleton-thumb {
+  width: calc(16.666% - 10px); /* Aproximadamente 6 por fila en desktop */
+  min-width: 60px; /* Tamaño mínimo */
+  height: 0;
+  padding-bottom: 16.666%; /* Mantiene proporción cuadrada */
+  background: #f0f0f0;
+  border-radius: 4px;
+  animation: loading 1.5s infinite 0.2s;
+}
+
+/* En móvil: miniaturas más pequeñas pero más compactas */
+@media (max-width: 480px) {
+  .skeleton-thumb {
+    min-width: 50px;
+    padding-bottom: 14%; /* Ajuste para móvil */
+  }
+}
+
+.skeleton-title {
+  width: 70%;
+  height: 40px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  animation: loading 1.5s infinite;
+}
+
+.skeleton-text {
+  height: 20px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  animation: loading 1.5s infinite 0.1s;
+}
+
+/* Clases helper para anchos */
+.w-80 {
+  width: 80%;
+}
+
+.w-60 {
+  width: 60%;
+}
+
+.w-120 {
+  width: 120px;
+}
+
+@media (max-width: 768px) {
+  .w-120 {
+    width: 100px; /* Botón un poco más pequeño en móvil */
+  }
+}
+
+.skeleton-price {
+  width: 120px;
+  height: 40px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin: 20px 0;
+  animation: loading 1.5s infinite 0.3s;
+}
+
+.skeleton-button {
+  width: 180px;
+  height: 50px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  animation: loading 1.5s infinite 0.4s;
+}
+
+@media (max-width: 768px) {
+  .skeleton-button {
+    width: 100%; /* Botones ocupan todo el ancho en móvil */
+    max-width: 280px; /* Pero con un máximo */
+  }
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

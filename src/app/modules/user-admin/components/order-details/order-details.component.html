@@ -1,0 +1,63 @@
+<h5><b>Productos en la Orden</b></h5>
+<p class="mt-4"><b>Numero de orden:</b> {{order.order_number}}</p>
+<p><b>Fecha:</b> {{ order.created_at | date: 'YYYY-MM-dd hh:mm' }}</p>
+<p><b>Estado:</b> {{order.status | orderStatus}}</p>
+<p><b>Despacho:</b></p>
+@if(order.shipped!=undefined){
+<p>Dirección: {{order.shipped.address_line1}} {{order.shipped.address_line2}} {{order.shipped.nro}} </p>
+<p>Contacto: {{order.shipped.contact}}</p>
+<p>Observaciones: {{order.shipped.obs}}</p>
+}
+<table class="table table-striped table-bordered align-middle">
+    <thead class="table-light">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Producto</th>
+        <th scope="col">Cantidad</th>
+        <th scope="col">Precio</th>
+        <th scope="col">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let item of order.items">
+            <td><img src="{{item.img}}" width="100"></td>
+            <td>{{item.name}}</td>
+            <td>{{item.quantity}}</td>
+            <td>${{item.price | number | comaToDot}}</td>
+            <td>${{(item.price*item.quantity) | number | comaToDot}}</td>
+        </tr>
+        <tr>
+             <td colspan="5" class="text-end">
+                <span class="float-start fw-bold" >Sub Total:</span> ${{originalPrice | number | comaToDot}}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="5" class="text-end">
+                <span class="float-start fw-bold" >Costo de Envío:</span> ${{order.shipping_cost | number | comaToDot}}
+            </td>
+        </tr>
+        @if(orderDiscountModel && orderDiscountModel.length>0)
+        {
+            <tr>
+                <td colspan="5" class="text-end">
+                    <span class="float-start fw-bold">Descuentos:</span> 
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5" class="text-end">
+                        @for(discount of orderDiscountModel ;track discount.name; let i = $index){
+                            <span class="float-start ms-4 fw-bold text-danger" style="font-size: 14px;">{{discount.name}} - %{{discount.discount_apply}}</span>
+                            <span class="text-danger">- ${{discount.total_discount | number | comaToDot}}</span>
+                        }
+                        
+                </td>
+            </tr>
+        }
+        <tr>
+            <td colspan="5" class="text-end"><span class="float-start fw-bold">Total:</span> ${{order.total_amount | number | comaToDot}}</td>
+        </tr>
+    </tbody>
+</table>
+<div class="text-center">
+    <button class="btn btn-primary-c1" (click)="back()" >Volver</button>
+</div>

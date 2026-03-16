@@ -1,0 +1,78 @@
+
+@if(attributes().length > 0) {
+  <div class="attributes-wrapper mt-4">
+
+    @for(attr of attributes(); track attr.id) {
+      <div class="attribute-block mb-3">
+
+        <div class="attribute-title">
+          <strong>{{ attr.name }}</strong>
+        </div>
+
+        <!-- TEXT TYPE -->
+        @if(attr.code === 'text') {
+          <div class="d-flex flex-wrap gap-2 mt-2">
+
+            @for(value of attr.attr; track value.id) {
+              <button
+                type="button"
+                class="attr-btn"
+                [class.selected]="isSelected(attr.id, value.id)"
+                (click)="selectValue(attr, value)">
+
+                {{ value.label }}
+
+
+              </button>
+            }
+
+          </div>
+        }
+
+        @if(attr.code === 'color') {
+            <div class="d-flex flex-wrap gap-3 mt-2">
+
+                @for(value of attr.attr; track value.id) {
+
+                <div class="color-wrapper text-center">
+
+                    <button
+                    type="button"
+                    class="color-btn"
+                    [style.background]="value.label"
+                    [class.selected]="isSelected(attr.id, value.id)"
+                    (click)="selectValue(attr, value)">
+                    </button>
+
+                </div>
+
+                }
+
+            </div>
+        }
+
+        <!-- IMAGE TYPE -->
+        @if(attr.code === 'image') {
+          <div class="d-flex flex-wrap gap-3 mt-2">
+
+            @for(value of attr.attr; track value.id) {
+              <div
+                class="attr-image"
+                [class.selected]="isSelected(attr.id, value.id)"
+                (click)="selectValue(attr, value)">
+
+                <img [src]="value.img" [alt]="value.img">
+
+              </div>
+            }
+
+          </div>
+        }
+
+      </div>
+
+    }
+
+  </div>
+
+}

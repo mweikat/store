@@ -1,0 +1,46 @@
+<app-checkout-steps [currentStep]="currentStep"></app-checkout-steps>
+
+<app-order-iterate-purchase [totalOrderPrice]="totalOrderPrice()"></app-order-iterate-purchase>
+
+<div class="check-out container my-4">
+    <div class="row">
+      <app-nostock  [cart]="cart()"></app-nostock>
+      <div class="col-12 col-md-6 mb-4">
+         
+        <!-- Shipping Method Selection -->
+        <div [hidden]="currentStep !== 1">
+          <app-shipping-method (methodSelected)="selectedShippingMethodFunc($event)"></app-shipping-method>
+          <app-address (addressSelected)="setSelectedAddress($event)" (whatsappUpdated)="whatsappNumber = $event"></app-address>
+        </div>
+
+        <!-- Payment Selection -->
+        <div [hidden]="currentStep !== 2">
+          <app-payment (paymentSelected)="getPaymentMethod($event)"></app-payment>
+        </div>
+       
+      </div>
+      <div class="col-12 col-md-6">
+        <app-purchase-detail [sub_total_price]="sub_total_price()" [shipping_price]="shipping_price" 
+                             [shippingBusiness]="selectedShippingMethod" [totalOrderPrice]="totalOrderPrice()" 
+                             [discountValue]="discountValue()" [applyDiscountText]="applyDiscountText()" [disc_amount]="disc_amount()"
+                             [shippingAddress]="shippingAddress" 
+                             [contact]="whatsappNumber"></app-purchase-detail>
+      </div>
+
+      <div class="text-center">
+        <button class="btn btn-light mt-3 " *ngIf="currentStep>1" (click)="back()">Atrás</button>&nbsp;&nbsp;
+        @if(currentStep==2){
+          <button class="btn btn-primary-c1 mt-3" type="button" (click)="gotoPayment()" [disabled]="isSubmitting">Comprar</button>
+        }@else{
+          @if(cart().id!=undefined && cart().items.length>0){
+            <button class="btn btn-primary-c1 mt-3" type="button" (click)="next()">Siguiente</button>
+          }@else{
+            <div class="alert alert-danger">
+              <p><i class="bi bi-cart fs-5" ></i> No cuenta con productos en el carrito de compras, <a [routerLink]="'/cart'"><b> Ir al carrito </b></a></p>
+            </div>
+          }
+        }
+      </div>
+    </div>
+</div>
+  

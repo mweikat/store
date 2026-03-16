@@ -1,0 +1,14 @@
+
+@if(isInterateActive() && isAmountCorrect){
+    @if(discountIterate().status=='APPLY'){
+        <div class="container text-center alert iterate-purchase">
+            <b>🎊🎉🥳👏 ¡Yupi! Has alcanzado tu compra número {{discountIterate().real_count}} y ganaste tu descuento 🎊🎉🥳👏</b>
+        </div>
+    }@else{
+        @if(flag2() && discountIterate().real_count!=0 && discountIterate().status!='APPLY'){
+            <div class="container text-center mt-4">
+            ⭐ Te falta <b>{{discountIterate().param_cant_order-discountIterate().purchase}} </b> compra(s) para tu descuento. ¡Vamos por él!
+            </div>
+        }
+    }
+}

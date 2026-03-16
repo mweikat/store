@@ -1,0 +1,192 @@
+<div class="container py-5">
+     <!-- Breadcrumb -->
+     <app-bread-crumb [categories]="categories()"></app-bread-crumb>
+  
+    <!-- Sección de Imágenes y Detalles -->
+     <!-- Mostrar skeleton mientras carga -->
+  @if(!product().id) {
+     <app-product-skeleton></app-product-skeleton>
+  }@else{
+<div class="row">
+      
+      <!-- Galería de Imágenes del Producto (Carrusel) -->
+      <div class="col-md-6">
+        <!--
+        @if(bundlesArray() && bundlesArray().length > 0) {
+          <div class="bundle-badge">
+            <span class="badge bg-danger">¡Oferta!</span>
+          </div>
+        }
+        -->
+        <h1 class="product-title color1 mt-2 d-block d-block d-sm-none">{{ product().name }}</h1>
+        <div class="product-images text-center">
+                     
+          <!-- Imagen o video principal -->
+          <div class="media-wrapper">
+
+            @if(mainMedia().type === 'video') {
+              <iframe 
+                [src]="mainMedia().src | htmlSanitize:'resourceUrl'"
+                allowfullscreen>
+              </iframe>
+            } @else {
+              <img 
+                ImgBrokenDirective 
+                [src]="mainMedia().src" 
+                [alt]="product().name"
+                loading="eager">
+            }
+
+          </div>
+          <!-- Thumbnails -->
+          <div class="mt-3 d-flex justify-content-start flex-wrap gap-2">
+            <!-- Video thumbnail -->
+            @if(product().video?.code) {
+              <div (click)="changeMainMedia('video', 'https://www.youtube.com/embed/' + product().video?.code)">
+                <img src="https://img.youtube.com/vi/{{product().video?.code}}/0.jpg" alt="Video" class="thumbnail-img" title="Video del producto">
+                <i class="bi bi-play-circle-fill position-absolute" style="font-size: 1.5rem; top: 8px; left: 8px; color: white;"></i>
+              </div>
+            }
+
+            <!-- Imagenes miniatura -->
+            <img 
+              *ngFor="let img of product().imgs" 
+              [src]="img.img" 
+              alt="Imagen secundaria" 
+              class="thumbnail-img" 
+              (click)="changeMainMedia('image', img.img)">
+          </div>
+
+          
+          <!-- Thumbnails o imágenes adicionales 
+          <div class="mt-3 d-flex justify-content-start">
+            <img *ngFor="let img of product().imgs" 
+                  [src]="img.img" 
+                  alt="Imagen secundaria" 
+                  class="thumbnail-img mx-2"
+                  (click)="changeImage(img.img)">
+          </div>-->
+        </div>
+      </div>
+  
+      <!-- Información del Producto -->
+      <div class="col-md-6">
+        <h1 class="product-title color1 d-none d-md-block">{{ product().name }}</h1>
+        <div class="product-info">
+          @if(product().descShort){
+            <div class="color1" [innerHTML]="product().descShort | htmlSanitize:'html'"></div>
+          }
+          @if(product().price && product().price > 0){
+            <div class="price-section mt-4">
+              <p class="price color1">
+                <span class="old-price text-muted price-out text-decoration-line-through" *ngIf="product().priceSale">
+                  ${{ product().price | number }}
+                </span>
+                <span class="current-price color2">
+                  ${{ product().priceSale ? (product().priceSale | number | comaToDot) : (product().price | number | comaToDot) }}
+                </span>
+              </p>
+            </div>
+            
+            @if(bundlesArray() && bundlesArray().length > 0 && product().stock>0) {
+              <div class="bundle-alert alert alert-warning mt-3" (click)="scrollToBundles()" style="cursor:pointer;">
+                <i class="bi bi-box-seam me-2"></i>
+                <strong>¡Oferta especial!</strong> Este producto tiene combos con descuento
+              </div>
+            }
+          }
+          @defer (when product().stock) {
+            @if(product().stock > 0){
+              <app-product-attributes
+              [product]="product()"
+              (imageSelected)="changeMainMedia('image', $event)"
+              (attributesChanged)="onAttributesChanged($event)"></app-product-attributes>
+              <!--p><strong>En stock: </strong>Disponible para envío inmediato</p -->  
+            }@else{
+              <p><strong>Stock: </strong> <span class="text-danger">Agotado</span></p>
+              <app-product-notice [product]="product()"></app-product-notice>
+            }
+          }
+          <!-- Botones de Comprar -->
+          @defer{
+            @if(product().stock > 0){
+              <div class="input-group mb-3" style="width: 150px;">
+                <span class="input-group-text" style="cursor: pointer;" (click)="restCant()">-</span>
+                <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)" min="1" max="{{product().stock}}" value="{{cantProduct}}" readonly>
+                <span class="input-group-text" style="cursor: pointer;" (click)="addCant()">+</span>
+              </div>
+              <!-- Botones para pantallas grandes -->
+              <div class="buy-button d-flex justify-content-start mt-3 d-none d-md-flex">
+                <button class="btn btn-primary-c1 me-2" (click)="addToCart(product())" [disabled]="isAddingToCart()" [class.disabled]="isAddingToCart()">
+                  {{ isAddingToCart() ? 'Agregando...' : 'Agregar al carrito' }}
+                </button>
+                  
+                <button class="btn btn-primary-c2" (click)="buyNow(product())">Comprar</button>
+
+              </div>
+              
+              <!-- Botones para pantallas pequeñas -->
+              <div class="fixed-buttons d-md-none">
+                <button class="btn btn-primary-c1" (click)="addToCart(product())">Agregar al carrito</button>
+                <button class="btn btn-primary-c2" (click)="buyNow(product())">Comprar</button>
+              </div>
+            
+              <br>
+              <!-- despacho-->
+              <select class="form-select" (change)="getDelivery()" [(ngModel)]="methodSelected" style="font-size: small; max-width: 400px;">
+                <option value="0">Seleccione Envío</option>
+                @for(method of shippingMehtods(); track method.id){
+                  <option value="{{method.id}}">{{method.name}}</option>
+                }
+              </select>
+              @if(isShowMethod()){
+                <br>
+                <div class="alert alert-success" style=" font-size: 12px;">
+                  <b>{{deliveryData()?.delivery_text}} </b>
+                    {{deliveryData()?.arrival_estimated_time}}
+                </div>
+              }
+
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+    
+    <!-- bundle product-->
+    @defer{ 
+      @if(product().stock > 0){
+        @if(bundlesArray() && bundlesArray().length>0){
+          <app-product-bundles [bundles]="bundlesArray()" (bundleSelected)="onBundleSelected($event)"></app-product-bundles>
+        }
+      }
+    }
+    @defer{
+      <!-- Sección de Características -->
+      <app-description [desc]="this.product().desc" *ngIf="this.product().desc"></app-description>
+      <!-- productos de la categoría -->
+      <app-category-rel [categoriesNames]="categoriesNames" [productIdToHide]="product().id"></app-category-rel>
+    }
+    <!-- Sección de Opiniones o Reviews --
+    <div class="row mt-5">
+      <div class="col-12">
+        <h3 class="color1">Opiniones de los Clientes</h3>
+        <div class="review" *ngFor="let review of reviews">
+          <p class="color3"><strong>{{ review.user }}</strong></p>
+          <p class="color4">{{ review.comment }}</p>
+          <p class="text-muted">Calificación: {{ review.rating }} / 5</p>
+        </div>
+      </div>
+    </div-->
+  
+  </div>
+  
+  <!-- Al final del componente -->
+@if(bundlesArray() && bundlesArray().length > 0) {
+  <div class="bundle-tab d-md-none">
+    <button class="btn btn-danger" (click)="scrollToBundles()">
+      <i class="bi bi-gift-fill me-2"></i>Ofertas!!
+    </button>
+  </div>
+}

@@ -1,0 +1,23 @@
+<div class="auth container-fluid d-flex justify-content-center align-items-center bg-light" style="min-height: 60vh;">
+    <div class="card rounded-3 elevate login-card p-4">
+      <div class="card-body">
+        <h4 class="title text-center mb-3">Verficación de email</h4>
+        <div class="text-center">
+          @if(isVerify()){
+            <p class="text-success">Su email ha sido verificado correctamente. <br> 🐾 Gracias! 🐾</p>
+          }@else {
+            <p>Actualmente se está verificando su email. Favor espere un momento.</p>
+          }
+
+        </div>
+        <div class="mt-4 text-center mb-4">
+ 
+            <button type="button" class="btn btn-primary-c1" routerLink="/" [hidden]="!isLogged"> Ir al home </button>
+   
+            <button type="button" class="btn btn-primary-c1" routerLink="/auth/login" [hidden]="isLogged"> Inicia sesión </button>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  

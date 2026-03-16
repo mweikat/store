@@ -1,0 +1,24 @@
+<div class="user-menu"  >
+  <div class="btn-group" *ngIf="isLogged; else noLoginBlock">
+    <a class="btn dropdown-toggle d-none d-md-block" data-bs-toggle="dropdown" aria-expanded="false">
+      {{user.name}}
+    </a>
+    <a class="btn  dropdown-toggle d-block d-md-none" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Iniciar sesión">
+      <i class="bi bi-person"></i>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end">
+      <li><a class="dropdown-item" [routerLink]="'/admin/orders'">Mis Compras</a></li>
+      <li><a class="dropdown-item" [routerLink]="'/admin/profile'">Mi Perfil</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item btn-go-cart" [routerLink]="'/logout'">Salir</a></li>
+    </ul>
+  </div>
+
+  <ng-template #noLoginBlock>
+    <a [routerLink]="'/auth/login'" class="nav-link" aria-label="Iniciar sesión">
+      <i class="bi bi-person"></i>
+    </a>
+  </ng-template>
+  
+
+</div>

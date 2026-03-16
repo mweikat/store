@@ -1,0 +1,24 @@
+@defer{
+    <div class="row">
+      <div class="col-12 text-start">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb justify-content-start">
+            <li class="breadcrumb-item" style="font-size: 12px;"><a [routerLink]="'/'">Inicio</a></li>
+            @for(category of categories; track category.id){
+              <li class="breadcrumb-item" style="font-size: 12px;"><a [routerLink]="'/categories/'+category.url_name">{{category.name}}</a></li>
+            }
+          </ol>
+        </nav>
+      </div>
+    </div>
+    }@placeholder {
+      <div class="row">
+      <div class="col-12 text-start">
+        <nav aria-label="breadcrumb">
+           <ol class="breadcrumb justify-content-start">
+            <li class="breadcrumb-item" style="font-size: 12px;"><a [routerLink]="'/'">Inicio</a></li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+    }

@@ -1,0 +1,74 @@
+<app-address-add-edt></app-address-add-edt>
+@if(address.length > 0) {
+    @for(add of address; track add.id) {
+        <div class="card mb-3 shadow-sm border-1">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <!-- Selección por defecto -->
+                    <div class="col-2 text-center">
+                        <input 
+                            type="radio" 
+                            name="defaultAddress" 
+                            class="form-check-input" 
+                            [value]="add.id" 
+                            [checked]="add.default === '1'" 
+                            aria-label="Seleccionar dirección por defecto"
+                            (click)="updateDefault(add)"
+                        >
+                    </div>
+
+                    <!-- Información de la dirección -->
+                    <div class="col-7">
+                        <p class="mb-1">Nombre: <strong>{{ add.name }}</strong></p>
+                        <p class="mb-1">Dirección: <strong>{{ add.address_line1 }}</strong></p>
+                        <p class="mb-1">Número: <strong>{{ add.address_line2 }}</strong></p>
+                        <p class="mb-1">Detalle: <strong>{{ add.nro }}</strong></p>
+                        <p class="mb-1">Observaciones: <strong>{{ add.obs }}</strong></p>
+                        <p class="mb-0">Teléfono contacto: <strong>@if(add.contact){+56} {{ add.contact }}</strong></p>
+                    </div>
+
+                    <!-- Botones de acciones -->
+                    <div class="col-3 text-end">
+                        <button 
+                            class="btn btn-primary-c1 btn-sm" 
+                            title="Editar dirección"
+                            type="button"
+                            (click)="edit(add)"
+                        >
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button 
+                            class="btn btn-danger btn-sm ms-2" 
+                            title="Eliminar dirección"
+                            type="button"
+                            (click)="modalShow(add)"
+                        >
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+<!-- Delete Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Confirmación Eliminar Dirección</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Desea eliminar la dirección <b>{{toShipDelete.name}}</b> ?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="modalHide()">Cancelar</button>
+          <button type="button" class="btn btn-primary-c2" (click)="delete()">Eliminar</button>
+        </div>
+      </div>
+    </div>
+</div>
+} @else {
+    <p class="text-muted">No tiene direcciones asociadas.</p>
+}

@@ -1,0 +1,50 @@
+<div class="checkout-failure container py-5 text-center">
+    <div class="card shadow-sm p-4">
+      <div class="card-body">
+        <div class="mb-4">
+          <img 
+            src="assets/images/error-icon.png" 
+            alt="Error en la compra" 
+            class="error-icon img-fluid"
+          />
+        </div>
+        <h1 class="text-danger">¡Lo sentimos!</h1>
+        <p class="text-secondary mt-3">
+          No hemos podido completar tu pedido. Por favor, intenta nuevamente o contacta a nuestro soporte.
+        </p>
+        
+        <!-- Posibles opciones -->
+        <div class="error-options my-4">
+          <h5 class="text-dark mb-3">¿Qué puedes hacer ahora?</h5>
+          <ul class="list-group">
+            <li class="list-group-item">
+              Verifica los datos de tu tarjeta o método de pago.
+            </li>
+            <li class="list-group-item">
+              Asegúrate de tener conexión a internet.
+            </li>
+            <li class="list-group-item">
+              Intenta realizar el pedido nuevamente en unos minutos.
+            </li>
+          </ul>
+        </div>
+  
+        <!-- Botones de acción -->
+        <div class="mt-4">
+          <a 
+            routerLink="/checkout" 
+            class="btn btn-primary-c1 me-2"
+          >
+            Intentar de nuevo
+          </a>
+          <a 
+            routerLink="/contacto" 
+            class="btn btn-outline-secondary"
+          >
+            Contactar soporte
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  

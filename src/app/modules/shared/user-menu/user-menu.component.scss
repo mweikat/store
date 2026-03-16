@@ -1,0 +1,35 @@
+.user-menu {
+
+    position: relative;
+  
+    .btn-go-cart {
+        
+        font-weight: bold;
+        text-align: center;
+        padding: 0.5rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .dropdown-toggle {
+      
+      padding: 0.5rem;
+      position: relative;
+    }
+  
+    .dropdown-menu {
+      min-width: 200px;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  
+      .dropdown-item {
+        
+        padding: 0.5rem 1rem;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+    }
+
+    .nav-link {
+      padding: unset;
+    }
+  }

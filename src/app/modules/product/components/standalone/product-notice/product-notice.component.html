@@ -1,0 +1,29 @@
+@if(statusNoti().value==='1'){
+    <p><b>Quiero saber cuando este producto esté disponible:</b></p>
+    <form class="row g-3" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="col-12 col-md-4">
+        <input type="text" class="form-control" placeholder="Nombre" formControlName="name" maxlength="50" [readonly]="isUserLogged">
+        <div *ngIf="this.form.get('name')?.invalid && this.form.get('name')?.touched" class="invalid-feedback  d-inline">
+            {{getErrorMessage('name')}}
+        </div>
+    </div>
+    
+    <div class="col-12 col-md-8">
+        <input type="text" class="form-control" placeholder="email" formControlName="email" maxlength="100" [readonly]="isUserLogged">
+        <div *ngIf="this.form.get('email')?.invalid && this.form.get('email')?.touched" class="invalid-feedback  d-inline">
+            {{getErrorMessage('email')}}
+        </div>
+    </div>
+    
+    <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-phone"></i>&nbsp;+56</span>
+        <input type="text" class="form-control" formControlName="phone" placeholder="Teléfono (9 dígitos)" (keypress)="allowOnlyNumbers($event)" maxlength="9" minlength="9" [readonly]="isUserLogged">
+    </div>
+    <div *ngIf="this.form.get('phone')?.invalid && this.form.get('phone')?.touched" class="invalid-feedback  d-inline">
+        {{getErrorMessage('phone')}}
+    </div>
+    
+        <button type="submit" class="btn btn-primary-c1 mb-3" [disabled]="form.invalid || isSubmitting">Enviar</button>
+    
+    </form>
+}

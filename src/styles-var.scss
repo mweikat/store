@@ -1,0 +1,216 @@
+// Paleta de colores principales
+$invalid-form-color: red;
+$link-color: #efbc98; // Color para enlaces
+
+$primary-color: #917f6e; // Color principal para acentos y detalles
+$primary-color-v1:#6d5742;
+$secondary-color: #efbc98; // Color secundario para acentos ligeros
+$tertiary-color: #efd2be; // Color terciario para fondos suaves
+$quaternary-color: #efe1d1; // Color cuaternario para fondos neutros
+$quaternary-color2: #ffedd9;
+$light-bg: white; // Fondo principal (blanco)
+$dark-text: black; // Color de texto principal (negro)
+$warning-color: #ffbd59; // Color de advertencia y avisos importantes
+$warning-color-v1:rgba(253,201,13,.25);
+$price-color-1: #e74c3c;
+
+// Tipografía
+$font-family-main: "Montserrat", sans-serif; // Fuente principal
+$font-weight-main: 500;
+$font-05: 0.5rem;
+$font-07: 0.7rem;
+$font-09: 0.9rem;
+
+//heeader
+$header-background-color: $light-bg;
+$header-media-background-color: $light-bg;
+$header-border-color: $tertiary-color;
+$header-nav-link-color: $dark-text;
+$header-nav-link-color-active: $primary-color-v1;
+$header-dropdown-menu: $light-bg;
+$header-dropdown-menu-text: $dark-text;
+$header-dropdown-menu-hover: $primary-color-v1;
+$header-dropdown-menu-hover-background: $warning-color-v1;
+$header-dropdown-active-link: $primary-color;
+$header-dropdown-active-border: $primary-color;
+$header-sidebar-background:  $light-bg;
+$header-sidebar-header: $tertiary-color;
+$header-sidebar-header-tilte: $primary-color;
+$header-sidebar-header-btn-close: $dark-text;
+$header-sidebar-nav-link: $dark-text;
+$header-sidebar-nav-link-hover: $primary-color;
+$header-sidebar-overlay: rgba(0, 0, 0, 0.5);
+
+//auth
+$auth-title: $primary-color;
+$autn-input-group-text-b: $quaternary-color;
+$autn-input-group-text-c: $primary-color;
+$autn-input-forgot-link: $link-color;
+$auth-toggle-password: $primary-color;
+$auth-form-check-label:$dark-text;
+$auth-terms-conditions-link:$link-color;
+$auth-back-link:$link-color;
+
+//cart
+$cart-list-title: $primary-color;
+$cart-list-item-background:#fef1c22b;
+$cart-list-product-name: $primary-color;
+$cart-list-product-price: $secondary-color;
+$cart-list-quantity-btn: $primary-color;
+$cart-list-quantity-border: $secondary-color;
+$cart-list-quantity-hover-background: $secondary-color;
+$cart-list-quantity-hover-color: $light-bg;
+$cart-list-btn-danger: $warning-color;
+$cart-list-btn-danger-border: $warning-color;
+$cart-list-btn-danger-hover-background: $warning-color;
+$cart-list-total: #fff3cd;
+$cart-list-total-h5: $primary-color;
+$cart-list-total-btn-back: $primary-color;
+$cart-list-total-btn-border: $primary-color;
+$cart-list-total-btn-hover: $primary-color;
+
+//categories
+$cat-product-title: $primary-color;
+$cat-product-card-border: $tertiary-color;
+$cat-product-card-background: $light-bg;
+$cat-product-card-img-back: $quaternary-color;
+$cat-product-card-img-border: $tertiary-color;
+$cat-product-card-price: $primary-color-v1;
+$cat-product-card-price-sale: #dc3545;
+
+//check out
+$check-title: $primary-color;
+$check-payment-section: $quaternary-color;
+$check-payment-section-accordion-collapse: $primary-color;
+$check-confirm-card: $light-bg;
+$check-confirm-h1: $primary-color;
+$check-confirm-text: $dark-text;
+$check-confirm-order: $tertiary-color;
+$check-confirm-order-item: $dark-text;
+$check-confirm-order-item-detail: $primary-color;
+$check-fail-card-back: $light-bg;
+$check-fail-card-text:$dark-text;
+$check-fail-card-h1: #d9534f;
+$check-fail-card-error-back: $tertiary-color;
+$check-fail-card-item: $dark-text;
+
+$checkout-discount-iterate-backgorund-msg: $quaternary-color2;
+$checkout-discount-iterate-color-msg: $primary-color-v1;
+$checkout-discount-iterate-border-msg: $link-color;
+
+$checkout-delivery-data-background-msg:$quaternary-color2;
+$checkout-delivery-data-color-msg:$primary-color-v1;
+$checkout-delivery-data-border-msg:none;
+
+//spinner
+$spinner-color: $secondary-color;
+
+//top
+$top-background: $primary-color;
+$top-text-1: $secondary-color;
+$top-text-2: $warning-color;
+$top-a: $warning-color;
+
+//home
+$home-delivery-background: $primary-color;
+$home-delivery-text: $light-bg;
+$home-delivery-icon: $light-bg;
+$home-delivery-iconbox: $warning-color;
+
+$home-pcategory-background: $light-bg;
+$home-pcategory-title: $primary-color;
+
+$home-sale-background: rgb(255 189 89 / 11%);
+$home-sale-product-title: $primary-color;
+$home-sale-product-border: $tertiary-color;
+$home-sale-product-background: $light-bg;
+$home-sale-product-img-background: $quaternary-color;
+$home-sale-product-img-border: $tertiary-color;
+$home-sale-normal-price: $primary-color-v1;
+$home-sale-text-decoration: #6c757d;
+
+$home-slide1-indicators: $primary-color;
+
+//product
+$prod-rel-title: $primary-color;
+$prod-rel-normal-price: $primary-color-v1;
+$prod-rel-sale-price: $price-color-1;
+
+$prod-bundle-title: $primary-color-v1;
+$prod-bundle-desc: $primary-color;
+$prod-bundle-price: $price-color-1;
+$prod-bundle-price-free: $price-color-1;
+$prod-bundle-old-price: $primary-color;
+
+$prod-attr-border:$quaternary-color2;
+$prod-attr-title: $dark-text;
+
+$prod-attr-color-border: $quaternary-color2;
+$prod-attr-color-selected: $primary-color-v1;
+$prod-attr-color-shadow-selected: $light-bg;
+
+$prod-attr-text-border: $quaternary-color2;
+$prod-attr-text-background: $light-bg;
+$prod-attr-text-border-hover: $primary-color;
+$prod-attr-text-border-selected-background: $tertiary-color;
+
+//shared
+//header cart
+$header-menu-cart-dropdown-toggle: $primary-color;
+$header-menu-cart-dropdown-toggle-hover: $primary-color;
+$header-menu-cart-dropdown-toggle-icon: $primary-color;
+$header-menu-cart-badge: $warning-color;
+$header-menu-cart-badge-text: $light-bg;
+$header-menu-cart-menu-border: $tertiary-color;
+$header-menu-cart-menu-background: $light-bg;
+$header-menu-cart-menu-item-color: $primary-color;
+$header-menu-cart-menu-item-quantity-color: $primary-color-v1;
+$header-menu-cart-menu-item-color-bckground: $tertiary-color;
+$header-menu-cart-btn-back: $secondary-color;
+$header-menu-cart-btn-color: $light-bg;
+$header-menu-cart-btn-back-hover: $secondary-color;
+$header-menu-cart-btn-color-hover: $light-bg;
+
+//steps
+$steps-bg: $quaternary-color;
+$steps-bg-em: $primary-color;
+$steps-list-item-cir-background: $primary-color;
+$steps-list-item-cir-color: $light-bg;
+$steps-list-item-label: $primary-color;
+$steps-list-circ-background: $quaternary-color;
+$steps-list-circ-text: $dark-text;
+$steps-list-circ-label: $dark-text;
+
+//header user menu
+$header-user-menu-icon: $primary-color;
+$header-user-menu-btn-background: $secondary-color;
+$header-user-menu-btn-text: $light-bg;
+$header-user-menu-dropdown-toggle: $primary-color;
+$header-user-menu-dropdown-toggle-hover: $primary-color;
+$header-user-menu-dropdown-border: $tertiary-color;
+$header-user-menu-dropdown-background: $light-bg;
+$header-user-menu-dropdown-text: $dark-text;
+$header-user-menu-dropdown-background-hover: $tertiary-color;
+$header-user-menu-dropdown-color-hover: $primary-color;
+
+//user admin
+$user-admin-menu-text: $primary-color;
+$user-admin-menu-border: $light-bg;
+$user-admin-menu-hover-background: $secondary-color;
+$user-admin-menu-hover-text: $light-bg;
+$user-admin-menu-active-background: $primary-color;
+$user-admin-menu-active-text: $light-bg;
+$user-admin-menu-icon:$primary-color;
+
+//orders
+$user-orders-title: $primary-color;
+$user-orders-badge-success-background: $secondary-color;
+$user-orders-badge-success-text: $light-bg;
+$user-orders-badge-warning-background: $warning-color;
+$user-orders-badge-warning-text: $primary-color-v1;
+$user-orders-badge-danger-background: $price-color-1;
+$user-orders-badge-danger-text: $light-bg;
+
+//footer
+$footer-background: $dark-text;
+$footer-text: $light-bg;

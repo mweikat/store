@@ -1,0 +1,55 @@
+
+<footer class="footer py-5 mt-4">
+    <div class="container">
+      <div class="row">
+        <!-- Sección de contacto -->
+        <div class="col-12 col-md-4 mb-4">
+          <h5 class="text-uppercase">Contáctanos</h5>
+          @if(business.info.email){
+            <p class="mb-2">{{business.info.email}}</p>
+          }
+          
+          @if(business.info.phone){
+            <p class="mb-2">wsp +{{business.info.cod_Area}} {{business.info.phone}}</p> 
+          }
+          <!--a href="#" class="text-white text-decoration-underline">Encuentra tu tienda más cercana aquí</a -->
+        </div>
+  
+        <!-- Sección de información -->
+        <div class="col-12 col-md-4 mb-4">
+          <h5 class="text-uppercase">Información</h5>
+          <ul class="list-unstyled">
+            <li><a [routerLink]="'/info/terminos-y-condiciones'" class="text-white text-decoration-none" aria-label="Terminos y condiciones">Términos y condiciones</a></li>
+            <li><a [routerLink]="'/info/devoluciones'" class="text-white text-decoration-none" aria-label="Cambios y devoluciones">Cambios y devoluciones</a></li>
+            <li><a [routerLink]="'/info/privacidad'" class="text-white text-decoration-none" aria-label="Política de privacidad">Política de privacidad</a></li>
+            <li><a [routerLink]="'/info/despachos'" class="text-white text-decoration-none" aria-label="Política de despacho">Política de despacho</a></li>
+            <li><a [routerLink]="'/info/horarios'" class="text-white text-decoration-none" aria-label="Horario de despacho">Horario de despacho</a></li> 
+            <!--li><a href="#" class="text-white text-decoration-none">Ganadores</a></li>
+            <li><a href="#" class="text-white text-decoration-none">Cyber Day</a></li-->
+            <!--li><a href="#" class="text-white text-decoration-none">Sobre Nosotros</a></li-->
+            <!--li><a href="#" class="text-white text-decoration-none">Blog</a></li-->
+            <!--li><a href="#" class="text-white text-decoration-none">Contáctanos</a></li-->
+            <!--li><a href="#" class="text-white text-decoration-none">Quiénes Somos</a></li-->
+            <!--li><a href="#" class="text-white text-decoration-none">Preguntas Frecuentes</a></li-->
+            <!--li><a href="#" class="text-white text-decoration-none">Únete a nuestro equipo</a></li-->
+            <!--li><a href="#" class="text-white text-decoration-none">Tu opinión</a></li-->
+          </ul>
+        </div>
+  
+        <!-- Sección del logo -->
+        <div class="col-12 col-md-4 text-center">
+          <img [src]="logoFooter" alt="Logo" class="img-fluid mb-3" style="max-width: 150px;">
+          <p>
+            @if(rrssModel().facebook){
+              <a href="{{rrssModel().facebook}}" target="_blank" aria-label="Facebook de Mi Patita"><i class="bi bi-facebook"></i></a>&nbsp;&nbsp;
+            }
+            @if(rrssModel().instagram){
+              <a href="{{rrssModel().instagram}}" target="_blank" aria-label="Instagram de Mi Patita"><i class="bi bi-instagram"></i></a>
+            }
+          </p>
+          
+          <p>© 2024 - Todos los derechos reservados. Sitio construido por <a href="https://joseluisrdf.cl" target="_blank">&#64;Teno</a></p>
+        </div>
+      </div>
+    </div>
+</footer>

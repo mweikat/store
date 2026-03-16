@@ -1,0 +1,44 @@
+
+<div class="container-fluid">
+    <div class="card rounded shadow forgot">
+        <div class="card-title text-center mt-4">        
+            
+        </div>
+        <div class="card-body">
+            <div class="title text-center mb-4">
+                <h5><b>Recuperar Contraseña</b></h5>
+            </div>
+            <form class="px-5" *ngIf="!isSend;else sendOk" [formGroup]="formEmail" (ngSubmit)="sendEmail()">
+                
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <input type="email" class="form-control" placeholder="Ingrese su Email" aria-label="Email" formControlName="email">
+                    <div *ngIf="this.formEmail.get('email')?.invalid && this.formEmail.get('email')?.touched" class="invalid-feedback text-center d-inline">
+                        {{getErrorMessage()}}
+                    </div>
+                </div>
+
+                <app-recaptcha (token)="responseToken($event)" (active)="activeRecaptcha($event)" ></app-recaptcha>
+
+                <div *ngIf="errorDiv" class="alert alert-danger mt-2">
+                    <small>{{errorText}}</small>
+                </div>
+                <div class="form-text text-center">
+                    Ingrese el correo electrónico de su cuenta. Recibirá un email con un link el cual debe visitar para poder recuperar su contraseña.
+                </div>
+                <div class="mb-4">&nbsp;</div>
+                <div class="mt-4 text-center">
+                    <button class="btn btn-primary-c1" type="submit" style="width: 80%;">Recuperar Contraseña</button>
+                </div>
+                <div class="mt-4 text-center">
+                    Volver al <a routerLink="/auth/login">login</a>
+                </div>
+                <div class="mb-4 mt-4">&nbsp;</div>
+            </form>
+            <ng-template #sendOk>
+                <div class="alert alert-success">Se le ha enviado un correo para poder recuperar su contraseña. <br></div>
+                <div class="text-center"><a routerLink="/auth/login"><span>Regresar al login</span></a></div>
+            </ng-template>
+        </div>
+    </div>
+</div>

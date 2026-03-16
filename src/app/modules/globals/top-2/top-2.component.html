@@ -1,0 +1,12 @@
+@if(topBanner() && topBanner().text!=undefined){
+  <div class="construction-container">
+      <div class="construction-marquee">
+        <div class="marquee-content" [innerHTML]="topBanner().text | htmlSanitize:'html'">
+         
+        </div>
+        <div class="marquee-content"  [innerHTML]="topBanner().text | htmlSanitize:'html'">
+          
+        </div>
+      </div>
+  </div>
+}

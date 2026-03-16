@@ -1,0 +1,56 @@
+
+
+.checkout-failure {
+    .card {
+      border: none;
+      border-radius: 12px;
+  
+      .error-icon {
+        width: 100px;
+        height: auto;
+      }
+  
+      h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        
+      }
+  
+      .error-options {
+        ul {
+          
+          border-radius: 8px;
+  
+          .list-group-item {
+            background-color: transparent;
+            border: none;
+            font-size: 1rem;
+            
+          }
+        }
+      }
+  
+      /*.btn {
+        padding: 0.8rem 1.5rem;
+        border-radius: 25px;
+  
+        &.btn-primary-c1 {
+          background-color: vars.$primary-color;
+          border: none;
+          &:hover {
+            background-color: color.adjust(vars.$primary-color,  $lightness:10%);
+          }
+        }
+  
+        &.btn-outline-secondary {
+          border-color: vars.$secondary-color;
+          color: vars.$primary-color;
+          &:hover {
+            background-color: vars.$secondary-color;
+            color: #fff;
+          }
+        }
+      }*/
+    }
+  }
+  

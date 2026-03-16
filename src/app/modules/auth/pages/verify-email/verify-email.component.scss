@@ -1,0 +1,15 @@
+@use 'src/styles-var.scss' as vars;
+@use 'sass:color';
+
+body, html {
+  height: 100%;
+}
+.auth{
+  .login-card {
+    max-width: 420px;
+    width: 100%;
+  }
+  .login-logo {
+    width: 60%; 
+  }
+}

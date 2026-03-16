@@ -1,0 +1,42 @@
+<div class="d-flex flex-column mt-4 align-items-center">
+    <h1>Política de Despachos</h1>
+    <div class="row col-12 col-md-8 col-lg-6 mt-4">
+        <!--p>En <strong>Mi Patita</strong>, nos comprometemos a ofrecer un servicio de despacho eficiente y puntual para nuestros clientes. A continuación, te presentamos las condiciones y horarios de nuestros despachos:</p>
+
+        <h5 class="mt-4"><u>1. Zonas de Despacho</u></h5>
+
+        <p>Realizamos despachos exclusivamente en las zonas de <strong>Placilla-Curauma</strong>. Actualmente, no realizamos envíos fuera de esta área.</p>
+
+        <h5 class="mt-4"><u>2. Tiempos de Entrega</u></h5>
+
+        <ul class="ms-4 mt-2">
+            <li><strong>Compras realizadas en horario AM o PM (hasta las 18:00 hrs.):</strong> Los pedidos serán despachados durante el mismo día (si es domingo o festivo, se dejará para el siguiente día hábil).</li>
+            <li><strong>Compras realizadas después de las 18:00 hrs:</strong> Los pedidos efectuados después de las 19:00 hrs serán despachados en el horario AM del siguiente día hábil.</li>
+        </ul>
+
+        <h5 class="mt-4"><u>3. Confirmación de Entrega</u></h5>
+
+        <p>Antes de la entrega, nuestro equipo se pondrá en contacto contigo para confirmar la hora aproximada de llegada del pedido. Asegúrate de proporcionar una dirección y un número de contacto correcto para evitar inconvenientes.</p>
+
+        <h5 class="mt-4"><u>4. Costo de Despacho</u></h5>
+
+        <p>El costo de despacho se calculará al momento de finalizar tu compra y dependerá de la dirección de entrega ingresada. La información sobre costos será claramente mostrada antes de realizar el pago.</p>
+
+        <h5 class="mt-4"><u>5. Modificaciones en la Política de Despacho</u></h5>
+
+        <p><strong>Mi Patita</strong> se reserva el derecho de modificar esta política en cualquier momento. Cualquier cambio será notificado a través de nuestro sitio web <a href="/" target="_blank">mipatita.cl</a>.</p -->
+        <h5 class="mt-4"><u>Horarios de Despacho</u></h5>
+
+        <p>Los despachos se realizan en el siguiente horario:</p>
+        <ul class="ms-4">
+            @for(schedule of scheduleModel; track schedule.id; let i = $index){
+                
+                <li><strong>{{schedule.day}}:</strong> de <strong>{{schedule.init | slice: 0 : 5 }} a {{schedule.end | slice: 0 : 5 }} hrs</strong>.</li>
+                
+            }
+            
+        </ul>
+
+        <small><strong>*Domingos y días festivos:</strong> no realizamos despachos.</small>
+    </div>
+</div>

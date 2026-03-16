@@ -1,0 +1,84 @@
+<div class="user-account container py-4">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8">
+        <!-- Información del Usuario -->
+        <div class="card mb-4 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title text-center">Información Personal</h5>
+           
+
+              <!-- Email -->
+              <div class="mb-3">
+                <label for="firstName" class="form-label">Email</label>
+                <input
+                  type="text"
+                  id="email"
+                  class="form-control"
+                  readonly="true"
+                  [(ngModel)]="email"
+                />
+                <div class="invalid-feedback">Por favor, ingrese un nombre válido.</div>
+              </div>
+
+              <form (ngSubmit)="updateUserInfo()" [formGroup]="userForm">
+                <!-- Nombre -->
+                <div class="mb-3">
+                  <label for="firstName" class="form-label">Nombre</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    formControlName="firstName"
+                    class="form-control"
+                    [ngClass]="{'is-invalid': userForm.get('firstName')?.touched && userForm.get('firstName')?.invalid}"
+                    maxlength="30"
+                  />
+                  <div class="invalid-feedback">Por favor, ingrese un nombre válido.</div>
+                </div>
+    
+                <!-- Apellido -->
+                <div class="mb-3">
+                  <label for="lastName" class="form-label">Apellido</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    formControlName="lastName"
+                    class="form-control"
+                    [ngClass]="{'is-invalid': userForm.get('lastName')?.touched && userForm.get('lastName')?.invalid}"
+                    maxlength="30"
+                  />
+                  <div class="invalid-feedback">Por favor, ingrese un apellido válido.</div>
+                </div>
+    
+                <!-- Teléfono -->
+                <div class="mb-3">
+                  <label for="phone" class="form-label">Teléfono</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-phone"></i>&nbsp;+56</span> 
+                    <input
+                      type="text"
+                      id="phone"
+                      formControlName="phone"
+                      class="form-control"
+                      [ngClass]="{'is-invalid': userForm.get('phone')?.touched && userForm.get('phone')?.invalid}"
+                      maxlength="9"
+                    />
+                  </div>
+                  <div class="invalid-feedback">Por favor, ingrese un teléfono válido.</div>
+                </div>
+    
+                <button type="submit" class="btn btn-primary-c1 w-100">Guardar Cambios</button>
+            </form>
+          </div>
+        </div>
+  
+        <!-- Verificación de Email -->
+        @if(!isEmailVerified){
+          <div class="alert alert-warning">
+            Tu email no ha sido verificado. Por favor, revisa tu bandeja de entrada o
+            haz clic <span (click)="resendVerificationEmail()" style="cursor: pointer;"><b>aquí</b></span> para reenviar el correo de verificación.
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+  

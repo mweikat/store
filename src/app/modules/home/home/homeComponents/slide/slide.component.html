@@ -1,0 +1,94 @@
+<div class="slide1">
+  <div class="visually-hidden">
+  <h4 class="fw-bold">{{title}}</h4>
+  <div [innerHTML]="desc?desc:'' |htmlSanitize :'html'"></div>
+</div>     
+<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" [attr.data-bs-interval]="carouselInterval">
+    <!-- Puntos indicadores -->
+    <div class="carousel-indicators">
+      @for (slide of slides(); track slide.id; let i = $index) {
+      <button 
+        type="button" 
+        data-bs-target="#carouselExampleIndicators" 
+        [attr.data-bs-slide-to]="i" 
+        [class.active]="i === 0" 
+        [attr.aria-current]="i === 0 ? 'true' : null" 
+        attr.aria-label="Slide {{i + 1}}"
+      ></button>
+    }
+    </div>
+  
+    <!-- Imágenes del carrusel -->
+    <div class="carousel-inner">
+      @if(hasSlides()) {
+
+        @for(slide of slides(); track slide.id; let i = $index ){
+
+          <div class="carousel-item" [ngClass]="i==0 ? 'active' : ''">
+            <ng-container *ngIf="slide.link; else noLink">
+              <!--a [routerLink]="slide.link" [target]="isExternal(slide.link) ? '_blank' : '_self'" -->
+              <a [routerLink]="slide.link">
+                <picture>
+                  <!-- Imagen para móviles -->
+                  <source media="(max-width: 768px)" srcset="{{slide.img_cellphone}}" priority placeholder>
+                  <!-- Imagen para pantallas grandes -->
+                  <img src="{{slide.img}}" class="d-block img-fluid slide-img" alt="Imagen {{ i + 1 }}" fetchpriority="high" loading="eager" placeholder>
+                </picture>
+              </a>
+            </ng-container>
+            <ng-template #noLink>
+              <picture>
+                <!-- Imagen para móviles -->
+                <source media="(max-width: 768px)" srcset="{{slide.img_cellphone}}" placeholder>
+                <!-- Imagen para pantallas grandes -->
+                <img src="{{slide.img}}" class="d-block img-fluid slide-img" fetchpriority="high" loading="eager" alt="Imagen {{ i + 1 }}" priority placeholder>
+              </picture>
+            </ng-template>
+            
+            <!--img src="{{slide.img}}" class="d-block img-fluid slide-img" alt="Imagen {{ i + 1 }}" -->
+            @if(slide.link!=null && slide.link!=''){
+              <!-- a href="{{slide.link}}">
+                <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                  {{slide.html}}
+                </div>
+              </a -->
+            }@else{
+              <!-- div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                {{slide.html}}
+              </div -->
+            }
+          </div>
+
+        }
+      }@else{
+
+        <div class="carousel-item active">
+           
+           
+              <picture>
+                <!-- Imagen para móviles -->
+                <source media="(max-width: 768px)" srcset="assets/images/slide-home/slide_loading_phone.png" >
+                <!-- Imagen para pantallas grandes -->
+                <img src="assets/images/slide-home/slide_loading.png" class="d-block img-fluid slide-img" >
+              </picture>
+ 
+            
+        </div>
+        
+      }
+  
+    </div>
+  
+    <!-- Flechas de navegación -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Siguiente</span>
+    </button>
+  </div>
+</div>
+
+    

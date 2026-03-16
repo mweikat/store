@@ -1,0 +1,20 @@
+<div class="card shadow-sm">
+  <div class="card-body p-0">
+    <nav class="nav flex-column user-submenu">
+      <a class="nav-link" [class.active]="isActive('profile')" [routerLink]="'profile'">
+        <i class="bi bi-person-circle me-2"></i> Cuenta
+      </a>
+      <a class="nav-link" [class.active]="isActive('change-pass')" [routerLink]="'change-pass'">
+        <i class="bi bi-key me-2"></i> Cambia tu Clave
+      </a>
+      <a class="nav-link" [class.active]="isActive('orders')" [routerLink]="'orders'">
+        <i class="bi bi-card-list me-2"></i> Órdenes
+      </a>
+      <a class="nav-link" [class.active]="isActive('address')" [routerLink]="'address'" >
+        <i class="bi bi-geo-alt me-2"></i> Direcciones de Envío
+      </a>
+    </nav>
+  </div>
+</div>
+
+  

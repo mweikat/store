@@ -1,0 +1,44 @@
+  <div class="payment-section mt-4">
+    <div class="accordion" id="accordionExample">
+      <!-- Opción 1: Pago con Flow -->
+      @for(ship of ships(); track ship.id; let  i = $index){
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne_{{ship.id}}">
+          <button 
+            class="accordion-button" 
+            type="button" 
+            [class.collapsed]="selectedAccordionId !== ship.id"
+            [attr.aria-expanded]="selectedAccordionId === ship.id" 
+            (click)="selectMethod(ship)">
+            <div class="form-check">
+              <input 
+                class="form-check-input" 
+                type="radio" 
+                name="shippingMethod" 
+                id="flexRadioDefault1_{{ship.id}}" 
+                [checked]="selectedAccordionId === ship.id">
+              <label class="form-check-label" for="flexRadioDefault1_{{ship.id}}">
+                {{ship.name}}
+              </label>
+            </div>
+          </button>
+        </h2>
+        <div 
+          id="collapse_{{ship.id}}" 
+          class="accordion-collapse collapse" 
+          [class.show]="selectedAccordionId === ship.id" 
+          [attr.aria-labelledby]="'headingOne_'+ship.id" 
+          data-bs-parent="#accordionExample">
+          <div class="accordion-body" [innerHTML]="ship.desc | htmlSanitize:'html'"></div>
+          <p class="text-end me-4">Valor despacho: <b>${{ship.price}}</b></p>
+          @if(ship.price_for_free>0){
+          <p class="text-end me-4">
+            Despacho gratis por compras superiores o igual a: <b>${{ship.price_for_free | number | comaToDot}}</b>
+          </p>
+          }
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  

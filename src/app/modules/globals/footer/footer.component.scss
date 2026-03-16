@@ -1,0 +1,14 @@
+@media (max-width: 768px) {
+    .footer .row {
+      text-align: center; /* Asegura que el texto esté centrado */
+    }
+    .footer .col-12 {
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Centra los elementos en dispositivos móviles */
+    }
+    .footer ul {
+      padding: 0; /* Quita márgenes adicionales de las listas */
+    }
+  }
+  

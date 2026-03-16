@@ -1,0 +1,17 @@
+html, body {
+    height: 100%; /* Asegura que el body ocupe toda la altura */
+    margin: 0;
+  }
+  
+  .layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* El layout ocupará al menos el alto completo de la ventana */
+  }
+  
+  .content {
+    flex: 1; /* Hace que el contenido principal ocupe el espacio restante */
+    display: flex;
+    flex-direction: column;
+  }
+  

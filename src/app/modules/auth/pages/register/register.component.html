@@ -1,0 +1,121 @@
+<div class="auth container-fluid d-flex justify-content-center align-items-center bg-light" style="min-height: 82vh;">
+    <div class="card register-card p-4">
+        <div class="card-body">
+            <div class="mb-4 text-center">
+                <h4 class="auth-title"><b>Registro</b></h4>
+            </div>
+            <form class="px-md-5" [formGroup]="form" (ngSubmit)="register()">
+                <!-- Nombre -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" placeholder="Nombre" 
+                           formControlName="name" maxlength="30" 
+                           [ngClass]="{'is-invalid': form.get('name')?.invalid && form.get('name')?.touched}">
+                    <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched" 
+                         class="invalid-feedback text-center d-inline msg">
+                        {{ getErrorMessage('name') }}
+                    </div>
+                </div>
+
+                <!-- Apellido -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                    <input type="text" class="form-control" placeholder="Apellido" 
+                           formControlName="lastName" maxlength="30" 
+                           [ngClass]="{'is-invalid': form.get('lastName')?.invalid && form.get('lastName')?.touched}">
+                    <div *ngIf="form.get('lastName')?.invalid && form.get('lastName')?.touched" 
+                         class="invalid-feedback text-center d-inline msg">
+                        {{ getErrorMessage('lastName') }}
+                    </div>
+                </div>
+
+                <!-- Teléfono -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-phone"></i>&nbsp;+56</span> 
+                    <input type="text" class="form-control" placeholder="Teléfono (9 dígitos)" 
+                           formControlName="phone" (keypress)="allowOnlyNumbers($event)" 
+                           maxlength="9" minlength="9"
+                           [ngClass]="{'is-invalid': form.get('phone')?.invalid && form.get('phone')?.touched}">
+                    <div *ngIf="form.get('phone')?.invalid && form.get('phone')?.touched" 
+                         class="invalid-feedback text-center d-inline msg">
+                        {{ getErrorMessage('phone') }}
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <input type="email" class="form-control" placeholder="Email" 
+                           formControlName="email" 
+                           [ngClass]="{'is-invalid': form.get('email')?.invalid && form.get('email')?.touched}">
+                    <div *ngIf="form.get('email')?.invalid && form.get('email')?.touched" 
+                         class="invalid-feedback text-center d-inline msg">
+                        {{ getErrorMessage('email') }}
+                    </div>
+                </div>               
+
+                <!-- Contraseña -->
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-key"></i></span>
+                    <input type="password" placeholder="Contraseña (6-20 caracteres)" 
+                           #passwordInput formControlName="password" 
+                           class="form-control" autocomplete="true"
+                           [ngClass]="{'is-invalid': form.get('password')?.invalid && form.get('password')?.touched}">
+                    <span class="input-group-text toggle-password" (click)="showPass()" 
+                          style="cursor: pointer">
+                        <i class="bi" [ngClass]="isShowing ? 'bi-eye-slash' : 'bi-eye'"></i>
+                    </span>
+                    <div *ngIf="form.get('password')?.invalid && form.get('password')?.touched" 
+                         class="invalid-feedback text-center d-inline msg">
+                        {{ getErrorMessage('password') }}
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <p class="must-fields">(*) Campos obligatorios</p>
+                </div>
+              
+                <app-recaptcha (token)="responseToken($event)" 
+                               (active)="activeRecaptcha($event)"></app-recaptcha>
+
+                <div class="text-center mt-4 terms">
+                    <p>Al crear el usuario declaro que he leído y acepto los 
+                       <a routerLink="/info/terminos-y-condiciones" target="_blank" 
+                          class="terms-conditions-link">Términos y condiciones</a> 
+                       y nuestra 
+                       <a routerLink="/info/privacidad" target="_blank" 
+                          class="terms-conditions-link">Política de Privacidad</a>, 
+                       y acepto recibir correos informativos, novedades y/o promociones.
+                    </p>
+                </div>
+
+                <div class="form-check text-center">
+                    <input class="form-check-input" type="checkbox" id="flexCheckDefault" 
+                           style="float: none; margin-right: 4px;" formControlName="terms">
+                    <label class="form-check-label" for="flexCheckDefault">Acepto</label>
+                </div>
+
+                <div *ngIf="form.get('terms')?.invalid && form.get('terms')?.touched" 
+                     class="invalid-feedback text-center d-inline msg">
+                    {{ getErrorMessage('terms') }}
+                </div>
+
+                <!-- Mensaje de error general -->
+                <div *ngIf="errorOnRegister" class="alert alert-danger text-center mt-3">
+                    {{ errorOnRegister }}
+                </div>  
+
+                <div class="mt-4 text-center">
+                    <button class="btn btn-primary-c1 btn-lg w-100" type="submit" 
+                            [disabled]="form.invalid || (isEnableRecaptcha && !captchaResponse)">
+                        Registrarme
+                    </button>
+                </div>
+
+                <div class="mt-4 text-end back-link">
+                    ¿Ya tiene una cuenta? <a routerLink="/auth/login">Inicie sesión</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,42 @@
+<!-- feature-section.component.html -->
+<div class="feature-section py-4">
+  <div class="container">
+    <div class="row">
+      <!-- Caja 1 -->
+      <div class="col-md-4 d-flex flex-column align-items-center text-center mb-3">
+        <div class="icon-box mb-2">
+          <svg class="icon" stroke-width="1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+            <path d="M15.64 6.92L9.5 5.12V4a.5.5 0 00-.5-.5H1a.5.5 0 00-.5.5v8.5c0 .28.22.5.5.5h1.27a2.1 2.1 0 004.06 0h3.94a2.1 2.1 0 004.06 0h1.17a.5.5 0 00.5-.5V7.4a.5.5 0 00-.36-.48zM4.3 13.6a1.1 1.1 0 110-2.2 1.1 1.1 0 010 2.2zM6.33 12a2.1 2.1 0 00-4.06 0H1.5V4.5h7V12H6.33zm5.97 1.6a1.1 1.1 0 110-2.2 1.1 1.1 0 010 2.2zM15 12h-.67a2.1 2.1 0 00-4.06 0H9.5V6.17l5.5 1.6V12z"></path>
+          </svg>
+        </div>
+        <h2 class="feature-title">Envíos a todo Placilla</h2>
+        <p class="feature-description">Despachamos desde Curauma</p>
+      </div>
+
+      <!-- Caja 2 -->
+      <div class="col-md-4 d-flex flex-column align-items-center text-center mb-3">
+        <div class="icon-box mb-2">
+          <img src="/assets/images/icons/pago_seguro.svg" alt="Pago seguro" loading="lazy" class="icon-image">
+        </div>
+        <h2 class="feature-title">Pago 100% Seguro</h2>
+        <p class="feature-description">Pasarela web o Máquina</p>
+      </div>
+
+      <!-- Caja 3 -->
+      <div class="col-md-4 d-flex flex-column align-items-center text-center mb-3">
+        <div class="icon-box mb-2">
+          <img src="/assets/images/icons/atencion-cliente.svg" alt="Atención al cliente" loading="lazy" class="icon-image">
+        </div>
+        <h2 class="feature-title">Atención al cliente</h2>
+        <p class="feature-description">
+          Escríbenos 
+          <a href="https://api.whatsapp.com/send?phone={{business.info.cod_Area}}{{business.info.phone}}" target="_blank" class="text-warning" title="+{{business.info.cod_Area}}{{business.info.phone}}">+{{business.info.cod_Area}} {{business.info.phone}}</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  

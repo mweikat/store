@@ -1,0 +1,86 @@
+<div class="category container py-5">
+    @if(category().length>0){
+      <h4 class="text-center mb-4 category-title">{{ category()[0].name }}</h4>
+  
+      <!-- Texto introductorio -->
+      <p class="text-center category-intro">
+        {{category()[0].desc}}
+      </p>
+    }
+    
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <input 
+          type="text" 
+          class="form-control" 
+          placeholder="Filtrar producto..." 
+          [(ngModel)]="searchTerm"
+          (input)="filterProducts()" 
+          *ngIf="flagsearch"/>
+      </div>
+  
+      <div class="col-md-6 text-md-end">
+        <select class="form-select" [(ngModel)]="sortOption" (change)="sortProducts()">
+          <option value="">Ordenar por</option>
+          <option value="name">Nombre</option>
+          <option value="priceAsc">Precio: Menor a Mayor</option>
+          <option value="priceDesc">Precio: Mayor a Menor</option>
+          <option value="stock">Con Stock</option>
+        </select>
+      </div>
+    </div>
+  
+    <!-- Lista de productos -->
+    <div class="row" *ngIf="paginatedProducts.length > 0">
+  
+      @for(product of paginatedProducts; track product.id){
+        <ng-container>
+          <div class="col-6 col-md-4 col-lg-3 mb-4">
+            <a [routerLink]="'/product/'+product.url">
+            <div class="card h-100 product-card">
+              <div class="product-image-wrapper mt-4">
+                @if(product.imgs.length>0){
+                  <img appImgBroken src="{{product.imgs[0].img}}" class="card-img-top product-image img-fluid" [alt]="product.name"   >
+                }@else{
+                  <img appImgBroken  src="{{product.imgP}}" class="card-img-top product-image img-fluid" [alt]="product.name"   >
+                }
+                <div class="stock-overlay" *ngIf="product.stock == 0">Agotado</div>
+              </div>
+              <div class="card-body text-center">
+                <p class="card-title product-title">{{ product.name }}</p>
+                <p class="card-text product-price">
+                  <span class="normal-price" [ngClass]="{'text-decoration-line-through text-muted': product.priceSale}">${{ product.price | number | comaToDot}}</span>
+                  <span class="text-danger fw-bold sale-price" *ngIf="product.priceSale">
+                    ${{ product.priceSale | number | comaToDot}}
+                  </span>
+                </p>
+                <!-- button class="btn btn-primary add-to-cart-btn">Agregar al carrito</button -->
+              </div>
+            </div>
+          </a>
+          </div>
+        </ng-container>
+      }
+    </div>
+  
+    <div *ngIf="paginatedProducts.length === 0">
+      <p>No se encontraron productos.</p>
+    </div>
+  
+    <!-- Paginación -->
+    <nav *ngIf="filteredProducts.length > pageSize">
+      <ul class="pagination justify-content-center">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" (click)="changePage(currentPage - 1)">Anterior</a>
+        </li>
+        <li class="page-item" *ngFor="let page of totalPagesArray()" [class.active]="currentPage === page">
+          <a class="page-link" (click)="changePage(page)">{{ page }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" (click)="changePage(currentPage + 1)">Siguiente</a>
+        </li>
+      </ul>
+    </nav>
+  </div>

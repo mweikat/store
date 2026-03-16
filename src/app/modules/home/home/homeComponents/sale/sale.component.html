@@ -1,0 +1,40 @@
+@if(category().length>0){
+  <div class="sale">
+      <section class="productos-destacados py-5">
+      <div class="container">
+        <h2 class="section-title text-start mb-4 text-center"><b>{{title}}</b></h2>
+        <h5 class="section-title text-start mb-4 text-center">{{desc}}</h5>
+        <div class="row">
+          <!-- Iteración de productos -->
+          <ng-container *ngFor="let product of products()">
+            <div class="col-6 col-md-4 col-lg-3 mb-4">
+              <a [routerLink]="'/product/'+product.url">
+                <div class="card h-100 product-card">
+                  <div class="product-image-wrapper mt-4">
+                    @if(product.imgs.length>0){
+                      <img appImgBroken [src]="product.imgs[0].img" class="card-img-top product-image img-fluid" [alt]="product.name" loading="lazy">
+                    }@else{
+                      <img appImgBroken [src]="''" class="card-img-top product-image img-fluid" [alt]="product.name" loading="lazy">
+                    }
+                    <div class="stock-overlay" *ngIf="product.stock == 0">Agotado</div>
+                  </div>
+                  <div class="card-body text-center">
+                    <p class="card-title product-title">{{ product.name }}</p>
+                    @if(product.price && product.price > 0){
+                      <p class="card-text product-price">
+                        <span class="normal-price" [ngClass]="{'text-decoration-line-through text-muted': (product.priceSale && product.price > product.priceSale)}">${{ product.price | number | comaToDot}}</span>
+                        <span class="text-danger fw-bold sale-price" *ngIf="product.priceSale && product.priceSale < product.price">
+                          ${{ product.priceSale | number | comaToDot}}
+                        </span>
+                      </p>
+                    }
+                  </div>
+                </div>
+              </a>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </section>  
+  </div>
+}

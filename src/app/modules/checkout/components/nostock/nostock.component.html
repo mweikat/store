@@ -1,0 +1,64 @@
+<div *ngIf="stockErrorView">
+    <div class="alert alert-danger text-center" >Ups!... Lo sentimos, Hay productos sin stock en tu carrito, favor revisalos antes de comprar..</div>
+    @if(stockErrorModel.stockDetails && stockErrorModel.stockDetails!=undefined){
+
+      @for(item of stockErrorModel.stockDetails; track item.product_id)
+      {
+        <div class="cart-item mb-3 p-3" *ngIf="item.status=='STOCKNOK'">
+            <div class="row align-items-center">
+
+              @if(stockErrorModel.errorCode=='product'){
+                <!-- Imagen del producto -->
+                <div class="col-3 col-md-2">
+                  <a [routerLink]="'/product/'+item.cartItem?.product_name+'/'+item.cartItem?.product_id">
+                    <img appImgBroken [src]="item.cartItem?.image" alt="{{ item.cartItem?.image }}" class="img-fluid rounded">
+                  </a>
+                </div>
+              
+                <!-- Nombre y detalles del producto -->
+                <div class="col-6 col-md-5">
+                  <h5 class="product-name">{{ item.cartItem?.product_name }}</h5>
+                  <p class="product-price mb-1"><b>Precio: {{ item.cartItem?.price | number | comaToDot}}</b></p>
+                </div>
+
+                <!-- Controles de cantidad -->
+                <div class="col-3 col-md-3 text-center">
+                  <div class="fs-6 ">Solo existen <b>{{item.stock}}</b> unidades del producto.</div>
+                </div>
+
+                <!-- Botón de eliminar -->
+                <div class="col-12 col-md-2 text-md-end mt-2 mt-md-0">
+                  @if(item.stock>0){
+                      <button class="btn btn-primary-c1 btn-sm" (click)="setStock(item)">LLevar <b>{{item.stock}}</b> unidades.</button>
+                  }
+                  <button class="btn btn-danger btn-sm" (click)="removeItem(item)">Quitar Del Carrito</button>
+                </div>
+              }
+              @if(stockErrorModel.errorCode=='product_bundle'){
+
+                <!-- Imagen del producto -->
+                <div class="col-3 col-md-2">
+                  
+                    <img appImgBroken [src]="item.cartItem?.product_bundle?.img" alt="{{ item.cartItem?.product_bundle?.img }}" class="img-fluid rounded">
+                  
+                </div>
+              
+                <!-- Nombre y detalles del producto -->
+                <div class="col-6 col-md-5">
+                  <h5 class="product-name">{{ item.cartItem?.product_bundle?.name_budle }}</h5>
+                  <p class="product-price mb-1"><b>Precio: {{ item.cartItem?.product_bundle?.discount_price | number | comaToDot}}</b></p>
+                </div>
+
+
+                <!-- Botón de eliminar -->
+                <div class="col-12 col-md-2 text-md-end mt-2 mt-md-0">
+                  <button class="btn btn-danger btn-sm" (click)="removeItemBundle(item)">Quitar Del Carrito</button>
+                </div>
+
+              }
+            </div>
+        </div>
+      }
+      
+    }
+</div>

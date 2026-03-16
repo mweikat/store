@@ -1,0 +1,40 @@
+
+.checkout-success {
+    .card {
+      border: none;
+      border-radius: 12px;
+        
+      .success-icon {
+        width: 100px;
+        height: auto;
+      }
+  
+      .title {
+        font-size: 2rem;
+        font-weight: 600;
+        
+      }
+  
+      .text-secondary {
+        font-size: 1rem;
+      }
+  
+      .order-summary {
+        ul {
+          
+          border-radius: 8px;
+  
+          .list-group-item {
+            background-color: transparent;
+            border: none;
+            font-size: 1rem;
+            
+            strong {
+              font-weight: 600;
+            }
+          }
+        }
+      }
+    }
+  }
+  

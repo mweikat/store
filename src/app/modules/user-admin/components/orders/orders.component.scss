@@ -1,0 +1,60 @@
+.orders-section {
+
+  transition: all 0.3s ease;
+  
+  .d-none {
+    display: none !important;
+  }
+
+  h5.card-title {
+    font-weight: bold;
+    font-size: 1.8rem;
+  }
+
+  .order-text{
+    font-size:14px;
+    cursor:pointer;
+    text-decoration: underline;
+  
+  }
+
+  .card {
+    border-radius: 10px;
+    border: none;
+    transition: transform 0.2s;
+
+    .card-header {
+      border-radius: 10px 10px 0 0 !important;
+    }
+  }
+
+  .badge {
+    padding: 0.5em 1em;
+    font-size: 0.8em;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .order-click {
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  @media (max-width: 768px) {
+    .card-header {
+      flex-direction: column;
+      align-items: flex-start !important;
+      
+      div:first-child {
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    .card-body .row > div {
+      width: 100%;
+      max-width: 100%;
+      flex: 0 0 100%;
+    }
+  }
+}

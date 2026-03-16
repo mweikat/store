@@ -1,0 +1,92 @@
+.slide1{
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+  
+
+  .carousel {
+    .carousel-indicators{
+      bottom: -35px !important;
+      
+    }
+    
+    .carousel-inner {
+      .carousel-item {
+        transition: transform 0.5s ease-in-out, opacity 0.5s ease;
+  
+        img.slide-img {
+          width: 100%;
+          height: auto;
+          min-height: 300px; // Altura mínima en móviles
+          max-height: 585px; // Máximo estándar
+          object-fit: cover;
+          object-position: center;
+        }
+      }
+    }
+  
+    .carousel-caption {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 800px;
+      
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      color: white;
+    }
+  
+    // Pantallas grandes (26" o más)
+    @media (min-width: 1920px) {
+      .carousel-inner .carousel-item img.slide-img {
+        height: 100vh; // Ocupa toda la altura de la pantalla
+        //max-height: none;
+        object-fit: cover;
+      }
+     
+    }
+
+
+  
+    // Dispositivos medianos y pequeños
+    @media (max-width: 768px) {
+      .carousel-inner .carousel-item img.slide-img {
+        min-height: 250px;
+        max-height: 400px;
+        object-fit: contain; // Evita cortes
+      }
+  
+      .carousel-caption {
+        bottom: 10px;
+        font-size: 14px;
+        padding: 10px;
+      }
+    }
+  
+    @media (max-width: 576px) {
+      .carousel-inner .carousel-item img.slide-img {
+        min-height: 176px;
+        max-height: 350px;
+        object-fit: contain;
+      }
+  
+      .carousel-caption {
+        bottom: 5px;
+        font-size: 12px;
+        padding: 8px;
+      }
+    }
+  }
+}
+  
+  

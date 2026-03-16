@@ -1,0 +1,33 @@
+@if(categoriesChunks().length>0){
+  <div class="pcategory">
+    <div class="container-fluid category-carousel py-5">
+      <div id="categoryCarousel" class="carousel slide" data-bs-ride="carousel">
+          <!-- Botones de navegación -->
+          <button *ngIf="showButtons" class="carousel-control-prev custom-control-prev"  type="button" data-bs-target="#categoryCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true" style="background-color: grey;"></span>
+            <span class="visually-hidden">Anterior</span>
+          </button>
+          <button *ngIf="showButtons" class="carousel-control-next custom-control-next" type="button" data-bs-target="#categoryCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true" style="background-color: grey;"></span>
+            <span class="visually-hidden">Siguiente</span>
+          </button>
+      
+          <!-- Contenido del carrusel -->
+          <div class="carousel-inner">
+            <div class="carousel-item" *ngFor="let chunk of categoriesChunks(); let i = index" [class.active]="i === 0">
+              <div class="d-flex justify-content-center">
+                <div class="col-4 col-md-2 col-lg-2 text-center" *ngFor="let category of chunk">
+                  <a [routerLink]="'/categories/' + category.link" class="category-card">
+                    <div class="category-image-wrapper mx-auto">
+                      <img [src]="category.image" [alt]="category.name" class="img-fluid"/>
+                    </div>
+                    <h5 class="category-title mt-3">{{ category.name }}</h5>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+}

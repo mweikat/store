@@ -1,0 +1,23 @@
+@if(cant()>0){
+  <div class="cart-menu btn-group">
+    <a  class="dropdown-toggle " data-bs-toggle="dropdown" aria-expanded="false" aria-label="Mi Carrito">
+      <i class="bi bi-cart"></i>
+      <!-- Indicador de cantidad de productos en el carrito -->
+        <span class="badge rounded-pill cart-badge">{{cant()}}</span>
+      
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end">
+      <li *ngFor="let item of cart.items">
+        <a class="dropdown-item">{{ item.product_name }} <span class="quantity-cart">{{item.quantity}}</span></a>
+      </li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item btn-go-cart" [routerLink]="'/cart'">Ir al Carrito ({{totalPrice()}})</a></li>
+    </ul>
+  </div>
+}@else{
+  <div class="cart-menu btn-group">
+    <a class="" aria-label="Mi Carrito">
+      <i class="bi bi-cart"></i>
+    </a>
+  </div>
+}

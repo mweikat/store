@@ -1,0 +1,40 @@
+@if(brands.length>0){
+  <div id="carouselMarcas" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
+    <!-- Flechas de navegación -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselMarcas" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselMarcas" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Siguiente</span>
+    </button>
+
+    <!-- Imágenes del carrusel de marcas -->
+    <div class="carousel-inner">
+      @for (chunk of getBrandChunks(); track $index; let first = $first) {
+        <div class="carousel-item" [class.active]="first">
+          <div class="d-flex justify-content-center align-items-center">
+            @for (brand of chunk; track brand.name) {
+              @if(brand.img){
+                <div class="col-6 col-md-4 col-lg-3 text-center">
+                  <img 
+                    [ngSrc]="brand.img" 
+                    class="img-fluid" 
+                    [alt]="brand.name" 
+                    loading="lazy" 
+                    width="300" 
+                    height="300">
+                </div>
+              }@else{
+                <div class="col-6 col-md-4 col-lg-3 text-center mt-4">
+                  <h3><b>{{brand.name}}</b></h3>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

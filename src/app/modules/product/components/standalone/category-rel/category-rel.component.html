@@ -1,0 +1,71 @@
+<div class="related-products-container position-relative my-5">
+  <h5 class="mb-4">Productos de Interes</h5>
+  
+  <div class="row g-3">
+    <!-- Flecha izquierda -->
+    <button *ngIf="showPrevArrow()" 
+            class="btn btn-primary-c1 position-absolute start-0 top-50 translate-middle-y z-1 d-none d-md-block"
+            (click)="prev()"
+            style="width: 40px; height: 40px; border-radius: 50%;">
+      <i class="bi bi-chevron-left"></i>
+    </button>
+
+    <!-- Productos visibles -->
+    @if(visibleProducts() && visibleProducts().length > 0) {
+      @for(product of visibleProducts(); track product.id) {
+        <div class="col-6 col-md-4 col-lg-3">
+          <div class="card h-100">
+            @if(product.imgs.length>0){
+            <img [src]="product.imgs[0].img" class="card-img-top" [alt]="product.name">
+            }@else{
+              <img appImgBroken [src]="''" class="card-img-top" [alt]="product.name"   >
+            }
+            <div class="stock-overlay" *ngIf="product.stock == 0">Agotado</div>
+            <div class="card-body text-center">
+              <h5 class="card-title" style="font-weight: bold;">{{ product.name }}</h5>
+              <p class="card-text text-muted"></p>
+              @if(product.price && product.price > 0){
+                <div class="text-center">
+                  <p class="card-text product-price">
+                    <span class="normal-price" [ngClass]="{'text-decoration-line-through text-muted': (product.priceSale && product.price > product.priceSale)}">
+                      ${{ product.price | number | comaToDot}}
+                    </span>
+                    <span class="fw-bold sale-price" *ngIf="product.priceSale && product.priceSale < product.price">
+                      ${{ product.priceSale | number | comaToDot}}
+                    </span>
+                  </p>
+                </div>
+              }
+              <a [routerLink]="'/product/'+product.url" class="btn btn-sm btn-primary-c1">Ver detalle</a>
+            </div>
+          </div>
+        </div>
+      }
+    } @else {
+      <div class="col-12 text-center py-4">
+        <p>No hay productos similares disponibles</p>
+      </div>
+    }
+
+    <!-- Flecha derecha -->
+    <button *ngIf="showNextArrow()" 
+            class="btn btn-primary-c1 position-absolute end-0 top-50 translate-middle-y z-1 d-none d-md-block"
+            (click)="next()"
+            style="width: 40px; height: 40px; border-radius: 50%;">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+
+  <!-- Indicadores para móvil -->
+  <div class="d-flex justify-content-center mt-3 d-md-none">
+    <button class="btn btn-sm btn-primary-c1 mx-1" (click)="prev()" [disabled]="!showPrevArrow()">
+      <i class="bi bi-chevron-left"></i>
+    </button>
+    <span class="mx-2 align-self-center">
+      {{ currentIndex() + 1 }}-{{ currentIndex() + visibleProducts().length }} de {{ productsRel().length }}
+    </span>
+    <button class="btn btn-sm btn-primary-c1 mx-1" (click)="next()" [disabled]="!showNextArrow()">
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+</div>

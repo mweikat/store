@@ -1,0 +1,72 @@
+<div class="user-account container py-4">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-8">
+ 
+        <!-- Cambio de Contraseña -->
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title text-center">Cambiar Contraseña</h5>
+            <form (ngSubmit)="changePassword()" [formGroup]="passwordForm">
+              <!-- Contraseña Actual -->
+              <div *ngIf="user.g_user=='0'" class="mb-3">
+                <label for="currentPassword" class="form-label">Contraseña Actual</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-key"></i></span>
+                  <input
+                    type="password"
+                    id="currentPassword"
+                    formControlName="currentPassword"
+                    class="form-control"
+                    [ngClass]="{'is-invalid': passwordForm.get('currentPassword')?.touched && passwordForm.get('currentPassword')?.invalid}"
+                    #passwordInput
+                    autocomplete="false"
+                  />
+                  <span class="input-group-text toggle-password" (click)="showPass()" style="cursor: pointer"><i class="bi bi-eye"></i></span>
+                </div>
+                <div class="invalid-feedback">Por favor, ingrese su contraseña actual.</div>
+              </div>
+  
+              <!-- Nueva Contraseña -->
+              <div class="mb-3">
+                <label for="newPassword" class="form-label">Nueva Contraseña</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-key"></i></span>
+                  <input
+                    type="password"
+                    id="newPassword"
+                    formControlName="newPassword"
+                    class="form-control"
+                    [ngClass]="{'is-invalid': passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid}"
+                    #passwordInput1
+                    autocomplete="false"
+                  />
+                </div>
+                <div class="invalid-feedback">Por favor, ingrese una nueva contraseña.</div>
+              </div>
+  
+              <!-- Confirmar Contraseña -->
+              <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-key"></i></span>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    formControlName="confirmPassword"
+                    class="form-control"
+                    [ngClass]="{'is-invalid': passwordForm.get('confirmPassword')?.touched && passwordForm.get('confirmPassword')?.invalid}"
+                    #passwordInput2
+                    autocomplete="false"
+                  />
+                </div>
+                <div class="invalid-feedback">Las contraseñas no coinciden.</div>
+              </div>
+  
+              <button type="submit" class="btn btn-primary-c1 w-100">Cambiar Contraseña</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

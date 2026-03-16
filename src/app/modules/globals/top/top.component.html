@@ -1,0 +1,20 @@
+@if(topBanner() && topBanner().text!=undefined){
+  <nav class="top">
+      <div class="container-fluid d-flex justify-content-center align-items-center">
+        <span class="text-light text-center small" [innerHTML]="topBanner().text | htmlSanitize:'html'">
+          <!-- i class="bi bi-truck text-color2" style="font-size: 1.5rem;"></i> Por compras sobre $15.990 en Placilla-Curauma <span class="text-color3"> ¡Envío Gratis!</span> Recive el mismo día!! más detalles <a [routerLink]="'/info/despachos'">aquí </a -->  
+          <!--i class="bi bi-truck text-color2" style="font-size: 1.5rem;"></i>&nbsp;&nbsp;&nbsp;&nbsp;Tienda Pet Placilla<span class="text-color3"> ¡Envío Gratis!</span> Recibe el mismo día!!, más detalles <a [routerLink]="'/info/despachos'">aquí </a -->  
+        </span>
+        <span class="d-flex justify-content-end ms-4">
+          @if(rrssModel().facebook){
+            <a href="{{rrssModel().facebook}}" target="_blank" aria-label="Facebook de Mi Patita"><i class="bi bi-facebook"></i></a>&nbsp;&nbsp;
+          }
+          @if(rrssModel().instagram)
+          {
+            <a href="{{rrssModel().instagram}}" target="_blank" aria-label="Instagram de Mi Patita"><i class="bi bi-instagram"></i></a>
+          }
+          
+        </span>
+      </div>
+  </nav>
+}

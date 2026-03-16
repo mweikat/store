@@ -1,0 +1,124 @@
+<nav class="navbar navbar-expand-lg navbar-light header justify-content-center" >
+ 
+      <div class="container-fluid">
+          <!-- Botón para colapsar menú en dispositivos móviles -->
+          <button
+          *ngIf="headerService.isToggleButton | async"
+          class="btn btn-default d-lg-none"
+          type="button"
+          (click)="toggleSidebar()"
+          aria-label="Toggle navigation"
+        >
+         
+          <i class="bi bi-list" style="font-size: 24px;"></i>
+        </button>
+        <div class="logo" >
+          <!-- Logo -->
+          <a [routerLink]="'/'" class="d-none d-md-block">
+            <img [ngSrc]="logos().logo" alt="Logo" width="184" *ngIf="logos().logo" height="65" priority>
+          </a>
+          <a [routerLink]="'/'" class="d-block d-md-none ms-3">
+            <img [ngSrc]="logos().logo_phone" alt="Logo" width="160" *ngIf="logos().logo_phone" height="60" priority>
+          </a>
+        </div>
+          <!-- Menú e iconos colapsables -->
+          <div class="collapse navbar-collapse justify-content-center" id="navbarMenu">
+          
+              <ul class="navbar-nav mb-2 mb-lg-0" *ngIf="headerService.isMenu | async">
+                          
+                <!-- Iteración sobre las categorías -->
+                @for(category of categories(); track category.id){
+
+                  @if(category.subcategories.length == 0){
+                  <li class="nav-item">
+                    <a class="nav-link " [routerLink]="category.url_name">{{category.name}}</a>
+                  </li>
+                  }@else{
+                  <!-- Solo muestra las categorías principales (sin padre) -->
+                  <li class="nav-item dropdown" *ngIf="!category.parent">
+                    <a class="nav-link dropdown-toggle " href="#" [id]="category.url_name + 'Dropdown'" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      {{ category.name }}
+                    </a>
+              
+                    <ul class="dropdown-menu" [attr.aria-labelledby]="category.url_name + 'Dropdown'">
+                      <ng-container *ngFor="let subcategory of category.subcategories">
+                        <li><a class="dropdown-item" [routerLink]="'/categories/' + subcategory.url_name">{{ subcategory.name }}</a></li>
+              
+                        <!-- Sub-subcategorías si las hubiera -->
+                        <ul *ngIf="subcategory.subcategories && subcategory.subcategories.length > 0">
+                          <li *ngFor="let subsubcategory of subcategory.subcategories">
+                            <a class="dropdown-item" [routerLink]="'/categories/' + subsubcategory.url_name" >{{ subsubcategory.name }}</a>
+                          </li>
+                        </ul>
+                      </ng-container>
+                    </ul>
+                  </li>
+                  }
+                }
+                
+              </ul>
+
+      
+              <app-search *ngIf="headerService.isSearch | async"></app-search>
+            
+          </div>
+          
+          <!-- Iconos de usuario y carrito -->
+
+          <div class="navbar-icons" style="gap: unset;">
+
+            <app-user-menu *ngIf="headerService.isUser | async"></app-user-menu>
+          
+
+            <app-cart-menu *ngIf="headerService.isCart | async"></app-cart-menu>
+
+          </div>
+        </div>
+   
+    <div class="row">
+     <div class="d-block d-lg-none text-center">
+      <app-search  *ngIf="headerService.isSearch | async"></app-search>
+     </div>
+    </div>
+
+      <!-- Sidebar -->
+  <div [class.active]="isSidebarOpen" class="sidebar d-lg-none">
+    <!-- Encabezado del Sidebar -->
+  <div class="sidebar-header d-flex justify-content-between align-items-center">
+    <h6 class="sidebar-title">Menú</h6>
+    <button class="btn-close" aria-label="Close" (click)="toggleSidebar()">×</button>
+  </div>
+    <ul class="navbar-nav mb-2 mb-lg-0" *ngIf="headerService.isMenu | async">
+      
+      <!-- Iteración sobre las categorías -->
+      @for(category of categories(); track category.id){
+        @if(category.subcategories.length == 0){
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="category.url_name" (click)="toggleSidebar()">{{category.name}}</a>
+        </li>
+        }@else{
+        <li class="nav-item dropdown" *ngIf="!category.parent">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ category.name }}
+          </a>
+          <ul class="dropdown-menu">
+            <ng-container *ngFor="let subcategory of category.subcategories">
+              <li>
+                <a class="dropdown-item" [routerLink]="'/categories/' + subcategory.url_name" (click)="toggleSidebar()">{{ subcategory.name }}</a>
+              </li>
+              <ul *ngIf="subcategory.subcategories && subcategory.subcategories.length > 0">
+                <li *ngFor="let subsubcategory of subcategory.subcategories">
+                  <a class="dropdown-item" [routerLink]="'/categories/' + subsubcategory.url_name">{{ subsubcategory.name }}</a>
+                </li>
+              </ul>
+            </ng-container>
+          </ul>
+        </li>
+        }
+      }
+    </ul>
+  </div>
+  <!-- Fondo oscuro para el sidebar -->
+  <div [class.active]="isSidebarOpen" class="sidebar-overlay" (click)="toggleSidebar()"></div>
+  </nav>
+ 

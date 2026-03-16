@@ -1,0 +1,56 @@
+.cart-container {
+   
+    .cart-item {
+      
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+      .product-name {
+        font-size: 1.1rem;
+      }
+    }
+}
+
+.product-bundle {
+
+  background-color: rgba(#28a745, 0.1); // Verde Bootstrap con transparencia
+  border-radius: 0.5rem;
+  border-left: 3px solid #28a745; // Verde Bootstrap
+  
+  .bundle-thumbnail {
+    img {
+      border-radius: 4px;
+    }
+  }
+  
+  .bundle-details {
+    small {
+      font-size: 0.75rem;
+      line-height: 1.2;
+    }
+    
+    .text-decoration-line-through {
+      text-decoration: line-through;
+      color: #6c757d; // Gris Bootstrap
+      font-size: 0.7rem;
+    }
+  }
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .product-bundle {
+    margin-top: 0.5rem;
+    padding: 0.5rem !important;
+    
+    .d-flex {
+      flex-direction: column;
+      align-items: flex-start !important;
+    }
+    
+    .bundle-thumbnail {
+      margin-bottom: 0.25rem;
+      margin-right: 0 !important;
+    }
+  }
+}

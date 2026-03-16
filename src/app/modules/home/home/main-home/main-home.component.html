@@ -1,0 +1,72 @@
+@if(rrssModel().whats_app){
+	<a href="{{rrssModel().whats_app}}" class="btn-wsp" target="_blank" aria-label="Contactar por WhatsApp">
+		<i class="bi bi-whatsapp icono" aria-hidden="true"></i>
+	</a>
+}
+
+@for (section of sections(); track section.code) {
+
+  @if (componentMap[section.code]) {
+
+    @switch (section.defer_strategy) {
+
+      @case ('none') {
+        <ng-container
+          *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
+        </ng-container>
+      }
+
+      @case ('immediate') {
+        @defer (on immediate) {
+          <ng-container
+            *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
+          </ng-container>
+        }
+      }
+
+      @case ('viewport') {
+       @defer (on viewport) {
+
+        <ng-container
+          *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
+        </ng-container>
+
+        } @placeholder {
+
+        <div class="home-section-placeholder"></div>
+
+        }
+      }
+
+      @case ('idle') {
+        @defer (on idle) {
+          <ng-container
+            *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
+          </ng-container>
+        }
+      }
+
+      <!-- @case ('when') {
+        @defer (when slideActive) {
+          <ng-container
+            *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
+          </ng-container>
+        }
+      }-->
+
+    }
+
+  }
+
+}
+
+
+<!--app-slide></app-slide>
+<app-photo-categories></app-photo-categories>
+<app-sale></app-sale>
+@defer (on immediate) {
+	<app-delivery></app-delivery>
+	<app-brands></app-brands>
+	<app-sale2></app-sale2>	
+}
+-->

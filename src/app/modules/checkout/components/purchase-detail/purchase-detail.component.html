@@ -1,0 +1,107 @@
+<div class="order-summary-detail card mt-4 p-3 shadow">
+    <h4 class="text-center mb-4">Detalle de tu compra</h4>
+    
+    <!-- Lista de Productos -->
+    <div class="order-items border-bottom pb-3">
+        @for(item of cart().items; track item.id) {
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <!-- Imagen del Producto -->
+                <div class="item-thumbnail me-3">
+                    <img [src]="item.image" alt="{{item.product_name}}" class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                </div>
+                <!-- Detalles del Producto -->
+                <div class="item-details flex-grow-1">
+                    <p class="item-name m-0"><strong>{{item.product_name}}</strong></p>
+                    <p class="item-quantity m-0 text-muted">Cantidad: {{item.quantity}}</p>
+                </div>
+                <!-- Precio del Producto -->
+                <div class="item-price text-end">
+                    <p class="m-0"><strong>${{item.price | number | comaToDot}} x {{item.quantity}}</strong></p>
+                </div>
+            </div>
+            @if(item.product_bundle) {
+
+                <div class="d-flex justify-content-between align-items-center mb-3 ">
+                       
+                         <!-- Imagen del Producto -->
+                        <div class="item-thumbnail me-3">
+                            <img [src]="item.product_bundle.img" alt="{{item.product_name}}" class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                        </div>
+                        <!-- Detalles del Producto -->
+                        <div class="item-details flex-grow-1">
+                            <p class="item-name m-0"><strong>💕Oferta especial incluida💕:</strong></p>
+                            <p class="item-quantity m-0 text-muted">Cantidad: {{item.product_bundle.quantity*item.quantity}}</p>
+                            <p class="item-quantity m-0 text-muted">{{item.product_bundle.name_budle}}</p>
+                        </div>
+                        <!-- Precio del Producto -->
+                        <div class="item-price text-end">
+                       
+                             @if(item.product_bundle.discount_type === 'free') {
+                                <p class="m-0 text-danger"><strong>¡Gratis! x {{item.product_bundle.quantity}}</strong></p>
+                                
+                            }@else{
+                                @if(item.product_bundle.discount_type === 'fixed'){ 
+                                    <p class="m-0 text-danger"><strong>${{item.product_bundle.discount_price| number | comaToDot}} x {{item.quantity}}</strong></p>
+                                }@else{
+                                    <p class="m-0 text-danger"><strong>${{item.product_bundle.discount_price | number | comaToDot}} x {{item.quantity}}</strong></p>
+                                }
+                            }
+                        </div>
+                       
+                  
+
+                </div>
+             
+            }
+        }
+    </div>
+
+    <!-- Resumen de Costos -->
+    <div class="cost-summary mt-3">
+        <!-- h6 class="mb-3">Resumen de Costos</h6 -->
+        
+        <div class="d-flex justify-content-between mb-2 text-success">
+            <p class="m-0">Subtotal</p>
+            <p class="m-0">${{sub_total_price | number | comaToDot}}</p>
+        </div>
+        <div>
+            <p class="mb-1"><b>Entrega:</b></p>
+        </div>
+        <div class="d-flex justify-content-between">
+            <p class="m-0">{{shippingBusiness.name}}</p>
+            <p class="m-0">
+                @if(shipping_price == 0) {
+                    <span class="text-success">$0</span>
+                } @else {
+                    <span class="text-success">{{shipping_price}}</span>
+                }
+            </p>
+        </div>
+        <div class="d-flex justify-content-between">
+            <p class="m-0">
+                {{shipingAddress.address_line1}} {{shipingAddress.address_line2}} {{shipingAddress.nro}} {{shipingAddress.obs}}
+            </p>
+        </div>
+        <div class="d-flex justify-content-between alert delivery-msg mt-2">
+            <b>{{deliveryData()?.delivery_text}} </b>
+                {{deliveryData()?.arrival_estimated_time}}
+        </div>
+        <div class="d-flex justify-content-between">
+            <p><b>Contacto:</b></p>
+            <p class="text-success">{{contact}}</p>
+        </div>
+        @if(applyDiscountText!="" && applyDiscountText!=null){
+            <div class="d-flex justify-content-between discount">
+                <p class="m-0 text-danger ts-1">{{applyDiscountText}}</p>
+                <p class="m-0 text-danger ts-1"><b>${{disc_amount | number | comaToDot}}</b></p>
+            </div>
+        }
+        <hr>
+        
+        <!-- Total -->
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="m-0">Total CLP</h5>
+            <h5 class="m-0"><b>${{totalOrderPrice | number | comaToDot}}</b></h5>
+        </div>
+    </div>
+</div>

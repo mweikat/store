@@ -1,0 +1,166 @@
+
+<button *ngIf="!btnPluss; else pluss" class="btn btn-primary-c2 mb-4" (click)="modalShowNew()">Nueva Dirección</button>
+
+<ng-template #pluss>
+  <button class="btn btn-primary-c2" (click)="modalShowNew()"><i class="bi bi-plus-circle"></i></button>
+</ng-template>
+
+<div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="addAddressModalLabel">
+          {{ action === 'new' ? 'Agregar' : 'Modificar' }} Dirección
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <form [formGroup]="addressForm" (ngSubmit)="saveAddress()" *ngIf="initiatedForm">
+          <!-- Región -->
+          <div class="mb-3">
+            <select 
+              class="form-control" 
+              formControlName="region" 
+              (change)="getCities('dropdown')"
+              [ngClass]="{ 'is-invalid': addressForm.get('region')?.touched && addressForm.get('region')?.invalid }"
+            >
+              <option value="0">-- Seleccione Región --</option>
+              <option 
+                *ngFor="let reg of regions" 
+                [value]="reg.id"
+                [selected]="addressForm.get('region')?.value === reg.id"
+              >
+                {{ reg.name }}
+              </option>
+            </select>
+            <div class="invalid-feedback">
+              La región es requerida.
+            </div>
+          </div>
+
+          <!-- Comuna -->
+          <div class="mb-3">
+            <select 
+              class="form-control" 
+              formControlName="city"
+              [ngClass]="{ 'is-invalid': addressForm.get('city')?.touched && addressForm.get('city')?.invalid }"
+            >
+              <option value="0">-- Seleccione Comuna --</option>
+              <option 
+                *ngFor="let cit of cities" 
+                [value]="cit.id"
+              >
+                {{ cit.name }} - {{ cit.desc }}
+              </option>
+            </select>
+            <div class="invalid-feedback">
+              La comuna es requerida.
+            </div>
+          </div>
+
+          <!-- Nombre -->
+          <div class="mb-3">
+            <input 
+              type="text" 
+              id="name" 
+              formControlName="name"
+              class="form-control" 
+              placeholder="Nombre corto para identificar dirección" 
+              maxlength="30"
+              [ngClass]="{ 'is-invalid': addressForm.get('name')?.touched && addressForm.get('name')?.invalid }"
+            >
+            <div class="invalid-feedback">
+              {{ addressForm.get('name')?.hasError('required') ? 'El nombre es requerido.' : 'Máximo 30 caracteres.' }}
+            </div>
+          </div>
+
+          <!-- Dirección -->
+          <div class="mb-3">
+            <input 
+              type="text" 
+              id="address" 
+              formControlName="address"
+              placeholder="Nombre Calle o Avenida"  
+              class="form-control" 
+              maxlength="100"
+              [ngClass]="{ 'is-invalid': addressForm.get('address')?.touched && addressForm.get('address')?.invalid }"
+            >
+            <div class="invalid-feedback">
+              {{ addressForm.get('address')?.hasError('required') ? 'La dirección es requerida.' : 'Máximo 100 caracteres.' }}
+            </div>
+          </div>
+
+          <!-- Número -->
+          <div class="mb-3">
+            <input 
+              type="text" 
+              id="number" 
+              formControlName="number" 
+              placeholder="Número de calle o casa"
+              class="form-control" 
+              maxlength="10"
+              [ngClass]="{ 'is-invalid': addressForm.get('number')?.touched && addressForm.get('number')?.invalid }"
+            >
+            <div class="invalid-feedback">
+              {{ addressForm.get('number')?.hasError('required') ? 'El número es requerido.' : 'Máximo 10 caracteres.' }}
+            </div>
+          </div>
+
+          <!-- Opcional: Depto, Casa u Oficina -->
+          <div class="mb-3">
+            <input 
+              type="text" 
+              id="houseNumber" 
+              formControlName="houseNumber"
+              placeholder="Opcional - Depto, Casa u Oficina" 
+              class="form-control" 
+              maxlength="100"
+            >
+          </div>
+
+          <!-- Teléfono -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="bi bi-phone"></i>&nbsp;+56
+              </span> 
+              <input 
+                type="text" 
+                id="phone" 
+                formControlName="phone" 
+                placeholder="Teléfono quién recibe"
+                class="form-control" 
+                maxlength="9"
+                (keypress)="allowOnlyNumbers($event)"
+                [ngClass]="{ 'is-invalid': addressForm.get('phone')?.touched && addressForm.get('phone')?.invalid }"
+              >
+            </div>
+            <div class="invalid-feedback">
+              Máximo 9 caracteres numéricos.
+            </div>
+          </div>
+
+          <!-- Instrucciones adicionales -->
+          <div class="mb-3">
+            <input 
+              type="text" 
+              id="obs" 
+              formControlName="obs" 
+              placeholder="Instrucciones adicionales"
+              class="form-control" 
+              maxlength="200"
+            >
+          </div>
+
+          <!-- Botón Guardar -->
+          <button type="submit" class="btn btn-primary-c1 w-100">
+            Guardar Dirección
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,67 @@
+<div class="auth container-fluid d-flex justify-content-center align-items-center bg-light" style="min-height: 60vh;">
+    <div class="card login-card p-4">
+
+      <div class="card-body">
+        <div class="mb-4 text-center auth-title">
+                <h4><b>Iniciar sesión</b></h4>
+            </div>
+        <form [formGroup]="form" (ngSubmit)="login()">
+            <!-- Campo email -->
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input type="email" id="inputEmail" class="form-control" placeholder="Email" 
+                      aria-label="Email" formControlName="email" />
+                <div *ngIf="form.get('email')?.invalid && (form.get('email')?.touched || form.get('email')?.dirty)" 
+                    class="invalid-feedback text-center d-inline msg">
+                  {{ getEmailErrorMessage() }}
+                </div>
+              </div>
+            </div>
+    
+            <!-- Campo password -->
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-key"></i></span>
+                <input type="password" id="inputPassword" class="form-control" placeholder="Contraseña" 
+                      aria-label="Contraseña" #passwordInput formControlName="password" autocomplete="true"/>
+                <span class="input-group-text toggle-password" (click)="showPass()">
+                  <i class="bi" [ngClass]="isShowing ? 'bi-eye-slash' : 'bi-eye'"></i>
+                </span>
+                <div *ngIf="(form.get('password')?.invalid && (form.get('password')?.touched || form.get('password')?.dirty)) || loginError" 
+                    class="invalid-feedback text-center d-inline msg">
+                  {{ getPasswordErrorMessage() }}
+                </div>
+              </div>
+            </div>
+    
+            <div class="mt-2 text-end">
+              <a routerLink="/auth/forgot" class="forgot-password-link">Olvidó su contraseña</a>
+            </div>
+    
+            <div class="text-center mt-4">
+              <button class="btn btn-primary-c1 btn-lg w-100" type="submit">Iniciar Sesión</button>
+            </div>
+            
+            <div class="d-flex justify-content-center mt-2 register-option">
+              <small>ó también puede</small>
+            </div>
+    
+            <div class="text-center register-link mt-2">
+              <small>Regístrarse <a routerLink="/auth/register">Aquí</a></small>
+            </div>
+          </form>
+          <div class="text-center">
+            <small>ó</small>
+          </div>
+           <!-- Botón de Google -->
+           <div class="GoogleLoginButtonContainer d-flex justify-content-center mt-2">
+            <asl-google-signin-button type="standard" size="large" logo_alignment="center"></asl-google-signin-button>
+          </div>
+
+
+      </div>
+
+    </div>
+  </div>
+  

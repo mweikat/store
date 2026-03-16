@@ -1,0 +1,57 @@
+// Contenedor del aviso
+.construction-container {
+  background: linear-gradient(45deg, #ff0000, #ff7300, #ffeb00); // Rojo, naranja y amarillo
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  width: 100%;
+}
+
+// Marquesina con animación
+.construction-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 15s linear infinite; // Velocidad ajustada
+
+  .marquee-content {
+    display: flex;
+    gap: 50px;
+  }
+
+  p {
+    margin: 0;
+    padding: 0 30px;
+    white-space: nowrap;
+  }
+}
+
+// Animación para mover el texto de derecha a izquierda de forma continua
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+// Responsividad
+@media (max-width: 768px) {
+  .construction-container {
+    font-size: 1rem;
+    padding: 8px 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .construction-container {
+    font-size: 0.9rem;
+    padding: 6px 0;
+  }
+}
