@@ -1,5 +1,5 @@
 {
-  "name": "mipatita",
+  "name": "store",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -10,7 +10,7 @@
     "build:styles": "node build-styles.js",
     "dev:with-styles": "npm run build:styles && ng serve",
     "build:prod": "npm run build:styles && ng build --configuration=production",
-    "serve:ssr:mipatita": "node dist/mipatita/server/server.mjs",
+    "serve:ssr:store": "node dist/store/server/server.mjs",
     "build:dev": "npm run build:styles && ng build"
   },
   "private": true,

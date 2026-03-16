@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "mipatita": {
+    "store": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/mipatita",
+            "outputPath": "dist/store",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -80,10 +80,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "mipatita:build:production"
+              "buildTarget": "store:build:production"
             },
             "development": {
-              "buildTarget": "mipatita:build:development"
+              "buildTarget": "store:build:development"
             }
           },
           "defaultConfiguration": "development"
