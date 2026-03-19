@@ -11,6 +11,7 @@ import { environment } from 'src/environments/environment';
 import { SeoService } from './seo.service';
 import { PageInfoModel } from '@models/pageInfo.model';
 import { SiteHomeSectionsModel } from '@models/siteHomeSections.model';
+import { BusinessService } from './business.service';
 
 @Injectable({
   providedIn: 'root'
@@ -57,7 +58,8 @@ export class SiteService {
   constructor(private httpClient:HttpClient, 
               private transferState: TransferState, 
               @Inject(PLATFORM_ID) private platformId: Object,
-              private seoService:SeoService
+              private seoService:SeoService,
+              private businessService:BusinessService
             ) {}
 
   getHomeRrss(){
@@ -86,14 +88,14 @@ export class SiteService {
 
   }
 
-  getHomeSlide() {
+  async getHomeSlide() {
 
     if(isPlatformBrowser(this.platformId)) {
       const home_slide = this.transferState.get(this.HOME_SLIDE, []);
       
       if(home_slide.length != 0) {
         this.$homeSlide.set(home_slide);
-        sessionStorage.setItem('slides',JSON.stringify(home_slide));
+        await sessionStorage.setItem('slides_'+this.businessService.getNameHost(),JSON.stringify(home_slide));
       } else {
         const carritoStorage = sessionStorage.getItem('slides');
         if(carritoStorage){

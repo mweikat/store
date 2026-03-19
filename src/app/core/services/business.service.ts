@@ -48,28 +48,29 @@ export class BusinessService {
       host = parts.length > 1 ? parts[0] : host;
 
       return host;
-    } else if (isPlatformServer(this.platformId) && this.request) {
+    } else 
+        if (isPlatformServer(this.platformId) && this.request) {
       
-      // En SSR con request disponible
-      host = this.request.headers?.get('host');
+        // En SSR con request disponible
+        host = this.request.headers?.get('host');
 
-      //console.log('host server: ', this.request.headers);
+        //console.log('host server: ', this.request.headers);
 
-      // Eliminar "www."
-      host = host.replace(/^www\./, '');
-      // Quitar extensión (.cl, .com, etc.) → sólo deja ej "mipatita"
-      let parts = host.split('.');
-      host = parts.length > 1 ? parts[0] : host;
+        // Eliminar "www."
+        host = host.replace(/^www\./, '');
+        // Quitar extensión (.cl, .com, etc.) → sólo deja ej "mipatita"
+        let parts = host.split('.');
+        host = parts.length > 1 ? parts[0] : host;
 
-      if (host && host.includes('localhost')) {
+        if (host && host.includes('localhost')) {
+          return this.defaultBusinessName;
+        }
+        return host || this.defaultBusinessName;;
+
+      } else {
+        // Fallback para SSR sin request
         return this.defaultBusinessName;
       }
-      return host || this.defaultBusinessName;;
-
-    } else {
-      // Fallback para SSR sin request
-      return this.defaultBusinessName;
-    }
   }
 
   /*setBusiness(business:BusinessInfoModel){
