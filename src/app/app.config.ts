@@ -3,10 +3,10 @@ import { provideRouter, withInMemoryScrolling } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay, withIncrementalHydration } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
-import { TokenInterceptor } from '@interceptor/token.interceptor';
-import { GenericInterceptor } from '@interceptor/generic.interceptor';
-import { TenantInterceptor } from './core/tenants/tenant.interceptor';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { tokenInterceptor } from '@interceptor/token.interceptor';
+import { genericInterceptor } from '@interceptor/generic.interceptor';
+import { tenantInterceptor } from './core/tenants/tenant.interceptor';
 import { TenantService } from './core/tenants/tenants.service';
 import { IMAGE_LOADER, ImageLoaderConfig } from '@angular/common';
 
@@ -25,31 +25,19 @@ export const appConfig: ApplicationConfig = {
       anchorScrolling: 'enabled',
     })), 
     provideClientHydration(withIncrementalHydration(), withEventReplay()),
-    provideHttpClient(withInterceptorsFromDi(),withFetch()),
-      {
-        provide: APP_INITIALIZER,
-        useFactory: initializeTenant,
-        deps: [TenantService],
-        multi: true
-      },
-      {
-        provide: HTTP_INTERCEPTORS,
-        useClass: TokenInterceptor,
-        multi: true
-      },
-      {
-        provide: HTTP_INTERCEPTORS,
-        useClass: GenericInterceptor,
-        multi: true
-      },
-      {
-        provide: HTTP_INTERCEPTORS,
-        useClass: TenantInterceptor,
-        multi: true
-      },
-      {
-        provide: IMAGE_LOADER,
-        useValue: (config: ImageLoaderConfig) => config.src
-      } 
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([tokenInterceptor, genericInterceptor, tenantInterceptor])
+    ),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeTenant,
+      deps: [TenantService],
+      multi: true
+    },
+    {
+      provide: IMAGE_LOADER,
+      useValue: (config: ImageLoaderConfig) => config.src
+    }
   ]
 };

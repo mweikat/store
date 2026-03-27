@@ -1,30 +1,19 @@
-// src/app/core/tenants/tenant.interceptor.ts
-import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { TenantService } from './tenants.service';
 
+export const tenantInterceptor: HttpInterceptorFn = (req, next) => {
+  const tenantService = inject(TenantService);
 
-@Injectable()
-export class TenantInterceptor implements HttpInterceptor {
-
-  constructor(private tenantService: TenantService) {}
-
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    try {
-      const businessId = this.tenantService.getBusinessId();
-      //console.log('busnessId---------> ', businessId);
-      const tenantReq = req.clone({
-        setHeaders: {
-          'businessId': businessId
-        }
-      });
-
-      return next.handle(tenantReq);
-    } catch (error) {
-      // Si el TenantService no está inicializado, continuar sin el header
-      //console.warn('TenantService not initialized, proceeding without businessId');
-      return next.handle(req);
-    }
+  try {
+    const businessId = tenantService.getBusinessId();
+    const tenantReq = req.clone({
+      setHeaders: {
+        'businessId': businessId
+      }
+    });
+    return next(tenantReq);
+  } catch (error) {
+    return next(req);
   }
-}
+};
