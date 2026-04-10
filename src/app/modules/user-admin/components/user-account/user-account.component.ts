@@ -22,8 +22,8 @@ export class UserAccountComponent implements OnInit {
     this.userService.getUserLoggedInfoFromServer();
 
     this.userForm = this.fb.group({
-      firstName: ['', [Validators.required, Validators.minLength(2)]],
-      lastName: ['', [Validators.minLength(2)]],
+      firstName: ['', [Validators.required, Validators.minLength(3)]],
+      lastName: ['', [Validators.minLength(3)]],
       phone: ['', [Validators.required, Validators.pattern(/^\d{9,15}$/)]],
     });
 
@@ -68,6 +68,37 @@ export class UserAccountComponent implements OnInit {
 
   resendVerificationEmail(): void {
     this.userService.resendVerifiedEmail();
+  }
+
+  // En el componente .ts
+  getFieldError(fieldName: string): string {
+    const field = this.userForm.get(fieldName);
+    
+    if (!field || !field.invalid || !(field.dirty || field.touched)) {
+      return '';
+    }
+    
+    if (field.errors?.['required']) {
+      return 'Este campo es requerido';
+    }
+    
+    if (field.errors?.['minlength']) {
+      return `Mínimo ${field.errors['minlength'].requiredLength} caracteres`;
+    }
+    
+    if (field.errors?.['pattern']) {
+      if (fieldName === 'phone') {
+        return 'Ingrese un teléfono válido (9 dígitos)';
+      }
+      return 'Formato inválido';
+    }
+    
+    return 'Campo inválido';
+  }
+
+  showFieldError(fieldName: string): boolean {
+    const field = this.userForm.get(fieldName);
+    return !!field && field.invalid && (field.dirty || field.touched);
   }
 
 }

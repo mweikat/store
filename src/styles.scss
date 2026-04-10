@@ -18,11 +18,11 @@ a:hover{
 }
 /**********************buttonss***************/
 .btn-primary-c1 {
-    background-color: vars.$primary-color;
-    border-color: vars.$primary-color;
-    color: vars.$light-bg;
+    background-color: vars.$primary-color !important;
+    border-color: vars.$primary-color !important;
+    color: vars.$light-bg !important;
     &:hover {
-      background-color: color.adjust(vars.$primary-color, $lightness:5%);
+      background-color: color.adjust(vars.$primary-color, $lightness:5%) !important;
     }
 }
 .btn-primary-c1:hover {

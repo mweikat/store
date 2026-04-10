@@ -15,9 +15,9 @@
                   id="email"
                   class="form-control"
                   readonly="true"
+                  disabled="true"
                   [(ngModel)]="email"
                 />
-                <div class="invalid-feedback">Por favor, ingrese un nombre válido.</div>
               </div>
 
               <form (ngSubmit)="updateUserInfo()" [formGroup]="userForm">
@@ -29,10 +29,10 @@
                     id="firstName"
                     formControlName="firstName"
                     class="form-control"
-                    [ngClass]="{'is-invalid': userForm.get('firstName')?.touched && userForm.get('firstName')?.invalid}"
+                    [ngClass]="{'is-invalid': showFieldError('firstName')}"
                     maxlength="30"
                   />
-                  <div class="invalid-feedback">Por favor, ingrese un nombre válido.</div>
+                  <div class="invalid-feedback">{{ getFieldError('firstName') }}</div>
                 </div>
     
                 <!-- Apellido -->
@@ -43,10 +43,10 @@
                     id="lastName"
                     formControlName="lastName"
                     class="form-control"
-                    [ngClass]="{'is-invalid': userForm.get('lastName')?.touched && userForm.get('lastName')?.invalid}"
+                    [ngClass]="{'is-invalid': showFieldError('lastName')}"
                     maxlength="30"
                   />
-                  <div class="invalid-feedback">Por favor, ingrese un apellido válido.</div>
+                  <div class="invalid-feedback">{{ getFieldError('lastName') }}</div>
                 </div>
     
                 <!-- Teléfono -->
@@ -59,11 +59,11 @@
                       id="phone"
                       formControlName="phone"
                       class="form-control"
-                      [ngClass]="{'is-invalid': userForm.get('phone')?.touched && userForm.get('phone')?.invalid}"
+                      [ngClass]="{'is-invalid': showFieldError('phone')}"
                       maxlength="9"
-                    />
+                    /><div class="invalid-feedback">{{ getFieldError('phone') }}</div>
                   </div>
-                  <div class="invalid-feedback">Por favor, ingrese un teléfono válido.</div>
+                  
                 </div>
     
                 <button type="submit" class="btn btn-primary-c1 w-100">Guardar Cambios</button>

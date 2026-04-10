@@ -183,7 +183,7 @@
   </div>
   
   <!-- Al final del componente -->
-@if(bundlesArray() && bundlesArray().length > 0) {
+@if(bundlesArray() && bundlesArray().length > 0 && product().stock > 0){
   <div class="bundle-tab d-md-none">
     <button class="btn btn-danger" (click)="scrollToBundles()">
       <i class="bi bi-gift-fill me-2"></i>Ofertas!!

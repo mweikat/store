@@ -12,6 +12,7 @@ import { SeoService } from './seo.service';
 import { PageInfoModel } from '@models/pageInfo.model';
 import { SiteHomeSectionsModel } from '@models/siteHomeSections.model';
 import { BusinessService } from './business.service';
+import { EMPTY } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -181,8 +182,7 @@ export class SiteService {
     if(isPlatformBrowser(this.platformId)){
       
       const home_logos = this.transferState.get(this.HOME_LOGOS, {} as siteLogoModel);
-
-      (home_logos)? this.$homeLogos.set(home_logos) : this.getLogosCall();
+      (home_logos&&home_logos.logo!=undefined)? this.$homeLogos.set(home_logos) : this.getLogosCall();
       
     }
 
