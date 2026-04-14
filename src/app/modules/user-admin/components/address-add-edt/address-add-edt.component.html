@@ -21,6 +21,8 @@
         <form [formGroup]="addressForm" (ngSubmit)="saveAddress()" *ngIf="initiatedForm">
           <!-- Región -->
           <div class="mb-3">
+            {{addressForm.get('phone')?.touched}}
+            {{addressForm.get('phone')?.invalid}}
             <select 
               class="form-control" 
               formControlName="region" 
@@ -36,7 +38,7 @@
                 {{ reg.name }}
               </option>
             </select>
-            <div class="invalid-feedback">
+            <div class="invalid-feedback" [style.display]="(addressForm.get('region')?.invalid) ? 'block' : 'none'">
               La región es requerida.
             </div>
           </div>
@@ -56,7 +58,7 @@
                 {{ cit.name }} - {{ cit.desc }}
               </option>
             </select>
-            <div class="invalid-feedback">
+            <div class="invalid-feedback" [style.display]="(addressForm.get('city')?.invalid) ? 'block' : 'none'">
               La comuna es requerida.
             </div>
           </div>
@@ -72,7 +74,7 @@
               maxlength="30"
               [ngClass]="{ 'is-invalid': addressForm.get('name')?.touched && addressForm.get('name')?.invalid }"
             >
-            <div class="invalid-feedback">
+            <div class="invalid-feedback" [style.display]="(addressForm.get('name')?.invalid) ? 'block' : 'none'">
               {{ addressForm.get('name')?.hasError('required') ? 'El nombre es requerido.' : 'Máximo 30 caracteres.' }}
             </div>
           </div>
@@ -88,7 +90,7 @@
               maxlength="100"
               [ngClass]="{ 'is-invalid': addressForm.get('address')?.touched && addressForm.get('address')?.invalid }"
             >
-            <div class="invalid-feedback">
+            <div class="invalid-feedback" [style.display]="(addressForm.get('address')?.invalid) ? 'block' : 'none'">
               {{ addressForm.get('address')?.hasError('required') ? 'La dirección es requerida.' : 'Máximo 100 caracteres.' }}
             </div>
           </div>
@@ -104,7 +106,7 @@
               maxlength="10"
               [ngClass]="{ 'is-invalid': addressForm.get('number')?.touched && addressForm.get('number')?.invalid }"
             >
-            <div class="invalid-feedback">
+            <div class="invalid-feedback" [style.display]="(addressForm.get('number')?.invalid) ? 'block' : 'none'">
               {{ addressForm.get('number')?.hasError('required') ? 'El número es requerido.' : 'Máximo 10 caracteres.' }}
             </div>
           </div>
@@ -134,12 +136,13 @@
                 placeholder="Teléfono quién recibe"
                 class="form-control" 
                 maxlength="9"
+                minlength="9"
                 (keypress)="allowOnlyNumbers($event)"
                 [ngClass]="{ 'is-invalid': addressForm.get('phone')?.touched && addressForm.get('phone')?.invalid }"
               >
             </div>
-            <div class="invalid-feedback">
-              Máximo 9 caracteres numéricos.
+            <div class="invalid-feedback" [style.display]="(addressForm.get('phone')?.invalid) ? 'block' : 'none'">
+              {{ addressForm.get('phone')?.hasError('minlength')|| addressForm.get('phone')?.hasError('maxlength') ? 'Ingrese un número válido.' : '' }}
             </div>
           </div>
 
