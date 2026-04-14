@@ -2,7 +2,7 @@ import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, PLATFORM_ID, REQUEST } from '@angular/core';
 import { BusinessModel } from '@models/business.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -12,7 +12,7 @@ export class BusinessService {
 
   private readonly URL = environment.api_business;
   private readonly defaultBusinessName = environment.defaultBusinessName;
-
+  private businessItem: BusinessModel = {} as BusinessModel;
 
   constructor(private httpClient:HttpClient, 
 
@@ -25,8 +25,13 @@ export class BusinessService {
   getBusinessHost(domain:string):Observable<BusinessModel>{
 
     //console.log('localhost ', domain);
-
-    return this.httpClient.get <BusinessModel>(`${this.URL}/info/${domain}`);
+    const isNumeric = (value: string): boolean => !isNaN(Number(value)) && value.trim() !== "";
+    if (isNumeric(domain)) {
+      return throwError(() => new Error('Invalid domain: numeric value provided'));
+    }else{
+      return this.httpClient.get <BusinessModel>(`${this.URL}/info/${domain}`);
+    }
+    
 
   }
 
@@ -73,18 +78,18 @@ export class BusinessService {
       }
   }
 
-  /*setBusiness(business:BusinessInfoModel){
+  setBusiness(business:BusinessModel){
 
-    localStorage.setItem('business', JSON.stringify(business));
+    localStorage.setItem(`business_${this.getNameHost()}`, JSON.stringify(business));
 
-  }*/
+  }
 
-  /*getBusinessStorage():BusinessModel{
-    const businessStorage = JSON.stringify(localStorage.getItem('business'));
-    this.businessItem = businessStorage;
+  getBusinessStorage():BusinessModel{
+    const businessStorageString = localStorage.getItem(`business_${this.getNameHost()}`);
+    this.businessItem = businessStorageString ? JSON.parse(businessStorageString) : {} as BusinessModel;
     return this.businessItem;
 
-  }*/
+  }
 
   /*getBusinessByName(name:string){
     

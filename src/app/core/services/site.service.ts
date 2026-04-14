@@ -13,6 +13,7 @@ import { PageInfoModel } from '@models/pageInfo.model';
 import { SiteHomeSectionsModel } from '@models/siteHomeSections.model';
 import { BusinessService } from './business.service';
 import { EMPTY } from 'rxjs';
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,7 @@ import { EMPTY } from 'rxjs';
 export class SiteService {
 
   private readonly URL = environment.api_store;
-  private readonly ENV =  environment.production; 
+  private readonly ENV =  environment.production;
 
   private readonly HOME_SECTIONS = makeStateKey<SiteHomeSectionsModel[]>('home_sections')
   private $homeSections = signal<SiteHomeSectionsModel[]>([]);
@@ -60,7 +61,8 @@ export class SiteService {
               private transferState: TransferState, 
               @Inject(PLATFORM_ID) private platformId: Object,
               private seoService:SeoService,
-              private businessService:BusinessService
+              private businessService:BusinessService,
+              private storageService: StorageService
             ) {}
 
   getHomeRrss(){
@@ -89,7 +91,7 @@ export class SiteService {
 
   }
 
-  async getHomeSlide() {
+  /*async getHomeSlide() {
 
     if(isPlatformBrowser(this.platformId)) {
       const home_slide = this.transferState.get(this.HOME_SLIDE, []);
@@ -116,7 +118,62 @@ export class SiteService {
       this.$homeSlide.set(receivedItem); // Usamos set() en lugar de next()
       
     });
+  }*/
+
+  async getHomeSlide() {
+
+  const storageKey = 'slides_' + this.businessService.getNameHost();
+
+  if (isPlatformBrowser(this.platformId)) {
+
+    const home_slide = this.transferState.get(this.HOME_SLIDE, []);
+
+    if (home_slide.length != 0) {
+
+      this.$homeSlide.set(home_slide);
+
+      // ✅ Guardar con expiración usando el service
+      this.storageService.setWithExpiry(storageKey, home_slide, '1d');
+
+    } else {
+
+      const storedSlides = this.storageService.getWithExpiry<SiteSlideHomeModel[]>(storageKey);
+
+      if (storedSlides) {
+        // ✅ Cache válido
+        this.$homeSlide.set(storedSlides);
+        //console.log("Cargado desde cache con StorageService");
+        //console.log(storedSlides);
+      } else {
+        this.getHomeSlideCall();
+      }
+
+    }
+
+  } else {
+    this.getHomeSlideCall();
   }
+}
+
+
+private getHomeSlideCall() {
+  this.httpClient
+    .get<SiteSlideHomeModel[]>(`${this.URL}/slides?time=${new Date().toString()}`)
+    .subscribe(receivedItem => {
+
+      this.transferState.set(this.HOME_SLIDE, receivedItem);
+      this.$homeSlide.set(receivedItem);
+
+      // ✅ Guardar cache con expiración
+      if (isPlatformBrowser(this.platformId)) {
+        const storageKey = 'slides_' + this.businessService.getNameHost();
+        const oneDay = 24 * 60 * 60 * 1000;
+
+        this.storageService.setWithExpiry(storageKey, receivedItem, '1d');
+      }
+
+    });
+}
 
   getBanner(name:string){ 
 

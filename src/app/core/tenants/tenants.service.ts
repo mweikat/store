@@ -75,7 +75,7 @@ export class TenantService {
     return this.currentBusiness;
   }
 
-  private async loadBusinessStyles_(): Promise<void> {
+  /*private async loadBusinessStyles_(): Promise<void> {
 
     if (!this.currentBusiness) return;
 
@@ -98,9 +98,9 @@ export class TenantService {
         document.head.appendChild(this.styleElement!);
       });
     }
-  }
+  }*/
 
-  private loadBusinessStyles(){
+  private async loadBusinessStyles(){
 
     if (!this.currentBusiness) return;
 
@@ -118,6 +118,8 @@ export class TenantService {
 
       this.document.head.appendChild(this.styleElement);
       
+    }else{
+      await this.businessApi.setBusiness(this.currentBusiness);
     }
   }
 

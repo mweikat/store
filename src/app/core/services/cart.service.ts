@@ -9,6 +9,8 @@ import { environment } from 'src/environments/environment';
 import { MessagesService } from './messages.service';
 import { CartItemQRModel } from '@models/cartItemQR.model';
 import { isPlatformBrowser } from '@angular/common';
+import { BusinessService } from './business.service';
+import { BusinessModel } from '@models/business.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +18,8 @@ import { isPlatformBrowser } from '@angular/common';
 export class CartService {
 
   private readonly URL = environment.api_store;
+
+  private business:BusinessModel = {} as BusinessModel;
 
   private $currentCart = signal<CartModel>({} as CartModel);
   public readonly $currentCartSignal = this.$currentCart.asReadonly();
@@ -43,7 +47,13 @@ export class CartService {
 
   constructor(private httpClient:HttpClient, private router: Router, 
               private messageService:MessagesService,
-              @Inject(PLATFORM_ID) private platformId: Object) { }
+              @Inject(PLATFORM_ID) private platformId: Object,
+              private businessService: BusinessService
+            ) {
+              if(isPlatformBrowser(this.platformId)){
+                this.business = this.businessService.getBusinessStorage();
+              }
+             }
 
   getCart(){
 
@@ -138,10 +148,10 @@ export class CartService {
 
     this.httpClient.post<CartModel>(`${this.URL}/${urlEndopoint}`,toJson, { responseType: 'json'}).subscribe(receivedItem => {
       this.setCartFromLocalSession(receivedItem);
-      //localStorage.setItem('cart', JSON.stringify(receivedItem));
+
       this.$currentCart.set(receivedItem);
       this.cartModelMenu$.next(receivedItem);
-      //this.$haveStock.set(true);
+
       const msgModel = {} as MessageModel;
       msgModel.msg="El producto ha sido agregado al carrito.";
       msgModel.active=1;
@@ -216,7 +226,7 @@ export class CartService {
 
   
   getCartFromLocalSession(){
-    return JSON.parse(localStorage.getItem('cart') || '[]');
+    return JSON.parse(localStorage.getItem(`cart_${this.business.id}`) || '[]');
   }
 
   addQuantity(cartItemId:string, quantity:number, cartReload:boolean){
@@ -361,11 +371,11 @@ private async removeItemBundleFromCart(itemId: string){
 }
 
 private setCartFromLocalSession(cart:CartModel){
-  localStorage.setItem('cart', JSON.stringify(cart));
+  localStorage.setItem(`cart_${this.business.id}`, JSON.stringify(cart));
 }
 
 private delCartFromLocalSession(){
-  localStorage.removeItem('cart');
+  localStorage.removeItem(`cart_${this.business.id}`);
 }
 
 private  goCart(){

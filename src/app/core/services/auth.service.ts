@@ -1,28 +1,20 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable, makeStateKey, PLATFORM_ID, signal, TransferState } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { LoginModel } from '@models/login.model';
 import { ResetPasswordModel } from '@models/changeResetPassword.model';
-import { UserService } from './user.service';
 import { UserModel } from '@models/user.model';
 import { CartService } from './cart.service';
 import { CartModel } from '@models/cart.model';
 import { LoginResponseModel } from '@models/loginResponse.model';
 import { MessageModel } from '@models/message.model';
 import { MessagesService } from './messages.service';
-import { isPlatformBrowser, isPlatformServer } from '@angular/common';
-import { SocialUser } from '@abacritt/angularx-social-login';
-import { blob } from 'stream/consumers';
-import { error } from 'console';
-/*import { UserModel } from '@models/user.model';
-import { MessagesService } from './messages.service';
-import { MessageModel } from '@models/message.model';
-import { ResetPasswordModel } from '@models/changeResetPassword.model';
+import { isPlatformBrowser } from '@angular/common';
 import { BusinessService } from './business.service';
-import { BusinessModel } from '../models/business.model';
-*/
+import { BusinessModel } from '@models/business.model';
+
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +22,7 @@ import { BusinessModel } from '../models/business.model';
 export class AuthService {
 
   private readonly URL = environment.apiAuth;
-  //private readonly business_id = environment.id_business;
+  private business:BusinessModel = {} as BusinessModel;
 
   private readonly token$: BehaviorSubject<any> = new BehaviorSubject( {} as any);
   public readonly currentToken: Observable<any> = this.token$.asObservable();
@@ -51,10 +43,15 @@ export class AuthService {
   constructor(private httpClient:HttpClient, 
               private router:Router,
               private cartService:CartService,
-              private transferState: TransferState,
               private messageService:MessagesService,
-              @Inject(PLATFORM_ID) private platformId: Object
-            ) { }
+              @Inject(PLATFORM_ID) private platformId: Object,
+              private businessService: BusinessService
+            ) { 
+              if(isPlatformBrowser(this.platformId)){
+                this.business = this.businessService.getBusinessStorage();
+                //console.log('Negocio actual en AuthService constructor:', this.business.id);
+              }
+            }
 
   login (loginModel:LoginModel, goCheckout:boolean){
     
@@ -89,17 +86,20 @@ export class AuthService {
   }
 
   setUserItemStorage(user:UserModel){
-    
-    localStorage.setItem('user',JSON.stringify(user));
-    this.user$.next(user);
+    //console.log('Negocio actual en setUserItemStorage 1:', this.business.id);
+    if(this.business.id==undefined)
+      this.business.id = this.businessService.getBusinessStorage().id;
+    //console.log('Negocio actual en setUserItemStorage 2:', this.business.id);
 
+    localStorage.setItem('user_'+this.business.id,JSON.stringify(user));
+    this.user$.next(user);
   }
 
   isLoggedIn() {
 
     if(isPlatformBrowser(this.platformId)){ 
     
-      if(localStorage.getItem('access_token')!=null && localStorage.getItem('user')!=null)
+      if(localStorage.getItem('access_token_'+this.business.id)!=null && localStorage.getItem('user_'+this.business.id)!=null)
         return true;
       
       return false;
@@ -112,18 +112,26 @@ export class AuthService {
   logout() {
     if(isPlatformBrowser(this.platformId)){ 
       this.removeLocalStorage();
-      this.router.navigate(['/']).then(() => {
+      
+      /*this.router.navigate(['/']).then(() => {
+        console.log('Navegación a la página de inicio después del logout');
         window.location.href = '/';
-      });
+      });*/
+      window.location.href = '/';
+      //console.log('Usuario deslogueado, redirigiendo a la página de inicio');
     }
   }
 
   removeLocalStorage(){
-    localStorage.clear();
+    //localStorage.clear();
+    //console.log('Negocio actual en logout:', this.business.id);
+    localStorage.removeItem('access_token_'+this.business.id);
+    localStorage.removeItem('user_'+this.business.id);
+    localStorage.removeItem('cart_'+this.business.id);
   }
 
   getToken(){
-    const userStorage = localStorage.getItem('access_token');
+    const userStorage = localStorage.getItem('access_token_'+this.business.id);
     return JSON.parse(userStorage!);
   }
 
@@ -131,7 +139,7 @@ export class AuthService {
 
     if(isPlatformBrowser(this.platformId)){ 
 
-      const userStorage = localStorage.getItem('user');
+      const userStorage = localStorage.getItem('user_'+this.business.id);
       if(userStorage){
         const userModel:UserModel = JSON.parse(userStorage!);
         return userModel;
@@ -231,6 +239,10 @@ export class AuthService {
       let cart:CartModel = this.cartService.getCartFromLocalSession();
       if(cart.id!=undefined)
         this.cartService.asosiateCart(cart.id);
+      else{
+        //console.log('No hay carrito local para asociar');
+        this.cartService.getCartLoggedIn();
+      }
 
     }
     
@@ -238,8 +250,14 @@ export class AuthService {
   }
 
   private postLogin(receivedItem:LoginResponseModel, goCheckout:boolean){
+    //console.log('Negocio actual en postLogin 1:', this.business.id);
+    
+    if(this.business.id==undefined)
+      this.business.id = this.businessService.getBusinessStorage().id;
+    
+    //console.log('Negocio actual en postLogin 2:', this.business.id);
 
-    localStorage.setItem('access_token',JSON.stringify(receivedItem.access_token));
+    localStorage.setItem('access_token_'+this.business.id,JSON.stringify(receivedItem.access_token));
 
       const userRecived:UserModel = receivedItem.user;
       this.setUserItemStorage(userRecived);
