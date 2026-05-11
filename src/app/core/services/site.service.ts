@@ -133,7 +133,7 @@ export class SiteService {
       this.$homeSlide.set(home_slide);
 
       // ✅ Guardar con expiración usando el service
-      this.storageService.setWithExpiry(storageKey, home_slide, '1d');
+      this.storageService.setWithExpiry(storageKey, home_slide, '1h');
 
     } else {
 
@@ -167,9 +167,8 @@ private getHomeSlideCall() {
       // ✅ Guardar cache con expiración
       if (isPlatformBrowser(this.platformId)) {
         const storageKey = 'slides_' + this.businessService.getNameHost();
-        const oneDay = 24 * 60 * 60 * 1000;
 
-        this.storageService.setWithExpiry(storageKey, receivedItem, '1d');
+        this.storageService.setWithExpiry(storageKey, receivedItem, '1h');
       }
 
     });
