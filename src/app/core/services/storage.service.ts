@@ -34,7 +34,7 @@ export class StorageService {
       case '1d':
         ttl = this.oneDay; 
         break;
-      case '1m':
+      case '1mo':
         ttl = this.oneMonth;
         break;
       case '1y':
