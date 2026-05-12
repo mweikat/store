@@ -123,6 +123,9 @@ export class SiteService {
   async getHomeSlide() {
 
   const storageKey = 'slides_' + this.businessService.getNameHost();
+  //const storedSlides = this.storageService.getWithExpiry<SiteSlideHomeModel[]>(storageKey);
+  
+  //console.log("obteniendo slides con StorageService: ", storageKey, storedSlides);
 
   if (isPlatformBrowser(this.platformId)) {
 
@@ -131,9 +134,13 @@ export class SiteService {
     if (home_slide.length != 0) {
 
       this.$homeSlide.set(home_slide);
+      //
+      this.transferState.set(this.HOME_SLIDE, []); // Limpiar el estado transferido para liberar memoria y guardar cache solo en StorageService
 
       // ✅ Guardar con expiración usando el service
-      this.storageService.setWithExpiry(storageKey, home_slide, '1h');
+      this.storageService.setWithExpiry(storageKey, home_slide, '1m');
+
+      //console.log("seteando slice setWithExpiry: ", storageKey, home_slide);
 
     } else {
 
@@ -168,7 +175,7 @@ private getHomeSlideCall() {
       if (isPlatformBrowser(this.platformId)) {
         const storageKey = 'slides_' + this.businessService.getNameHost();
 
-        this.storageService.setWithExpiry(storageKey, receivedItem, '1h');
+        this.storageService.setWithExpiry(storageKey, receivedItem, '1m');
       }
 
     });

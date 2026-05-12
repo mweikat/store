@@ -6,6 +6,7 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class StorageService {
 
+  private readonly oneMinute = 60 * 1000;
   private readonly oneHour = 60 * 60 * 1000;
   private readonly oneDay = 24 * 60 * 60 * 1000;
   private readonly oneMonth = 24 * 60 * 60 * 1000 * 30;
@@ -24,6 +25,9 @@ export class StorageService {
     let ttl = 0;
     
     switch (time) {
+      case '1m':
+        ttl = this.oneMinute;
+        break;
       case '1h':
         ttl = this.oneHour;
         break;
