@@ -46,6 +46,59 @@
         }
       }
 
+      @case ('timer') {
+
+        @if(section.defer_time === 3 || section.defer_time == null) {
+          @defer (on timer(3s)) {
+            <ng-container
+              *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
+            </ng-container>
+          } @placeholder {
+            <div class="home-section-placeholder">
+            </div>
+          }
+
+        }
+
+        @if(section.defer_time === 5) {
+          @defer (on timer(5s)) {
+            <ng-container
+              *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
+            </ng-container>
+          } @placeholder {
+            <div class="home-section-placeholder">
+            </div>
+          }
+
+        }
+
+        @if(section.defer_time === 10) {
+          @defer (on timer(10s)) {
+            <ng-container
+              *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
+            </ng-container>
+          } @placeholder {
+            <div class="home-section-placeholder">
+            </div>
+          }
+
+        }
+
+        @if(section.defer_time === 15) {
+
+          @defer (on timer(15s)) {
+            <ng-container
+              *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
+            </ng-container>
+          } @placeholder {
+            <div class="home-section-placeholder">
+            </div>
+          }
+
+        }
+        
+      }
+
       <!-- @case ('when') {
         @defer (when slideActive) {
           <ng-container
