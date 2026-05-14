@@ -13,6 +13,8 @@ export class DeliveryComponent {
 
     @Input() title?: string;
     @Input() desc?: string;
+    @Input() ttl?: string;
+    
     private tenantService = inject(TenantService);
     business = this.tenantService.getCurrentBusiness();
     

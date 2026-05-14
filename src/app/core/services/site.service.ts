@@ -120,9 +120,8 @@ export class SiteService {
     });
   }*/
 
-  getHomeSlide() {
+  getHomeSlide(ttl:string) {
 
-  const storageKey = 'slides_' + this.businessService.getNameHost();
   //const storedSlides = this.storageService.getWithExpiry<SiteSlideHomeModel[]>(storageKey);
   
   //console.log("obteniendo slides con StorageService: ", storageKey, storedSlides);
@@ -130,15 +129,16 @@ export class SiteService {
   if (isPlatformBrowser(this.platformId)) {
 
     const home_slide = this.transferState.get(this.HOME_SLIDE, []);
+    const storageKey = 'slides_' + this.businessService.getNameHost();
 
     if (home_slide.length != 0) {
 
       this.$homeSlide.set(home_slide);
       //
-      this.transferState.set(this.HOME_SLIDE, []); // Limpiar el estado transferido para liberar memoria y guardar cache solo en StorageService
+      this.transferState.remove(this.HOME_SLIDE); // Limpiar el estado transferido para liberar memoria y guardar cache solo en StorageService
 
       // ✅ Guardar con expiración usando el service
-      this.storageService.setWithExpiry(storageKey, home_slide, '1h');
+      this.storageService.setWithExpiry(storageKey, home_slide, ttl);
 
       //console.log("seteando slice setWithExpiry: ", storageKey, home_slide);
 
@@ -152,18 +152,18 @@ export class SiteService {
         //console.log("Cargado desde cache con StorageService");
         //console.log(storedSlides);
       } else {
-        this.getHomeSlideCall();
+        this.getHomeSlideCall(ttl);
       }
 
     }
 
   } else {
-    this.getHomeSlideCall();
+    this.getHomeSlideCall(ttl);
   }
 }
 
 
-private getHomeSlideCall() {
+private getHomeSlideCall(ttl:string) {
   this.httpClient
     .get<SiteSlideHomeModel[]>(`${this.URL}/slides?time=${new Date().toString()}`)
     .subscribe(receivedItem => {
@@ -175,7 +175,7 @@ private getHomeSlideCall() {
       if (isPlatformBrowser(this.platformId)) {
         const storageKey = 'slides_' + this.businessService.getNameHost();
 
-        this.storageService.setWithExpiry(storageKey, receivedItem, '1h');
+        this.storageService.setWithExpiry(storageKey, receivedItem, ttl);
       }
 
     });

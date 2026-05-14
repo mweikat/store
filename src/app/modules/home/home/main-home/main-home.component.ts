@@ -49,7 +49,8 @@ export class MainHomeComponent{
 
     return {
       title: siteHomeSections.title,
-      desc: siteHomeSections.desc
+      desc: siteHomeSections.desc,
+      ttl: siteHomeSections.ttl,
     };
 
   }

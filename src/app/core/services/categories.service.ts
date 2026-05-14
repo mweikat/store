@@ -6,6 +6,8 @@ import { CategoryHomeModel } from '@models/categoryHome.model';
 import { Observable, Subject } from 'rxjs';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { environment } from 'src/environments/environment';
+import { BusinessService } from './business.service';
+import { StorageService } from './storage.service';
 
 const CATEGORY_KEY = makeStateKey<CategoryModel>('category');
 
@@ -52,29 +54,47 @@ export class CategoriesService {
   private $homeCat = signal<CategoryHomeModel[]>([]);
   public readonly homeCatSignal = this.$homeCat.asReadonly(); 
   
-  constructor(private httpClient:HttpClient, private transferState: TransferState, @Inject(PLATFORM_ID) private platformId: Object) { }
+  constructor(private httpClient:HttpClient, private transferState: TransferState, @Inject(PLATFORM_ID) private platformId: Object, 
+              private businessService: BusinessService,
+              private storageService: StorageService) { }
 
-  getHomeCat(){
-
-    if(isPlatformServer(this.platformId))
-      this.getHomeCatCall();
-    
+  getHomeCat(ttl:string){
+   
     if(isPlatformBrowser(this.platformId)){
-      
+      const storageKey = 'home_cat_' + this.businessService.getNameHost();
       const home_cat = this.transferState.get(this.HOME_CAT, []);
    
-      (home_cat.length>0)? this.$homeCat.set(home_cat) : this.getHomeCatCall();
+      if(home_cat.length>0){
+        this.$homeCat.set(home_cat);
+        this.transferState.remove(this.HOME_CAT);
+        this.storageService.setWithExpiry(storageKey, home_cat, ttl);
+        //console.log("Cargado desde cache con TransferState homecat", ttl);
+       }else{
+
+        const storedHomeCat = this.storageService.getWithExpiry<CategoryHomeModel[]>(storageKey);
+        
+        if (storedHomeCat) {
+          this.$homeCat.set(storedHomeCat);
+          //console.log("Cargado desde cache con StorageService homecat", ttl);
+        }else
+          this.getHomeCatCall(ttl);
+       }
       
-    }
+    }else
+      this.getHomeCatCall(ttl);
 
   }
 
-  private getHomeCatCall(){
+  private getHomeCatCall(ttl:string){
 
     this.httpClient.get <CategoryHomeModel[]>(`${this.URL}/category/imgs`).subscribe(receivedItem => {
 
       this.transferState.set(this.HOME_CAT, receivedItem);
       this.$homeCat.set(receivedItem);
+
+      if(isPlatformBrowser(this.platformId)){
+
+      }
     
     });
 

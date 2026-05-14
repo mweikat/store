@@ -9,6 +9,7 @@ export class StorageService {
   private readonly oneMinute = 60 * 1000;
   private readonly oneHour = 60 * 60 * 1000;
   private readonly oneDay = 24 * 60 * 60 * 1000;
+  private readonly oneWeek = 7 * 24 * 60 * 60 * 1000;
   private readonly oneMonth = 24 * 60 * 60 * 1000 * 30;
   private readonly oneYear = 24 * 60 * 60 * 1000 * 30 * 12;
 
@@ -33,6 +34,9 @@ export class StorageService {
         break;
       case '1d':
         ttl = this.oneDay; 
+        break;
+      case '1w':
+        ttl = this.oneWeek;
         break;
       case '1mo':
         ttl = this.oneMonth;

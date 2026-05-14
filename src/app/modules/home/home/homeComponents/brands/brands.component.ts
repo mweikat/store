@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { SharedModule } from '@modules/shared/shared.module';
 import { BrandService } from '@services/brand.service';
 
@@ -10,16 +10,21 @@ import { BrandService } from '@services/brand.service';
     imports:[CommonModule, SharedModule],
     standalone: true
 })
-export class BrandsComponent {
+export class BrandsComponent implements OnChanges{
 
     @Input() title?: string;
     @Input() desc?: string;
+    @Input() ttl: string = '';
 
     private brandService = inject(BrandService);
     brands = this.brandService.brandArraySignal;
 
-    constructor(){
-        this.brandService.getBrands();
+    constructor(){}
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if(changes['ttl'].currentValue !== undefined && changes['ttl'].currentValue !== ''){
+            this.brandService.getBrands(this.ttl);
+        }
     }
 
     getBrandChunks() {

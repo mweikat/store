@@ -7,6 +7,7 @@ export interface SiteHomeSectionsModel {
     defer_strategy:'none' | 'immediate' | 'viewport' | 'idle' | 'when' | 'timer';
     defer_time:number|null;
     position:string;
+    ttl:string;
 }
 
 export type HomeSectionCode =

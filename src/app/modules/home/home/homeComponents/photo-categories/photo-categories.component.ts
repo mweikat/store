@@ -1,5 +1,5 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, HostListener, inject, Inject, Input, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, HostListener, inject, Inject, Input, OnChanges, PLATFORM_ID, SimpleChanges } from '@angular/core';
 import { SharedModule } from '@modules/shared/shared.module';
 import { CategoriesService } from '@services/categories.service';
 
@@ -11,10 +11,11 @@ import { CategoriesService } from '@services/categories.service';
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PhotoCategoriesComponent{
+export class PhotoCategoriesComponent implements OnChanges{
 
   @Input() title?: string;
   @Input() desc?: string;
+  @Input() ttl: string = '';
 
   private categoryService = inject(CategoriesService);
   categories = this.categoryService.homeCatSignal;
@@ -30,7 +31,6 @@ export class PhotoCategoriesComponent{
   showButtons:boolean = false;
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object){
-    this.categoryService.getHomeCat();
 
     effect(()=>{
 
@@ -40,6 +40,11 @@ export class PhotoCategoriesComponent{
       }
 
     });
+  }
+  ngOnChanges(changes: SimpleChanges): void {
+    if(changes['ttl'].currentValue !== undefined && changes['ttl'].currentValue !== ''){
+      this.categoryService.getHomeCat(this.ttl);
+    }
   }
 
   @HostListener('window:resize')

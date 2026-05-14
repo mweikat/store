@@ -15,6 +15,7 @@ export class Sale2Component {
 
   @Input() title?: string;
   @Input() desc?: string;
+  @Input() ttl?: string;
 
   private categoryService = inject(CategoriesService);
   category = this.categoryService.categoryModelHome2Signal;
