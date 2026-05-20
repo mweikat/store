@@ -12,7 +12,7 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class ShippingService {
 
-  private readonly URL = environment.api_shipping_client;
+  private readonly URL = environment.api_shipping_client; 
   private msgModel:MessageModel = {} as MessageModel;
 
   private readonly shippingAddress$: Subject<ShippingAddress[]> = new Subject();
