@@ -2,7 +2,7 @@
 <app-checkout-steps [currentStep]="currentStep"></app-checkout-steps>
 }
 @defer(on idle){
-<app-order-iterate-purchase [totalOrderPrice]="totalOrderPrice()"></app-order-iterate-purchase>
+<app-order-iterate-purchase [totalOrderPrice]="sub_total_price()"></app-order-iterate-purchase>
 }
 
 <div class="check-out container my-4">
@@ -17,7 +17,7 @@
         </div>
 
         <!-- Payment Selection -->
-        <div [hidden]="currentStep !== 2">
+        <div [hidden]="currentStep !== 2"> 
           <app-payment (paymentSelected)="getPaymentMethod($event)"></app-payment>
         </div>
        
