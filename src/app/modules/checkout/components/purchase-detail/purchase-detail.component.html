@@ -92,7 +92,7 @@
         </div>
         @if(applyDiscountText!="" && applyDiscountText!=null){
             <div class="d-flex justify-content-between discount">
-                <p class="m-0 text-danger ts-1">{{applyDiscountText}}</p>
+                <p class="m-0 text-danger ts-1"><small>{{applyDiscountText}}</small></p>
                 <p class="m-0 text-danger ts-1"><b>${{disc_amount | number | comaToDot}}</b></p>
             </div>
         }
