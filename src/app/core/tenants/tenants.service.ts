@@ -1,6 +1,6 @@
 // src/app/core/tenants/tenant.service.ts
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { DOCUMENT, isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { Injectable, Inject, PLATFORM_ID, DOCUMENT } from '@angular/core';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { BusinessModel } from '@models/business.model';
 import { BusinessService } from '@services/business.service';
 import { BehaviorSubject, Observable } from 'rxjs';

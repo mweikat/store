@@ -1,6 +1,6 @@
-import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable, makeStateKey, PLATFORM_ID, signal, TransferState } from '@angular/core';
+import { Inject, Injectable, makeStateKey, PLATFORM_ID, signal, TransferState, DOCUMENT } from '@angular/core';
 import { ProductNStockError } from '@models/error/productNStockError.model';
 import { OrderModel } from '@models/order.model';
 import { OrderDiscountModel } from '@models/orderDiscount.model';

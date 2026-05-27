@@ -1,5 +1,5 @@
-import { DOCUMENT } from '@angular/common';
-import { Component, effect, inject, Inject, OnDestroy, OnInit } from '@angular/core';
+
+import { Component, effect, inject, Inject, OnDestroy, OnInit, DOCUMENT } from '@angular/core';
 import { CartItemModel } from '@models/cartItem.model';
 import { AuthService } from '@services/auth.service';
 import { CartService } from '@services/cart.service';

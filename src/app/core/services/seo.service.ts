@@ -1,5 +1,5 @@
-import { DOCUMENT, isPlatformBrowser, isPlatformServer } from '@angular/common';
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
+import { Inject, Injectable, PLATFORM_ID, DOCUMENT } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { environment } from 'src/environments/environment';
 import { TenantService } from '../tenants/tenants.service';
