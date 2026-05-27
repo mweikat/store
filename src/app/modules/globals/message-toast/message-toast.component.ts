@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
     standalone:true,
     imports: [CommonModule, SharedModule],
     templateUrl: './message-toast.component.html',
-    styleUrl: './message-toast.component.css',
+    styleUrl: './message-toast.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MessageToastComponent {

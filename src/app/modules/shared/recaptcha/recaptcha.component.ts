@@ -15,7 +15,7 @@ export {};
 @Component({
     selector: 'app-recaptcha',
     templateUrl: './recaptcha.component.html',
-    styleUrl: './recaptcha.component.css',
+    styleUrl: './recaptcha.component.scss',
     standalone: false
 })
 export class RecaptchaComponent implements OnInit, AfterViewInit, OnDestroy{

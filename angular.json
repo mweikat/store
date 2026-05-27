@@ -68,7 +68,7 @@
               ],
               "outputHashing": "all",
               "security": {
-                "allowedHosts": ["lil.cl","mipatita"]
+                "allowedHosts": ["lil.cl","mipatita.cl","localhost"]
               }
             },
             "development": {

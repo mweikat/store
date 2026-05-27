@@ -12,7 +12,11 @@ const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+
+const angularApp = new AngularNodeAppEngine({
+  // En AngularNodeAppEngine debe ser estrictamente un booleano
+  trustProxyHeaders: true 
+});
 
 app.use(express.static(browserDistFolder, {
   maxAge: '1y'
@@ -29,7 +33,14 @@ app.get('/sitemap.xml', async (req, res): Promise<void> => {
         console.log(`Generando sitemap para dominio: ${domain}`);
 
         // Manejo de localhost
-        const isLocalhost = domain.includes('localhost');
+        const localHosts = [
+                'localhost',
+                '127.0.0.1',
+                '34.201.206.99'
+                ];
+
+        const isLocalhost = localHosts.some(host => domain.includes(host));
+        //const isLocalhost = domain.includes('localhost','34.201.206.99');
         if (isLocalhost) {
             domain = 'localhost:4000'; // Usar puerto de desarrollo
             domain_sin_punto = 'mipatita'; // Default para desarrollo

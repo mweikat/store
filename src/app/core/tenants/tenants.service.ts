@@ -4,12 +4,14 @@ import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { BusinessModel } from '@models/business.model';
 import { BusinessService } from '@services/business.service';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 
 
 @Injectable({ providedIn: 'root' })
 export class TenantService {
 
+  private readonly ENVIRONMENT = environment.production;
   private currentBusiness: BusinessModel | undefined = undefined;
   private static readonly domainCache = new Map<string, BusinessModel>();
   private styleElement: HTMLLinkElement | null = null;
@@ -34,7 +36,7 @@ export class TenantService {
     if (cached) {
       this.currentBusiness = cached;
       this.businessSubject.next(cached);
-      await this.loadBusinessStyles();
+      await this.loadBusinessStyles(domain);
       return;
     }
 
@@ -51,7 +53,7 @@ export class TenantService {
       TenantService.domainCache.set(domain, this.currentBusiness);
       this.businessSubject.next(this.currentBusiness); // ← EMITIR GLOBALMENTE
       // Cargar estilos específicos del business
-      await this.loadBusinessStyles();
+      await this.loadBusinessStyles(domain);
 
       //console.log('✅ Tenant configurado:', this.currentBusiness.url);
       
@@ -100,7 +102,7 @@ export class TenantService {
     }
   }*/
 
-  private async loadBusinessStyles(){
+  private async loadBusinessStyles(domain:string){
 
     if (!this.currentBusiness) return;
 
@@ -114,7 +116,12 @@ export class TenantService {
       // Cargar nuevos estilos del business
       this.styleElement = this.document.createElement('link');
       this.styleElement.rel = 'stylesheet';
-      this.styleElement.href = `/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`;
+      //this.styleElement.href = `/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`;
+      if(this.ENVIRONMENT){
+        console.log('Entra production: ', `https://${domain}.cl/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`);
+        this.styleElement.href = `https://${domain}.cl/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`;
+      }else
+        this.styleElement.href = `http://localhost:4000/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`;
 
       this.document.head.appendChild(this.styleElement);
       
