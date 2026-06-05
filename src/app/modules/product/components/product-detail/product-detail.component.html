@@ -73,9 +73,9 @@
       <div class="col-md-6">
         <h1 class="product-title color1 d-none d-md-block">{{ product().name }}</h1>
         <div class="product-info">
-          @if(product().descShort){
+          <!-- @if(product().descShort){
             <div class="color1" [innerHTML]="product().descShort | htmlSanitize:'html'"></div>
-          }
+          } -->
           @if(product().price && product().price > 0){
             <div class="price-section mt-4">
               <p class="price color1">
@@ -95,18 +95,18 @@
               </div>
             }
           }
-          @defer (when product().stock) {
-            @if(product().stock > 0){
-              <app-product-attributes
-              [product]="product()"
-              (imageSelected)="changeMainMedia('image', $event)"
-              (attributesChanged)="onAttributesChanged($event)"></app-product-attributes>
-              <!--p><strong>En stock: </strong>Disponible para envío inmediato</p -->  
-            }@else{
-              <p><strong>Stock: </strong> <span class="text-danger">Agotado</span></p>
-              <app-product-notice [product]="product()"></app-product-notice>
-            }
+
+          @if(product().stock > 0){
+            <app-product-attributes
+            [product]="product()"
+            (imageSelected)="changeMainMedia('image', $event)"
+            (attributesChanged)="onAttributesChanged($event)"></app-product-attributes>
+            <!--p><strong>En stock: </strong>Disponible para envío inmediato</p -->  
+          }@else{
+            <p><strong>Stock: </strong> <span class="text-danger">Agotado</span></p>
+            <app-product-notice [product]="product()"></app-product-notice>
           }
+
           <!-- Botones de Comprar -->
           @defer{
             @if(product().stock > 0){
@@ -162,11 +162,12 @@
         }
       }
     }
-    @defer{
-      <!-- Sección de Características -->
-      <app-description [desc]="this.product().desc" *ngIf="this.product().desc"></app-description>
-      <!-- productos de la categoría -->
-      <app-category-rel [categoriesNames]="categoriesNames" [productIdToHide]="product().id"></app-category-rel>
+
+    <!-- Sección de Características -->
+    <app-product-details [productId]="product().id"></app-product-details>
+    @defer(on idle){
+    <!-- productos de la categoría -->
+    <app-category-rel [categoriesNames]="categoriesNames" [productIdToHide]="product().id"></app-category-rel>
     }
     <!-- Sección de Opiniones o Reviews --
     <div class="row mt-5">

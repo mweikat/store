@@ -7,7 +7,6 @@ export interface ProductModel {
     id:string;
     name:string;
     descShort:string;
-    desc:string;
     price:number;
     priceSale:number;
     status:string;

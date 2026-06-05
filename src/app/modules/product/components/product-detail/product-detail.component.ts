@@ -152,9 +152,7 @@ export class ProductDetailComponent implements OnDestroy {
         const availability =  this.product().stock > 0    ? 'https://schema.org/InStock'    : 'https://schema.org/OutOfStock';
         let cleanDesc = null;
         if(this.product().descShort)
-          cleanDesc = this.decodeHtml(
-    this.product().descShort.replace(/<[^>]+>/g, '')
-  );
+          cleanDesc = this.decodeHtml(this.product().descShort.replace(/<[^>]+>/g, ''));
         
         const images = this.product().imgs?.map(i => i.img) || [this.product().imgP];
 
@@ -162,7 +160,7 @@ export class ProductDetailComponent implements OnDestroy {
 
           '@context': 'https://schema.org/',
           '@type': 'Product',
-          name: this.product.name,
+          name: this.product().name,
           image: images,
           description: cleanDesc,
           sku: this.product().id,

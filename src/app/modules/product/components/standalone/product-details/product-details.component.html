@@ -1,0 +1,36 @@
+@if(productDetails().length > 0){
+    <div class="mt-4 product-details">
+        <ul class="nav nav-tabs" role="tablist">
+            @for(detail of productDetails(); track detail.id; let first = $first){
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" 
+                            [class.active]="first"
+                            [id]="'detail-' + detail.id + '-tab'"
+                            [attr.data-bs-toggle]="'tab'"
+                            [attr.data-bs-target]="'#detail-' + detail.id + '-tab-pane'"
+                            type="button" 
+                            role="tab" 
+                            [attr.aria-controls]="'detail-' + detail.id + '-tab-pane'" 
+                            [attr.aria-selected]="first">
+                        <b>{{detail.type}}</b>
+                    </button>
+                </li>
+            }
+        </ul>
+
+        <!-- Contenido de los tabs -->
+        <div class="tab-content">
+            @for(detail of productDetails(); track detail.id; let first = $first){
+                <br>
+                <div class="tab-pane fade" 
+                    [class.show]="first"
+                    [class.active]="first"
+                    [id]="'detail-' + detail.id + '-tab-pane'" 
+                    role="tabpanel" 
+                    [attr.aria-labelledby]="'detail-' + detail.id + '-tab'"
+                    [innerHtml]="detail.desc | htmlSanitize:'html'">
+                </div>
+            }
+        </div>
+    </div>
+}

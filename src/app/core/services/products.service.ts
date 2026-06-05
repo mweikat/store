@@ -9,6 +9,7 @@ import { ProductBundle } from '@models/productBundle.model';
 import { environment } from 'src/environments/environment';
 import { MessagesService } from './messages.service';
 import { ParamModel } from '@models/param.model';
+import { productDetailsModel } from '@models/productDetails.model';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,9 @@ export class ProductsService {
 
   private readonly STATUS_NOTI = makeStateKey<ParamModel>('status_noti');
   public readonly $status_noti = signal<ParamModel>({} as ParamModel);
+
+  private readonly PRODUCT_DETAILS = makeStateKey<productDetailsModel[]>('productDetails');
+  public $productDetail = signal<productDetailsModel[]>([]);
   
   constructor(private httpClient:HttpClient, private router: Router, 
               private transferState: TransferState, 
@@ -172,6 +176,41 @@ export class ProductsService {
        this.sendMessageService("No se pudo enviar el mensaje","Error","Nok");
     });
 
+  }
+
+  getProductDetails(productId:string ){
+
+    if(isPlatformServer(this.platformId)){
+      this.getProductDetailsCall(productId);
+    }else{
+      this.getProductDetailsCall(productId);
+      const productDetails = this.transferState.get(this.PRODUCT_DETAILS, null);
+      //console.log("product details from transfer state: ", productDetails);
+      if(productDetails===null){
+        this.getProductDetailsCall(productId);
+      }else{
+        
+        //const current_product = this.transferState.get(this.CURRENT_PRODUCT, null);
+        //console.log("current product from transfer state: ", current_product?.id);
+        
+        /*if(current_product && current_product.id === productId){
+          this.getProductDetailsCall(productId);
+          return;
+        }*/
+
+        this.$productDetail.set(productDetails);
+        this.transferState.set(this.PRODUCT_DETAILS,null);
+      }
+    }
+
+  }
+
+  private getProductDetailsCall(productId:string){
+    this.httpClient.get <productDetailsModel[]>(`${this.URL}/product-details/${productId}`).subscribe(receivedItem => {
+      //console.log('product details: ', receivedItem);
+      this.transferState.set(this.PRODUCT_DETAILS, receivedItem);
+      this.$productDetail.set(receivedItem);
+    });
   }
 
   private go404(){

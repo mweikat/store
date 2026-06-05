@@ -13,6 +13,7 @@ import { ProductSkeletonComponent } from './components/standalone/product-skelet
 import { ProductNoticeComponent } from './components/standalone/product-notice/product-notice.component';
 import { ProductBundlesComponent } from './components/standalone/product-bundles/product-bundles.component';
 import { ProductAttributesComponent } from './components/standalone/product-attributes/product-attributes.component';
+import { ProductDetailsComponent } from './components/standalone/product-details/product-details.component';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import { ProductAttributesComponent } from './components/standalone/product-attr
     ProductSkeletonComponent,
     ProductNoticeComponent,
     ProductBundlesComponent,
-    ProductAttributesComponent
+    ProductAttributesComponent,
+    ProductDetailsComponent
   ]
 })
 export class ProductModule { }

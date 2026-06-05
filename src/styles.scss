@@ -163,6 +163,12 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
     height: 10%;
 }
 
+.product-details{
+    .nav-tabs .nav-link {
+        color: vars.$prod-desc-tab;
+    }
+}
+
 /*****************header******************/
 .header{
     border-bottom: 1px solid vars.$header-border-color;
