@@ -164,9 +164,10 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 }
 
 .product-details{
-    .nav-tabs .nav-link {
+    .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
         color: vars.$prod-desc-tab;
     }
+
 }
 
 /*****************header******************/
