@@ -164,10 +164,12 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 }
 
 .product-details{
-    .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+    .nav-tabs .nav-link {
         color: vars.$prod-desc-tab;
     }
-
+    .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active{
+        color: vars.$prod-desc-tab-active;
+    }
 }
 
 /*****************header******************/
