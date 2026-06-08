@@ -1,7 +1,5 @@
-import { isPlatformServer } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, Inject, OnDestroy, PLATFORM_ID, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CartItemModel } from '@models/cartItem.model';
 import { DeliveryModel } from '@models/delivery.model';
@@ -103,7 +101,7 @@ export class ProductDetailComponent implements OnDestroy {
         //console.log('El valor cambió a:', value);
         if(this.product().id!=undefined && this.old_id!=this.product().id){
            this.old_id = this.product().id;
-          this.updateMetaTags(this.product());
+          this.seoService.updateMetaTags(this.product());
           this.setMainImage(this.product());
           this.categoryService.getCategoriesByProductId(this.product().id);
           this.cantProduct= 1;
@@ -117,7 +115,7 @@ export class ProductDetailComponent implements OnDestroy {
         //console.log('El valor cambió a:', value);
         if(this.categoryIds().length>0 && this.product().id!=undefined){
           this.productService.getProductsBundles(this.product().id,this.categoryIds());
-          this.googleMerchantCenter();
+          this.seoService.googleMerchantCenter(this.URL_BUSINESS, this.product());
         }
           
         this.categoriesNames =  this.categories().map(category => category.url_name);
@@ -129,6 +127,7 @@ export class ProductDetailComponent implements OnDestroy {
   totalModifier = 0;
 
  onAttributesChanged(event: any) {
+    //console.log(event);
     this.selectedAttributes = event.attributes;
     this.totalModifier = event.totalModifier;
   }
@@ -144,55 +143,6 @@ export class ProductDetailComponent implements OnDestroy {
 
   }
 
-
-  private googleMerchantCenter(){
-        
-      if (isPlatformServer(this.platformId)) {
-
-        const availability =  this.product().stock > 0    ? 'https://schema.org/InStock'    : 'https://schema.org/OutOfStock';
-        let cleanDesc = null;
-        if(this.product().descShort)
-          cleanDesc = this.decodeHtml(this.product().descShort.replace(/<[^>]+>/g, ''));
-        
-        const images = this.product().imgs?.map(i => i.img) || [this.product().imgP];
-
-        const schema = {
-
-          '@context': 'https://schema.org/',
-          '@type': 'Product',
-          name: this.product().name,
-          image: images,
-          description: cleanDesc,
-          sku: this.product().id,
-          offers: {
-            '@type': 'Offer',
-            url: `https://${this.URL_BUSINESS}.cl/product/${this.product().url}`,
-            priceCurrency: 'CLP',
-            price: this.product().price,
-            availability: availability,
-          },
-          "brand": 
-          { 
-            "@type": "Brand", 
-            "name": this.product().brand 
-
-          },
-          "itemCondition": "https://schema.org/NewCondition"
-        };
-        this.seoService.insertSchema(schema);
-
-      }
-  }
-
-  private decodeHtml(html: string): string {
-  return html
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
-  }
-
   changeMainMedia(type: 'image' | 'video', src: string) {
     this.mainMedia.set({ type, src });
   }
@@ -200,36 +150,36 @@ export class ProductDetailComponent implements OnDestroy {
 
   // Lógica para agregar al carrito
 
-addToCart(product: ProductModel) {
+  addToCart(product: ProductModel) {
 
-  if (this.isAddingToCart()) return;
-  
-  this.isAddingToCart.set(true);
-  
+    if (this.isAddingToCart()) return;
+    
+    this.isAddingToCart.set(true);
+    
 
-  if (this.cantProduct > product.stock) {
-    alert(`No se puede agregar más de ${product.stock} unidades de este producto.`);
-    this.restCant();
-    return;
+    if (this.cantProduct > product.stock) {
+      alert(`No se puede agregar más de ${product.stock} unidades de este producto.`);
+      this.restCant();
+      return;
+    }
+
+    const item: CartItemModel = {
+      id: '',
+      product_id: product.id,
+      product_name: product.name,
+      quantity: this.cantProduct,
+      price: product.price,
+      product_bundle: this.bundle
+    };
+
+    this.cartService.addToCart(item, this.isLogged());
+
+    setTimeout(()=>{ //corrige error NG0100: Expression has changed after it was checked
+        this.isAddingToCart.set(false);
+        //console.log('time out 3000')
+      },1000);
+  
   }
-
-  const item: CartItemModel = {
-    id: '',
-    product_id: product.id,
-    product_name: product.name,
-    quantity: this.cantProduct,
-    price: product.price,
-    product_bundle: this.bundle
-  };
-
-  this.cartService.addToCart(item, this.isLogged());
-
-  setTimeout(()=>{ //corrige error NG0100: Expression has changed after it was checked
-       this.isAddingToCart.set(false);
-       //console.log('time out 3000')
-    },1000);
-  
-}
 
   // Lógica para comprar directamente
   buyNow(product: ProductModel) {
@@ -287,19 +237,19 @@ addToCart(product: ProductModel) {
 
   // En tu componente.ts
   scrollToBundles() {
-  const element = document.querySelector('.bundles-container');
-  if (element) {
-    element.scrollIntoView({ 
-      behavior: 'smooth',
-      block: 'start'
-    });
-    
-    // Efecto visual de destello
-    element.classList.add('highlight-flash');
-    setTimeout(() => {
-      element.classList.remove('highlight-flash');
-    }, 2000);
-  }
+    const element = document.querySelector('.bundles-container');
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+      
+      // Efecto visual de destello
+      element.classList.add('highlight-flash');
+      setTimeout(() => {
+        element.classList.remove('highlight-flash');
+      }, 2000);
+    }
   }
 
  private setMainImage(product: ProductModel){
@@ -322,25 +272,5 @@ addToCart(product: ProductModel) {
     }
 
  }
-
- private updateMetaTags(product: ProductModel): void {
-   
-  this.seoService.setTitle(product.name);
-  this.seoService.setCanonical();
-  let metaDesc = product.meta_desc;
-
-  this.seoService.setMeta('description',metaDesc);
-  this.seoService.setIndexFallow();
-
-  this.seoService.setMetaPropertie('og:title',product.name);
-  this.seoService.setMetaPropertie('og:description',metaDesc);
-  //this.seoService.setMetaPropertie('og:url',this.$meta_data().url);
-  this.seoService.setMetaPropertie('og:image',product.imgs[0].img);
-
-  this.seoService.setMeta('twitter:title',product.name);
-  this.seoService.setMeta('twitter:description',metaDesc);
-  this.seoService.setMeta('twitter:image',product.imgs[0].img);
-    
-  }
   
 }

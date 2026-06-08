@@ -1,15 +1,12 @@
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID, DOCUMENT } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
-import { environment } from 'src/environments/environment';
-import { TenantService } from '../tenants/tenants.service';
+import { ProductModel } from '@models/product.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SeoService { 
-
-
 
   constructor(@Inject(DOCUMENT) private _document: Document, 
               public title:Title,
@@ -96,6 +93,75 @@ export class SeoService {
       newLink.href = iconUrl;
       this.document.head.appendChild(newLink);
     }
+  }
+
+   updateMetaTags(product: ProductModel): void {
+   
+    this.setTitle(product.name);
+    this.setCanonical();
+    let metaDesc = product.meta_desc;
+
+    this.setMeta('description',metaDesc);
+    this.setIndexFallow();
+
+    this.setMetaPropertie('og:title',product.name);
+    this.setMetaPropertie('og:description',metaDesc);
+    //this.seoService.setMetaPropertie('og:url',this.$meta_data().url);
+    this.setMetaPropertie('og:image',product.imgs[0].img);
+
+    this.setMeta('twitter:title',product.name);
+    this.setMeta('twitter:description',metaDesc);
+    this.setMeta('twitter:image',product.imgs[0].img);
+      
+  }
+
+  googleMerchantCenter(businessUrl:string, product:ProductModel){
+        
+      if (isPlatformServer(this.platformId)) {
+
+        const availability =  product.stock > 0    ? 'https://schema.org/InStock'    : 'https://schema.org/OutOfStock';
+        let cleanDesc = null;
+        if(product.descShort)
+          cleanDesc = this.decodeHtml(product.descShort.replace(/<[^>]+>/g, ''));
+        
+        const images = product.imgs?.map(i => i.img) || [product.imgP];
+
+        const schema = {
+
+          '@context': 'https://schema.org/',
+          '@type': 'Product',
+          name: product.name,
+          image: images,
+          description: cleanDesc,
+          sku: product.id,
+          offers: {
+            '@type': 'Offer',
+            url: `https://${businessUrl}.cl/product/${product.url}`,
+            priceCurrency: 'CLP',
+            price: product.price,
+            availability: availability,
+          },
+          "brand": 
+          { 
+            "@type": "Brand", 
+            "name": product.brand 
+
+          },
+          "itemCondition": "https://schema.org/NewCondition"
+        };
+
+        this.insertSchema(schema);
+
+      }
+  }
+
+  private decodeHtml(html: string): string {
+  return html
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
   }
 
 }

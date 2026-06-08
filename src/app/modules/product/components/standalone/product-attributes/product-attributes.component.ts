@@ -171,6 +171,7 @@ export class ProductAttributesComponent implements OnChanges {
   }
 
   emitChanges() {
+    //console.log("emite ");
     this.attributesChanged.emit({
       attributes: this.selectedAttributes,
       totalModifier: this.getTotalModifier()
