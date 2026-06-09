@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, Inject, OnDestroy, PLATFORM_ID, signal } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CartItemModel } from '@models/cartItem.model';
 import { DeliveryModel } from '@models/delivery.model';
@@ -12,9 +11,8 @@ import { DeliveryService } from '@services/delivery.service';
 import { ProductsService } from '@services/products.service';
 import { SeoService } from '@services/seo.service';
 import { ShippingBusinessService } from '@services/shipping-business.service';
-import { distinctUntilChanged, Subject, Subscription, takeUntil } from 'rxjs';
 import { TenantService } from 'src/app/core/tenants/tenants.service';
-
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-product-detail',
@@ -37,12 +35,10 @@ export class ProductDetailComponent implements OnDestroy {
 
   //componentes vars
   product = this.productService.$currentProduct;
-  private old_id:string ='';
   mainImage: string = '';
   mainMedia = signal<{ type: 'image' | 'video', src: string }>({ type: 'image', src: '' });
   categories = this.categoryService.categoriesProductDetailSignal;
-  //categoriesNames = computed(()=>this.categories().map(category => category.url_name));
-  categoriesNames:string[] = [];
+  categoriesNames = computed(()=> this.categories().map(category => category.url_name));;
   categoryIds = computed(()=> this.categories().map(category => category.id));
 
   bundlesArray = this.productService.productBundlesSignal;
@@ -54,74 +50,78 @@ export class ProductDetailComponent implements OnDestroy {
   isAddingToCart= signal<boolean>(false);
   isLogged = computed(()=> this.authService.isLoggedIn());
   shippingMehtods = this.businessShippingService.shippingMethodsSignal;
-  private destroy$ = new Subject<void>();
-  private destroy2$ = new Subject<void>();
 
   deliveryData = this.deliveryService.deliveryDataSignal;
   localDeliveryData = signal<DeliveryModel | null>(null);
   methodSelected:number=0;
   isShowMethod = computed(() => this.localDeliveryData() !== null);
 
-  constructor(private route: ActivatedRoute,  private router: Router, @Inject(PLATFORM_ID) private platformId: Object) {
+constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATFORM_ID) private platformId: Object ) {
 
-      // Obtener el productId de la ruta y solicitar el producto
-      this.destroyRoute = this.route.paramMap.subscribe(params => {
-        const param = params.get('param');
+  this.businessShippingService.getShippingMetphods();
 
-        if(param){
-          if (this.validateUuid(param)) {
-            this.productService.getProduct(param,true);
-            
-          }else{
-            this.productService.getProduct(param,false);
-          }
+  this.destroyRoute = this.route.paramMap.subscribe(params => {
 
-          this.businessShippingService.getShippingMetphods();
-        }
-      });
+    const param = params.get('param');
+
+    if (!param) {
+      return;
+    }
+
+    if (this.validateUuid(param)) {
+      this.productService.getProduct(param, true);
+    } else {
+      this.productService.getProduct(param, false);
+    }    
+
+  });
+
+
+  effect(() => {
+
+    const delivery = this.deliveryData();
+
+    if (delivery?.name) {
+      this.localDeliveryData.set(delivery);
+    }
+
+  });
+
+
+  effect(() => {
+
+    const product = this.product();
+
+    if (product.id===undefined) {
+      return;
+    }
+
+    this.seoService.googleMerchantCenter(this.URL_BUSINESS, product);
+
+    this.seoService.updateMetaTags(product);
+
+    this.setMainImage(product);
+
+    this.cantProduct = 1;
+    
+    this.categoryService.getCategoriesByProductId(product.id);
 
     
+  });
 
-      effect(()=>{
+  effect(() => {
 
-        if(this.deliveryData()?.name){
-          this.localDeliveryData.set(this.deliveryData());
-        }
-        
-      });
+    if (this.product().id === undefined || this.categoryIds().length === 0 || this.product().stock===0) {
+      return;
+    }
 
-      const productObs$ = toObservable(this.product);
-      const catgoriesObs$ = toObservable(this.categoryIds);
-    
-      // Nos suscribimos al observable
-      productObs$.pipe(
-        distinctUntilChanged(), // Evita llamadas duplicadas para el mismo valor
-        takeUntil(this.destroy$) // Se completa cuando destroy$ emite
-      ).subscribe(value => {
-        //console.log('El valor cambió a:', value);
-        if(this.product().id!=undefined && this.old_id!=this.product().id){
-           this.old_id = this.product().id;
-          this.seoService.updateMetaTags(this.product());
-          this.setMainImage(this.product());
-          this.categoryService.getCategoriesByProductId(this.product().id);
-          this.cantProduct= 1;
-        }
-      });
+    this.productService.getProductsBundles(
+      this.product().id,
+      this.categoryIds()
+    );
 
-      catgoriesObs$.pipe(
-        distinctUntilChanged(), // Evita llamadas duplicadas para el mismo valor
-        takeUntil(this.destroy2$) // Se completa cuando destroy$ emite
-      ).subscribe(value => {
-        //console.log('El valor cambió a:', value);
-        if(this.categoryIds().length>0 && this.product().id!=undefined){
-          this.productService.getProductsBundles(this.product().id,this.categoryIds());
-          this.seoService.googleMerchantCenter(this.URL_BUSINESS, this.product());
-        }
-          
-        this.categoriesNames =  this.categories().map(category => category.url_name);
-      });
-
-  }
+  });
+}
   //attr
   selectedAttributes: any = {};
   totalModifier = 0;
@@ -135,11 +135,7 @@ export class ProductDetailComponent implements OnDestroy {
   ngOnDestroy(): void {
   
     this.productService.$currentProduct.set({} as ProductModel);
-    this.destroy$.next(); // Emitimos para completar los observables
-    this.destroy$.complete(); // Completamos el subject
-    this.destroy2$.next(); 
-    this.destroy2$.complete(); 
-
+    this.destroyRoute?.unsubscribe();
 
   }
 

@@ -170,7 +170,7 @@
     <app-product-details [productId]="p.id"></app-product-details>
     @defer(on idle){
     <!-- productos de la categoría -->
-    <app-category-rel [categoriesNames]="categoriesNames" [productIdToHide]="p.id"></app-category-rel>
+    <app-category-rel [categoriesNames]="categoriesNames()" [productIdToHide]="p.id"></app-category-rel>
     }
     <!-- Sección de Opiniones o Reviews --
     <div class="row mt-5">
