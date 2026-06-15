@@ -35,7 +35,7 @@ export class AddressListComponent implements OnInit, OnDestroy{
 
     this.destroyNewShipping = this.shipService.newShippingAddress.subscribe(item => {
       if(item){
-        this.address.push(item);
+        this.address.unshift(item);
       }
     });
 

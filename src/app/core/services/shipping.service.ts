@@ -45,16 +45,10 @@ export class ShippingService {
   storeShippingAddress(shippingModel:ShippingAddress){
 
     this.httpClient.post<ShippingAddress>(`${this.URL}`,shippingModel).subscribe(item => {
+      
       this.newShippingAddress$.next(item);
-
-      this.msgModel = {} as MessageModel;
-      this.msgModel.msg="Se crea una nueva dirección de despacho.";
-      this.msgModel.active=1;
-      this.msgModel.duration=2;
-      this.msgModel.title="New Address";
-      this.msgModel.icon="ok";
-      this.msgModel.vertical = "top-0";
-      this.messageService.sendMessage(this.msgModel);
+      this.getShippingAdress();
+      this.sendMessageService("Se crea una nueva dirección de despacho.","New Address","ok");
     });
 
   }
@@ -62,16 +56,9 @@ export class ShippingService {
   updateShippingAddress(shippingModel:ShippingAddress){
 
     this.httpClient.put<ShippingAddress>(`${this.URL}`,shippingModel).subscribe(item => {
+      
       this.updatedShippingAddress$.next(item);
-
-      this.msgModel = {} as MessageModel;
-      this.msgModel.msg="Se actualiza la dirección.";
-      this.msgModel.active=1;
-      this.msgModel.duration=2;
-      this.msgModel.title="Update Address";
-      this.msgModel.icon="ok";
-      this.msgModel.vertical = "top-0";
-      this.messageService.sendMessage(this.msgModel);
+      this.sendMessageService("Se actualiza la dirección.","Update Address","ok");
 
     });
 
@@ -83,14 +70,7 @@ export class ShippingService {
 
     this.httpClient.put<ShippingAddress>(`${this.URL}/default`,shipToJson).subscribe(item => {
 
-      this.msgModel = {} as MessageModel;
-      this.msgModel.msg="Se actualiza la dirección por defecto.";
-      this.msgModel.active=1;
-      this.msgModel.duration=2;
-      this.msgModel.title="Update Address Default";
-      this.msgModel.icon="ok";
-      this.msgModel.vertical = "top-0";
-      this.messageService.sendMessage(this.msgModel);
+      this.sendMessageService("Se actualiza la dirección por defecto.","Update Address Default","ok");
 
     });
 
@@ -104,19 +84,26 @@ export class ShippingService {
 
     this.httpClient.delete(`${this.URL}/${ship.id}`,{ observe: 'response', responseType: 'text' }).subscribe(item => {
 
-      this.msgModel = {} as MessageModel;
-      this.msgModel.msg="La dirección ha sido eliminada con éxito.";
-      this.msgModel.active=1;
-      this.msgModel.duration=2;
-      this.msgModel.title="Delete Address";
-      this.msgModel.icon="ok";
-      this.msgModel.vertical = "top-0";
-      this.messageService.sendMessage(this.msgModel);
+      this.sendMessageService("La dirección ha sido eliminada con éxito.","Delete Address","ok");
 
       this.deleteShippingAddress$.next(ship);
 
+      this.getShippingAdress();
+
     });
 
+  }
+
+  private sendMessageService(msg:string, title:string, icon:string){
+
+    let msgModel = {} as MessageModel;
+    msgModel.msg=msg;
+    msgModel.active=1;
+    msgModel.duration=5;
+    msgModel.title=title;
+    msgModel.icon=icon;
+
+    this.messageService.sendMessage(msgModel);
   }
 
 

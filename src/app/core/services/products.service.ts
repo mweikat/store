@@ -168,11 +168,11 @@ export class ProductsService {
   saveNotificationAlarm(noti:NotificationAlarmModel){
 
     this.httpClient.post(`${this.URL}/product/notification-alarm`,noti).subscribe(items => {
-      console.log("ok");  
+      //console.log("ok");  
       this.sendMessageService("Mensaje enviado!","Menssage Created","ok");
     }
     ,err => {
-      console.log("Nok");  
+      //console.log("Nok");  
        this.sendMessageService("No se pudo enviar el mensaje","Error","Nok");
     });
 
