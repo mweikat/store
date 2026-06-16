@@ -58,6 +58,7 @@ export class AddressComponent implements OnInit, OnDestroy{
     this.destroyShippinAddress = this.shippingService.shippingAddress.subscribe(items => {
       
       this.shippingAddress = items;
+      console.log("direcciones ", items);
       this.setAddress(this.shippingAddress[0]);
       this.showSelectedAddressError = false;
 
