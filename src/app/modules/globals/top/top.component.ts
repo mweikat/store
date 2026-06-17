@@ -19,7 +19,7 @@ export class TopComponent {
   topBanner = this.siteService.top_1Signal;
 
   constructor(){
-    this.siteService.setMetaData();
+    
     this.siteService.getHomeRrss();
     this.siteService.getBanner('TOP_1');
   }

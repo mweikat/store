@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { HeaderService } from '@services/header.service';
+import { SeoService } from '@services/seo.service';
 
 @Component({
     selector: 'app-user-admin-layout',
@@ -13,12 +14,14 @@ export class UserAdminLayoutComponent implements OnInit{
   menuVisible = true;
   isMobile = false;
 
-  constructor(private headerService:HeaderService, @Inject(PLATFORM_ID) private platformId: Object){
+  constructor(private headerService:HeaderService, @Inject(PLATFORM_ID) private platformId: Object, private seoService:SeoService){
     this.headerService.isMenu.next(true);
     this.headerService.isSearch.next(true);
     this.headerService.isCart.next(true);
     this.headerService.isUser.next(true);
     this.headerService.isToggleButton.next(true);
+
+    this.seoService.setIndexFallow(false);
   }
 
   ngOnInit(): void {

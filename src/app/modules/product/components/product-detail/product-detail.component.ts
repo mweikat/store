@@ -96,9 +96,11 @@ constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATF
       return;
     }
 
-    this.seoService.googleMerchantCenter(this.URL_BUSINESS, product);
+    this.seoService.seoProductTags(this.URL_BUSINESS, product);
 
-    this.seoService.updateMetaTags(product);
+    //this.seoService.googleMerchantCenter(this.URL_BUSINESS, product);
+
+    //this.seoService.updateMetaTags(product);
 
     this.setMainImage(product);
 

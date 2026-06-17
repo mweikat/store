@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, Type } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, Inject, inject, PLATFORM_ID, Type } from '@angular/core';
 import { HeaderService } from '@services/header.service';
 import { SiteService } from '@services/site.service';
 import { SlideComponent } from '../homeComponents/slide/slide.component';
@@ -8,6 +8,9 @@ import { DeliveryComponent } from '../homeComponents/delivery/delivery.component
 import { BrandsComponent } from '../homeComponents/brands/brands.component';
 import { Sale2Component } from '../homeComponents/sale2/sale2.component';
 import { HomeSectionCode, SiteHomeSectionsModel } from '@models/siteHomeSections.model';
+import { SeoService } from '@services/seo.service';
+import { platformBrowser } from '@angular/platform-browser';
+import { isPlatformBrowser } from '@angular/common';
 
   
 @Component({
@@ -20,6 +23,7 @@ import { HomeSectionCode, SiteHomeSectionsModel } from '@models/siteHomeSections
 export class MainHomeComponent{
 
   private siteService = inject(SiteService);
+  private seoService = inject(SeoService);
   
   rrssModel = this.siteService.homeRrssSignal;
   sections = this.siteService.homeSectionSignals;
@@ -36,13 +40,17 @@ export class MainHomeComponent{
   };
 
   
-  constructor(private headerService:HeaderService){
+  constructor(private headerService:HeaderService, @Inject(PLATFORM_ID) private platformId: Object){
       this.headerService.isMenu.next(true);
       this.headerService.isSearch.next(true);
       this.headerService.isCart.next(true);
       this.headerService.isUser.next(true);
       this.headerService.isToggleButton.next(true);
       this.siteService.getHomeSections();
+      this.seoService.setIndexFallow();
+      if(isPlatformBrowser(this.platformId)){
+        this.siteService.setMetaData();
+      }
   }
 
   getComponentsInput(siteHomeSections:SiteHomeSectionsModel): Record<string, unknown> {

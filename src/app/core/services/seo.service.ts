@@ -1,18 +1,26 @@
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
-import { Inject, Injectable, PLATFORM_ID, DOCUMENT } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Inject, Injectable, PLATFORM_ID, DOCUMENT, makeStateKey, TransferState } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { ProductModel } from '@models/product.model';
+import { ProductMetaModel } from '@models/productMeta.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SeoService { 
+export class SeoService {
+  private readonly URL = environment.api_store;
+  
+  private readonly META_PRODUCT = makeStateKey<ProductMetaModel>('metaProduct');
 
-  constructor(@Inject(DOCUMENT) private _document: Document, 
+  constructor(private httpClient:HttpClient,
+              @Inject(DOCUMENT) private _document: Document, 
               public title:Title,
               public meta:Meta,
               @Inject(PLATFORM_ID) private platformId: Object,
-              @Inject(DOCUMENT) private document: Document) {
+              @Inject(DOCUMENT) private document: Document,
+              private transferState: TransferState,) {
               
              }
   
@@ -64,6 +72,10 @@ export class SeoService {
    this.meta.updateTag({name:"robots", content:state?"index , follow" : "noindex , nofollow"}); 
   }
 
+  setSiteName(siteName:string){
+    this.meta.updateTag({property:"og:site_name", content:siteName}); 
+  }
+
   
   insertSchema(schema: object): void {
     if (isPlatformServer(this.platformId)) {
@@ -95,19 +107,27 @@ export class SeoService {
     }
   }
 
-   updateMetaTags(product: ProductModel): void {
+   private updateMetaTags(product: ProductModel, metaModel:ProductMetaModel, url:string): void {
    
+    const availability =  product.stock > 0    ? 'InStock'    : 'OutOfStock';
+    let metaDesc = metaModel.meta_desc;
+
     this.setTitle(product.name);
     this.setCanonical();
-    let metaDesc = product.meta_desc;
-
+    
     this.setMeta('description',metaDesc);
     this.setIndexFallow();
 
     this.setMetaPropertie('og:title',product.name);
     this.setMetaPropertie('og:description',metaDesc);
-    //this.seoService.setMetaPropertie('og:url',this.$meta_data().url);
+    this.setMetaPropertie('og:url',url);
+    this.setMetaPropertie('og:type','product');
     this.setMetaPropertie('og:image',product.imgs[0].img);
+    this.setMetaPropertie('og:price:amount',product.price+"");
+    this.setMetaPropertie('og:price:currency','CLP');
+    this.setMetaPropertie('og:availability',availability);
+    
+    this.setMetaPropertie('product:brand',product.brand?product.brand:"");
 
     this.setMeta('twitter:title',product.name);
     this.setMeta('twitter:description',metaDesc);
@@ -115,16 +135,13 @@ export class SeoService {
       
   }
 
-  googleMerchantCenter(businessUrl:string, product:ProductModel){
-        
-      if (isPlatformServer(this.platformId)) {
+  private googleMerchantCenter(businessUrl:string, product:ProductModel, metaModel:ProductMetaModel){
 
         const availability =  product.stock > 0    ? 'https://schema.org/InStock'    : 'https://schema.org/OutOfStock';
-        let cleanDesc = null;
-        if(product.descShort)
-          cleanDesc = this.decodeHtml(product.descShort.replace(/<[^>]+>/g, ''));
         
         const images = product.imgs?.map(i => i.img) || [product.imgP];
+
+        const url =  `https://${businessUrl}.cl/product/${product.url}`;
 
         const schema = {
 
@@ -132,14 +149,15 @@ export class SeoService {
           '@type': 'Product',
           name: product.name,
           image: images,
-          description: cleanDesc,
+          description: metaModel.google_desc,
           sku: product.id,
           offers: {
             '@type': 'Offer',
-            url: `https://${businessUrl}.cl/product/${product.url}`,
+            url: url,
             priceCurrency: 'CLP',
             price: product.price,
             availability: availability,
+            itemCondition:"https://schema.org/NewCondition"
           },
           "brand": 
           { 
@@ -152,16 +170,54 @@ export class SeoService {
 
         this.insertSchema(schema);
 
-      }
+        this.updateMetaTags(product, metaModel, url);
+
+      
   }
 
-  private decodeHtml(html: string): string {
+  seoProductTags(businessUrl:string, product:ProductModel){
+
+    if(isPlatformServer(this.platformId)){
+      this.seoProductTagsCall(businessUrl, product);
+      return;
+    }
+
+    const meta_product = this.transferState.get(this.META_PRODUCT, null);
+    
+    if(!meta_product){
+      //console.log('no hay meta tags llamo por lado cliente: ', meta_product)
+      this.seoProductTagsCall(businessUrl, product);
+      return;  
+    }else{
+      //console.log("si hay meta tag: ", meta_product);
+      this.googleMerchantCenter(businessUrl, product, meta_product);    
+      this.transferState.remove(this.META_PRODUCT);
+      return;
+    }
+
+  }
+
+  private seoProductTagsCall(businessUrl:string, product:ProductModel){
+
+    this.httpClient.get <ProductMetaModel>(`${this.URL}/product-meta/${product.id}`).subscribe(receivedItem => {
+      this.transferState.set(this.META_PRODUCT, receivedItem);
+      this.googleMerchantCenter(businessUrl, product,receivedItem);
+    },err => {
+            
+      console.log("Meta Error ", err);
+
+          
+    })
+
+  }
+
+  /*private decodeHtml(html: string): string {
   return html
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'");
-  }
+  }*/
 
 }

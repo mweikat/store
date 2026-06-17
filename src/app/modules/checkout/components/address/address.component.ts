@@ -58,14 +58,18 @@ export class AddressComponent implements OnInit, OnDestroy{
     this.destroyShippinAddress = this.shippingService.shippingAddress.subscribe(items => {
       
       this.shippingAddress = items;
-      console.log("direcciones ", items);
+      //console.log("direcciones ", items);
+      if(this.shippingAddress.length===0)
+        return;
+
       this.setAddress(this.shippingAddress[0]);
       this.showSelectedAddressError = false;
 
       if(this.shippingAddress[0].contact){
         this.setPhoneWsp(this.shippingAddress[0].contact);
-        this.addressSelectedCombo = this.shippingAddress[0].id;
       }
+
+      this.addressSelectedCombo = this.shippingAddress[0].id;
 
       this.destroyLastOrder = this.orderService.lastOrder.subscribe( lastOrder => {
         //console.log('new phone aaa ', this.shippingAddress);
@@ -84,8 +88,8 @@ export class AddressComponent implements OnInit, OnDestroy{
     });
 
     this.destroyNewShippingAddress = this.shippingService.newShippingAddress.subscribe(newItem => {
-      
-      if(newItem.id!=undefined){
+      //console.log("new item: ", newItem);
+      if(newItem && newItem.id!=undefined){
 
         this.shippingAddress.push(newItem);
         this.addressSelectedCombo = newItem.id;

@@ -269,6 +269,7 @@ private getHomeSlideCall(ttl:string) {
       const meta_data = this.transferState.get(this.META_DATA, {} as MetaDataModel);
       (meta_data)? this.$meta_data.set(meta_data) : this.getLogosCall();
       this.seoService.updateFavicon(meta_data.faicon);
+      this.injectMetaData();
     }
 
   }

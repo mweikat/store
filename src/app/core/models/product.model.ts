@@ -6,13 +6,11 @@ export interface ProductModel {
     
     id:string;
     name:string;
-    descShort:string;
     price:number;
     priceSale:number;
     status:string;
     action_link:string;
     stock:number;
-    meta_desc:string;
     imgP:string;
     video?:ProductVideoModel;
     categories?:CategoryModel[];
