@@ -9,7 +9,7 @@ export interface ProductModel {
     price:number;
     priceSale:number;
     status:string;
-    action_link:string;
+    sku:string;
     stock:number;
     imgP:string;
     video?:ProductVideoModel;
