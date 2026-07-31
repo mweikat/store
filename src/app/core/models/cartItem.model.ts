@@ -1,4 +1,5 @@
 import { ProductBundle } from "./productBundle.model";
+import { ProductVariantSkuModel } from "./productVariantSku.model";
 
 export interface CartItemModel {
 
@@ -9,6 +10,7 @@ export interface CartItemModel {
     quantity:number;
     price:number;
     image?:string;
-    product_bundle:ProductBundle|null
+    product_bundle:ProductBundle|null;
+    variant?:ProductVariantSkuModel;
 
 }

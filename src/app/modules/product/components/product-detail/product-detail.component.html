@@ -76,9 +76,6 @@
         <div class="col-md-6">
           <h1 class="product-title color1 d-none d-md-block">{{ p.name }}</h1>
           <div class="product-info">
-            <!-- @if(p.descShort){
-              <div class="color1" [innerHTML]="p.descShort | htmlSanitize:'html'"></div>
-            } -->
               <div style="font-size: x-small;"><b>sku: </b>{{p.sku}}</div>
             @if(p.price && p.price > 0){
               <div class="price-section mt-4">
@@ -87,7 +84,7 @@
                     ${{ p.price | number }}
                   </span>
                   <span class="current-price color2">
-                    ${{ p.priceSale ? (p.priceSale | number | comaToDot) : (p.price | number | comaToDot) }}
+                    ${{ p.priceSale ? (p.priceSale+priceVariant | number | comaToDot) : (p.price+priceVariant | number | comaToDot) }}
                   </span>
                 </p>
               </div>
@@ -106,7 +103,7 @@
               (imageSelected)="changeMainMedia('image', $event)"
               (attributesChanged)="onAttributesChanged($event)"></app-product-attributes>
               <!--p><strong>En stock: </strong>Disponible para envío inmediato</p -->  
-            }@else{
+            }@if(p.stock === 0){
               <p><strong>Stock: </strong> <span class="text-danger">Agotado</span></p>
               <app-product-notice [product]="p"></app-product-notice>
             }
@@ -114,26 +111,56 @@
             <!-- Botones de Comprar -->
             @defer{
               @if(p.stock > 0){
+                @if(variantStock!==0){
                 <div class="input-group mb-3" style="width: 150px;">
                   <span class="input-group-text" style="cursor: pointer;" (click)="restCant()">-</span>
                   <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)" min="1" max="{{p.stock}}" value="{{cantProduct}}" readonly>
                   <span class="input-group-text" style="cursor: pointer;" (click)="addCant()">+</span>
                 </div>
-                <!-- Botones para pantallas grandes -->
-                <div class="buy-button d-flex justify-content-start mt-3 d-none d-md-flex">
-                  <button class="btn btn-primary-c1 me-2" (click)="addToCart(p)" [disabled]="isAddingToCart()" [class.disabled]="isAddingToCart()">
-                    {{ isAddingToCart() ? 'Agregando...' : 'Agregar al carrito' }}
-                  </button>
-                    
-                  <button class="btn btn-primary-c2" (click)="buyNow(p)">Comprar</button>
+                }
+                @if(variantStock === 0){
+                  <div class="text-danger">
+                    <!--b>Lo sentimos! </b--> Sin Stock.
+                  </div>
+                }@else {
+                  
+                  @if(isConsulting()){
+                    <div class="buy-button d-flex justify-content-start mt-3 d-none d-md-flex">
+                      <button class="btn btn-primary-c1 me-2" >
+                        {{ isAddingToCart() ? 'Agregando...' : 'Agregar al carrito' }}
+                      </button>
+                        
+                      <button class="btn btn-primary-c2"  >Comprar</button>
 
-                </div>
+                    </div>
+                  
+                    <!-- Botones para pantallas pequeñas -->
+                    <div class="fixed-buttons d-md-none">
+                      <button class="btn btn-primary-c1" >Agregar al carrito</button>
+                      <button class="btn btn-primary-c2" >Comprar</button>
+                    </div>
+                  }@else{
+                    <!-- Botones para pantallas grandes -->
+                    <div class="buy-button d-flex justify-content-start mt-3 d-none d-md-flex">
+                      <button class="btn btn-primary-c1 me-2" (click)="addToCart(p)" [disabled]="isAddingToCart()" [class.disabled]="isAddingToCart()">
+                        {{ isAddingToCart() ? 'Agregando...' : 'Agregar al carrito' }}
+                      </button>
+                        
+                      <button class="btn btn-primary-c2" (click)="buyNow(p)" >Comprar</button>
+
+                    </div>
+                  
+                    <!-- Botones para pantallas pequeñas -->
+                    <div class="fixed-buttons d-md-none">
+                      <button class="btn btn-primary-c1" (click)="addToCart(p)">Agregar al carrito</button>
+                      <button class="btn btn-primary-c2" (click)="buyNow(p)">Comprar</button>
+                    </div>
+                  }
+
+                  
+                  
+                }
                 
-                <!-- Botones para pantallas pequeñas -->
-                <div class="fixed-buttons d-md-none">
-                  <button class="btn btn-primary-c1" (click)="addToCart(p)">Agregar al carrito</button>
-                  <button class="btn btn-primary-c2" (click)="buyNow(p)">Comprar</button>
-                </div>
               
                 <br>
                 <!-- despacho-->
@@ -144,8 +171,8 @@
                   }
                 </select>
                 @if(isShowMethod()){
-                  <br>
-                  <div class="alert alert-success" style=" font-size: 12px;">
+                  
+                  <div class="mt-2" style=" font-size: 12px;">
                     <b>{{deliveryData()?.delivery_text}} </b>
                       {{deliveryData()?.arrival_estimated_time}}
                   </div>

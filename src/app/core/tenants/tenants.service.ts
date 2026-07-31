@@ -118,7 +118,7 @@ export class TenantService {
       this.styleElement.rel = 'stylesheet';
       //this.styleElement.href = `/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`;
       if(this.ENVIRONMENT){
-        console.log('Entra production: ', `https://${domain}.cl/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`);
+        //console.log('Entra production: ', `https://${domain}.cl/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`);
         this.styleElement.href = `https://${domain}.cl/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`;
       }else
         this.styleElement.href = `http://localhost:4000/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`;

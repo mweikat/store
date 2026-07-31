@@ -13,6 +13,7 @@ import { SeoService } from '@services/seo.service';
 import { ShippingBusinessService } from '@services/shipping-business.service';
 import { TenantService } from 'src/app/core/tenants/tenants.service';
 import { Subscription } from 'rxjs';
+import { ProductAttrService } from '@services/product-attr.service';
 
 @Component({
     selector: 'app-product-detail',
@@ -32,6 +33,7 @@ export class ProductDetailComponent implements OnDestroy {
   private seoService = inject(SeoService);
   private businessShippingService = inject(ShippingBusinessService);
   private authService = inject(AuthService);
+  private productAttrService = inject(ProductAttrService);
 
   //componentes vars
   product = this.productService.$currentProduct;
@@ -55,6 +57,11 @@ export class ProductDetailComponent implements OnDestroy {
   localDeliveryData = signal<DeliveryModel | null>(null);
   methodSelected:number=0;
   isShowMethod = computed(() => this.localDeliveryData() !== null);
+
+  //variants
+  variantStock:number = -1;
+  isConsulting = this.productAttrService.$isConsulting;
+  priceVariant = 0;
 
 constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATFORM_ID) private platformId: Object ) {
 
@@ -124,14 +131,19 @@ constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATF
 
   });
 }
-  //attr
-  selectedAttributes: any = {};
-  totalModifier = 0;
 
  onAttributesChanged(event: any) {
     //console.log(event);
-    this.selectedAttributes = event.attributes;
-    this.totalModifier = event.totalModifier;
+    this.priceVariant = event.price_modifier;
+    
+    if(event.stock===0){
+      this.variantStock = 0;
+    }else{
+      this.product().stock = event.stock;
+      this.variantStock = -1;
+    }
+
+    this.isConsulting.set(false);
   }
   
   ngOnDestroy(): void {
