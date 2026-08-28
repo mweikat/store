@@ -4,21 +4,44 @@
     <!-- Lista de Productos -->
     <div class="order-items border-bottom pb-3">
         @for(item of cart().items; track item.id) {
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <!-- Imagen del Producto -->
-                <div class="item-thumbnail me-3">
-                    <img [src]="item.image" alt="{{item.product_name}}" class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;">
+            @if(item.cartVariant && item.cartVariant.length > 0){
+
+                @for(cartVariant of item.cartVariant; track cartVariant.id){
+                     <div class="d-flex justify-content-between align-items-center mb-3">
+                        <!-- Imagen del Producto -->
+                        <div class="item-thumbnail me-3">
+                            <img [src]="item.image" alt="{{item.product_name}}" class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                        </div>
+                        <!-- Detalles del Producto -->
+                        <div class="item-details flex-grow-1">
+                            <p class="item-name m-0"><strong>{{item.product_name}}</strong></p>
+                            <span class="badge bg-light text-dark">{{ extraerValor(cartVariant.data) }}</span>
+                            <p class="item-quantity m-0 text-muted">Cantidad: {{cartVariant.quantity}}</p>
+                        </div>
+                        <!-- Precio del Producto -->
+                        <div class="item-price text-end">
+                            <p class="m-0"><strong>${{item.price+cartVariant.price_modifier| number | comaToDot}} x {{cartVariant.quantity}}</strong></p>
+                        </div>
+                    </div>
+                }
+
+            }@else{
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <!-- Imagen del Producto -->
+                    <div class="item-thumbnail me-3">
+                        <img [src]="item.image" alt="{{item.product_name}}" class="img-fluid rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                    </div>
+                    <!-- Detalles del Producto -->
+                    <div class="item-details flex-grow-1">
+                        <p class="item-name m-0"><strong>{{item.product_name}}</strong></p>
+                        <p class="item-quantity m-0 text-muted">Cantidad: {{item.quantity}}</p>
+                    </div>
+                    <!-- Precio del Producto -->
+                    <div class="item-price text-end">
+                        <p class="m-0"><strong>${{item.price | number | comaToDot}} x {{item.quantity}}</strong></p>
+                    </div>
                 </div>
-                <!-- Detalles del Producto -->
-                <div class="item-details flex-grow-1">
-                    <p class="item-name m-0"><strong>{{item.product_name}}</strong></p>
-                    <p class="item-quantity m-0 text-muted">Cantidad: {{item.quantity}}</p>
-                </div>
-                <!-- Precio del Producto -->
-                <div class="item-price text-end">
-                    <p class="m-0"><strong>${{item.price | number | comaToDot}} x {{item.quantity}}</strong></p>
-                </div>
-            </div>
+            }
             @if(item.product_bundle) {
 
                 <div class="d-flex justify-content-between align-items-center mb-3 ">

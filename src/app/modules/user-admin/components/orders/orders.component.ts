@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { OrderModel } from '@models/order.model';
-import { OrderShippedModel } from '@models/orderShipped.model';
 import { OrderService } from '@services/order.service';
 import { Subscription } from 'rxjs';
 import { OrderDetailsComponent } from '../order-details/order-details.component';
+import { CartService } from '@services/cart.service';
 
 
 @Component({
@@ -24,7 +24,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
   orderSelected:OrderModel = {} as OrderModel;
   showDetails:boolean = false;
 
-  constructor(private orderService:OrderService){
+  constructor(private orderService:OrderService, private cartService:CartService){
 
     this.orderService.getMyOrderList();
   }
@@ -58,10 +58,12 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   toggleDetails(order: OrderModel): void {
     
-    this.orderService.getOrderDetails(order.id);
+    //this.orderService.getOrderDetails(order.id);
     this.orderService.getShippedOrder(order.id);
-    this.orderSelected = {...order};
+    //this.orderSelected = {...order};
+    this.orderSelected = order;
     this.showDetails = true;
+    //console.log('order ', this.orderSelected);
   }
 
   getStatusClass(status: string): string {
@@ -83,14 +85,15 @@ export class OrdersComponent implements OnInit, OnDestroy {
     }
   }
 
-  // En tu componente
   getTrackId(item: any, index: number): string {
-    return item.id || 
-          item.product_id || 
-          `${index}-${item.name || 'item'}`;
+    return item.id || item.product_id || `${index}-${item.name || 'item'}`;
   }
 
   hideDetails(){
     this.showDetails = false;
+  }
+
+  getTextVariant(texto:string){
+    return this.cartService.extraerDatoVariant(texto);
   }
 }

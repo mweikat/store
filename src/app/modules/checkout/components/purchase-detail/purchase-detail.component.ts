@@ -30,9 +30,7 @@ export class PurchaseDetailComponent {
  private cartService = inject(CartService);
  cart = this.cartService.$currentCartSignal;
 
-
- constructor(){}
-
-
-
+ extraerValor(texto: string): string {
+    return this.cartService.extraerDatoVariant(texto);
+  }
 }

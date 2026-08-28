@@ -30,11 +30,11 @@ export class ProductAttrService {
       this.getProductAttrByIdCall(productId);
       return;
     }
-
+    
     const productAttr = this.transferState.get(this.PRODUCT_ATTR, []);
     if(productAttr&&productAttr.length>0){
        this.$productAttrArray.set(productAttr);
-       this.transferState.remove(this.PRODUCT_ATTR);
+       this.transferState.set(this.PRODUCT_ATTR,null);
     }else{
        this.getProductAttrByIdCall(productId);
     }
@@ -43,7 +43,9 @@ export class ProductAttrService {
   private getProductAttrByIdCall(productId:string){
 
     this.httpClient.get <ProductVariantTypeModel[]>(`${this.URL}/product-attr/${productId}`).subscribe(receivedItem => {
-      this.transferState.set(this.PRODUCT_ATTR, receivedItem);
+      if(isPlatformServer(this.platformId)){
+        this.transferState.set(this.PRODUCT_ATTR, receivedItem);
+      }
       this.$productAttrArray.set(receivedItem);
     });
   }

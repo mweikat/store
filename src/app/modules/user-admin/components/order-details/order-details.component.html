@@ -1,6 +1,6 @@
 <h5><b>Productos en la Orden</b></h5>
 <p class="mt-4"><b>Numero de orden:</b> {{order.order_number}}</p>
-<p><b>Fecha:</b> {{ order.created_at | date: 'YYYY-MM-dd hh:mm' }}</p>
+<p><b>Fecha:</b> {{ order.created_at | date: 'yyyy-MM-dd hh:mm' }}</p>
 <p><b>Estado:</b> {{order.status | orderStatus}}</p>
 <p><b>Despacho:</b></p>
 @if(order.shipped!=undefined){
@@ -19,13 +19,28 @@
       </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let item of order.items">
-            <td><img src="{{item.img}}" width="100"></td>
-            <td>{{item.name}}</td>
-            <td>{{item.quantity}}</td>
-            <td>${{item.price | number | comaToDot}}</td>
-            <td>${{(item.price*item.quantity) | number | comaToDot}}</td>
-        </tr>
+        @for(item of order.items; track getTrackId(item, $index); let i = $index){
+        
+            @if(item.variants!=undefined && item.variants.length>0){
+                @for(variant of item.variants; track variant.id){
+                    <tr>
+                    <td><img src="{{item.img}}" width="100"></td>
+                    <td>{{item.product.name}} <small><b>{{getTextVariant(variant.data)}}</b></small>    </td>
+                    <td>{{variant.quantity}}</td>
+                    <td>${{item.price + variant.price_modifier | number | comaToDot}}</td>
+                    <td>${{(item.price + variant.price_modifier*variant.quantity) | number | comaToDot}}</td>
+                    </tr>
+                }
+            }@else{
+                <tr>
+                <td><img src="{{item.img}}" width="100"></td>
+                <td>{{item.product.name}}</td>
+                <td>{{item.quantity}}</td>
+                <td>${{item.price | number | comaToDot}}</td>
+                <td>${{(item.price*item.quantity) | number | comaToDot}}</td>
+                </tr>
+            }
+        }
         <tr>
              <td colspan="5" class="text-end">
                 <span class="float-start fw-bold" >Sub Total:</span> ${{originalPrice | number | comaToDot}}

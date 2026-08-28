@@ -151,7 +151,7 @@ export class RecaptchaComponent implements OnInit, AfterViewInit, OnDestroy{
         }
         clearInterval(interval);
       }
-    }, 100);
+    }, 500);
   }
 
 }

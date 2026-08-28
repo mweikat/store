@@ -1,16 +1,20 @@
 import { ProductBundle } from "./productBundle.model";
 import { ProductVariantSkuModel } from "./productVariantSku.model";
+import { CartItemVariantModel } from "./cartItemVariant.model";
 
 export interface CartItemModel {
 
     id:string;
     cartId?:string;
     product_id:string;
+    sku:string;
     product_name:string;
     quantity:number;
     price:number;
     image?:string;
     product_bundle:ProductBundle|null;
-    variant?:ProductVariantSkuModel;
+    variant?:ProductVariantSkuModel
+    cartVariant?:CartItemVariantModel[];
+
 
 }

@@ -143,8 +143,9 @@ export class CheckoutComponent implements OnInit, OnDestroy{
   selectedShippingMethodFunc($event:ShippingBusiness){
     
     this.selectedShippingMethod = $event
-    if(this.cart().id!=undefined)
-      this.shippingBusinessService.getCost(this.cart().id, this.selectedShippingMethod.id);
+    //console.log('sub_total_price: ', this.cart().id);
+    if(this.cart().id!=undefined && this.sub_total_price()!=undefined)
+      this.shippingBusinessService.getCost(this.cart().id, this.selectedShippingMethod.id, this.sub_total_price());
   }
 
   next(){

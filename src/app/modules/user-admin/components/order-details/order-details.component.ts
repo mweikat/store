@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, OnInit, OnDestroy } from '@angular/core';
 import { OrderModel } from '@models/order.model';
 import { OrderDiscountModel } from '@models/orderDiscount.model';
+import { CartService } from '@services/cart.service';
 import { OrderService } from '@services/order.service';
 import { Subscription } from 'rxjs';
 
@@ -20,7 +21,7 @@ export class OrderDetailsComponent implements OnChanges, OnInit, OnDestroy{
 
   destroyOrder?:Subscription;
 
-  constructor(private orderService:OrderService){}
+  constructor(private orderService:OrderService, private cartService:CartService){}
 
   ngOnDestroy(): void {
 
@@ -41,6 +42,7 @@ export class OrderDetailsComponent implements OnChanges, OnInit, OnDestroy{
   ngOnChanges(changes: SimpleChanges): void {
     
     if(changes['order'].currentValue!=undefined && !changes['order'].firstChange){
+
       this.orderService.getOrderDiscount(changes['order'].currentValue.id);
       this.originalPrice=0;
       this.getTotal(changes['order'].currentValue)
@@ -56,5 +58,13 @@ export class OrderDetailsComponent implements OnChanges, OnInit, OnDestroy{
     for(let item of order.items){
       this.originalPrice+=item.quantity*item.price;
     }
+  }
+
+  getTextVariant(texto:string){
+    return this.cartService.extraerDatoVariant(texto);
+  }
+
+  getTrackId(item: any, index: number): string {
+    return item.id || item.product_id || `${index}-${item.name || 'item'}`;
   }
 }

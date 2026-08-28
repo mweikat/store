@@ -1,3 +1,4 @@
+import { CartItemVariantModel } from "./cartItemVariant.model";
 import { ProductModel } from "./product.model";
 
 export interface OrderItemModel {
@@ -9,5 +10,5 @@ export interface OrderItemModel {
     img?:string;
     quantity:number;
     product:ProductModel;
-
+    variants:CartItemVariantModel[];
 }    

@@ -62,9 +62,9 @@ export class ShippingBusinessService {
     });
   }
 
-  getCost(cartId:string, shippingBusinessId:number){
+  getCost(cartId:string, shippingBusinessId:number, totalCartCost:number){
 
-    let termToJson = {cartId:cartId,shippingBusinessId:shippingBusinessId};
+    let termToJson = {cartId:cartId,shippingBusinessId:shippingBusinessId,totalCartCost:totalCartCost};
 
     this.httpClient.post<number>(`${this.URL}/cost`,termToJson).subscribe(item => {
       

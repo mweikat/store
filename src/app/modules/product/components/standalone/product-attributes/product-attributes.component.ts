@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, EventEmitter, inject, input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { ProductModel } from '@models/product.model';
+import { Component, effect, EventEmitter, inject, Output } from '@angular/core';
 import { ProductVariantSkuModel } from '@models/productVariantSku.model';
 import { ProductAttrService } from '@services/product-attr.service';
+import { ProductsService } from '@services/products.service';
 
 @Component({
   selector: 'app-product-attributes',
@@ -11,11 +11,13 @@ import { ProductAttrService } from '@services/product-attr.service';
   styleUrl: './product-attributes.component.scss',
   imports:[CommonModule]
 })
-export class ProductAttributesComponent implements OnChanges {
+export class ProductAttributesComponent {
 
   private productAttrService = inject(ProductAttrService);
+  private productService = inject(ProductsService);
+
   attributes = this.productAttrService.$productAttrArray;
-  product = input.required<ProductModel>();
+  product = this.productService.$currentProduct;
 
   // Para cambiar imagen principal
   @Output() imageSelected = new EventEmitter<string>();
@@ -27,36 +29,41 @@ export class ProductAttributesComponent implements OnChanges {
   private skuSelected = this.productAttrService.$skuSelected;
   stockVariant = this.productAttrService.$stockVariant;
 
+
   constructor(){
+
     effect(()=>{
-      if(this.attributes() && this.attributes().length>0){
-        //console.log('cant attr: ', this.attributes());
-        this.initializeDefaults();
+      if(this.product().id){
+        //console.log("1 paso", this.product().id);
+        this.attributes.set([]);
+        this.productAttrService.getProductAttrById(this.product().id);
       }
     });
+
     effect(()=>{
-      //console.log("skuSelected ", this.skuSelected());
+
+      if(this.attributes() && this.attributes().length>0){
+        //console.log("2 paso si cant attr:", this.attributes());
+        this.initializeDefaults();
+      }else{
+        //console.log('2 paso no cant attr: ', this.attributes());
+      }
+    });
+
+    effect(()=>{
       if(this.skuSelected() && this.skuSelected().sku!=undefined){
-        //console.log("sku seleccionados ", this.skuSelected());
         this.stockVariant.set(-1);
         this.productAttrService.getSkuAttrStock(this.skuSelected().sku);
       }
     });
+
     effect(()=>{
       if(this.stockVariant()!==-1){
-        //console.log("stock variant ", this.skuSelected());
-        //console.log("selectedAttributes: ", this.selectedAttributes);
         this.emitChanges();
       }
     });
   }
-  ngOnChanges(changes: SimpleChanges): void {
-    //console.log(changes['product'].currentValue.id)
-    if (changes['product'].currentValue.id) {
-      this.productAttrService.getProductAttrById(changes['product'].currentValue.id)
-    }
-  }
-
+  
   initializeDefaults() {
     this.selectedAttributes = {};
 
@@ -104,9 +111,8 @@ export class ProductAttributesComponent implements OnChanges {
   }
 
   getSkuSelected(){
-    //console.log("selectedAttributes ", this.selectedAttributes);
     if(this.selectedAttributes && Object.keys(this.selectedAttributes).length>0){
-      //console.log("entra");
+
       const arrayIds: string[] = [];
       Object.values(this.selectedAttributes).forEach((element: any) => {
         arrayIds.push(element.id);
@@ -116,7 +122,6 @@ export class ProductAttributesComponent implements OnChanges {
   }
 
   emitChanges() {
-    //console.log("emite ", this.skuSelected());
     this.skuSelected().stock = this.stockVariant();
     this.skuSelected().Items = Object.values(this.selectedAttributes);
     this.attributesChanged.emit(this.skuSelected());

@@ -14,6 +14,7 @@ import { ShippingBusinessService } from '@services/shipping-business.service';
 import { TenantService } from 'src/app/core/tenants/tenants.service';
 import { Subscription } from 'rxjs';
 import { ProductAttrService } from '@services/product-attr.service';
+import { ProductVariantSkuModel } from '@models/productVariantSku.model';
 
 @Component({
     selector: 'app-product-detail',
@@ -62,6 +63,7 @@ export class ProductDetailComponent implements OnDestroy {
   variantStock:number = -1;
   isConsulting = this.productAttrService.$isConsulting;
   priceVariant = 0;
+  variantCartItem: ProductVariantSkuModel | undefined = undefined;
 
 constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATFORM_ID) private platformId: Object ) {
 
@@ -79,8 +81,12 @@ constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATF
       this.productService.getProduct(param, true);
     } else {
       this.productService.getProduct(param, false);
-    }    
+    }
 
+    this.priceVariant = 0;    
+    this.variantCartItem = undefined;
+    this.variantStock= -1;
+  
   });
 
 
@@ -144,6 +150,9 @@ constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATF
     }
 
     this.isConsulting.set(false);
+
+    //event.quantity = this.cantProduct;
+    this.variantCartItem = event;
   }
   
   ngOnDestroy(): void {
@@ -173,13 +182,20 @@ constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATF
       return;
     }
 
+    //add cant variant
+    if(this.variantCartItem!=undefined){
+      this.variantCartItem.quantity = this.cantProduct;
+    }
+
     const item: CartItemModel = {
       id: '',
       product_id: product.id,
       product_name: product.name,
+      sku: product.sku,
       quantity: this.cantProduct,
       price: product.price,
-      product_bundle: this.bundle
+      product_bundle: this.bundle,
+      variant: this.variantCartItem || undefined
     };
 
     this.cartService.addToCart(item, this.isLogged());
@@ -194,14 +210,22 @@ constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATF
   // Lógica para comprar directamente
   buyNow(product: ProductModel) {
 
+    //add cant variant
+    if(this.variantCartItem!=undefined){
+      this.variantCartItem.quantity = this.cantProduct;
+    }
+
     const item:CartItemModel = {
       id:'',
       product_id:product.id,
       product_name: product.name,
+      sku: product.sku,
       quantity: this.cantProduct,
       price:product.price,
-      product_bundle: this.bundle
+      product_bundle: this.bundle,
+      variant: this.variantCartItem || undefined
     }
+
     this.cartService.addToCartAndGoCheckout(item,this.isLogged());
     
   }

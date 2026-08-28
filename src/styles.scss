@@ -952,4 +952,8 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 footer.footer {
     background-color: vars.$footer-background;
     color: vars.$footer-text;
+
+    a{
+        color: vars.$footer-link;
+    }
 }

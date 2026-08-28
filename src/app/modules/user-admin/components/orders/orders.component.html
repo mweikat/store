@@ -1,9 +1,10 @@
 <div class="orders-section container">
   <h5 class="card-title text-center mb-4">Mis Compras</h5>
-  <div *ngIf="orders.length > 0; else noOrders">
+  @if(orders.length > 0){
+    
     <div [class.d-none]="showDetails">
       <div class="row g-3">
-        @for(order of orders; track order.id; let i = $index){
+                @for(order of orders; track order.id; let i = $index){
           <div class="col-12">
             <div class="card shadow-sm mb-3">
               <div class="card-header bg-light d-flex justify-content-between align-items-center">
@@ -12,7 +13,7 @@
                   
                 </div>
                 <div class="fw-bold small">
-                  {{ order.created_at | date: 'YYYY-MM-dd hh:mm' }}
+                  {{ order.created_at | date: 'yyyy-MM-dd hh:mm' }}
                 </div>
               </div>
               
@@ -20,19 +21,38 @@
                 <!-- Lista de productos -->
                 
                 @for(item of order.items; track getTrackId(item, $index); let i = $index){
-                    <div class="col-md-6 mb-2">
-                      <div class="d-flex">
-                        @if(item.product.imgs){
-                          <img [src]="item.product.imgs[0].img" class="rounded me-3" width="60" height="60" style="object-fit: cover;">
-                        }
-                        <div>
-                          <h6 class="mb-1">{{ item.product.name }}</h6>
-                          <div class="text-muted small">
-                            {{ item.quantity }} x ${{ item.price | number | comaToDot }}
+                     @if(item.variants.length>0){
+                      @for(variant of item.variants; track variant.id){
+                        <div class="col-md-6 mb-2">
+                          <div class="d-flex">
+                            @if(item.product.imgs){
+                              <img [src]="item.product.imgs[0].img" class="rounded me-3" width="60" height="60" style="object-fit: cover;">
+                            }
+                            <div>
+                              <h6 class="mb-1">{{ item.product.name }}</h6>
+                              <small><b>{{getTextVariant(variant.data)}}</b></small>
+                              <div class="text-muted small">
+                                {{ variant.quantity }} x ${{ item.price + variant.price_modifier| number | comaToDot }}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                     }@else{
+                      <div class="col-md-6 mb-2">
+                        <div class="d-flex">
+                          @if(item.product.imgs){
+                            <img [src]="item.product.imgs[0].img" class="rounded me-3" width="60" height="60" style="object-fit: cover;">
+                          }
+                          <div>
+                            <h6 class="mb-1">{{ item.product.name }}</h6>
+                            <div class="text-muted small">
+                              {{ item.quantity }} x ${{ item.price | number | comaToDot }}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    }
                   }
         
                 
@@ -53,16 +73,12 @@
         }
       </div>
     </div>
-    
    
-      <app-order-details [order]="orderSelected" (isShowDetails)="hideDetails()" [class.d-none]="!showDetails"></app-order-details>
-    
-  </div>
-  
-  <ng-template #noOrders>
+    <app-order-details [order]="orderSelected" (isShowDetails)="hideDetails()" [class.d-none]="!showDetails"></app-order-details>
+  }@else {
     <div class="text-center py-5">
       <i class="bi bi-box-seam display-5 text-muted mb-3"></i>
       <p class="text-muted fs-5">Aún no tienes órdenes registradas.</p>
     </div>
-  </ng-template>
+  }
 </div>

@@ -55,7 +55,8 @@ export class ProductsService {
     if(current_product && (current_product.id != param) && (current_product.url != param)){
       //console.log('tnego producto')
       this.getProductByIdCall(param);
-      return;  
+      return;
+        
     }else
         if(current_product){
           this.$currentProduct.set(current_product);
@@ -63,8 +64,6 @@ export class ProductsService {
           return;
         }
 
-       
-    
     this.getProductByIdCall(param);
     
   }
@@ -183,7 +182,7 @@ export class ProductsService {
     if(isPlatformServer(this.platformId)){
       this.getProductDetailsCall(productId);
     }else{
-      this.getProductDetailsCall(productId);
+      //this.getProductDetailsCall(productId);
       const productDetails = this.transferState.get(this.PRODUCT_DETAILS, null);
       //console.log("product details from transfer state: ", productDetails);
       if(productDetails===null){

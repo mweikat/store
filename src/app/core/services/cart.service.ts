@@ -211,6 +211,13 @@ export class CartService {
     });
   }
 
+  deleteItemVariant(cartItemId:string, cartItemVariantId:string){
+      this.httpClient.delete(`${this.URL}/cart-item-variant/${cartItemVariantId}`).subscribe(() => {
+      
+      this.removeItemVariantFromCart(cartItemId, cartItemVariantId);
+    });
+  }
+
   deleteItemBundle(id:string){
     this.httpClient.delete(`${this.URL}/cart-item-bundle/${id}`).subscribe(() => {
       this.removeItemBundleFromCart(id);
@@ -240,7 +247,7 @@ export class CartService {
       this.cartQuantResult$.next(resp);
 
       if(resp.action){
-        this.uptateQuantityItemFromCart(cartItemId, resp.current,cartReload);
+        this.updateQuantityItemFromCart(cartItemId, resp.current,cartReload);
       }
 
     });
@@ -258,33 +265,14 @@ export class CartService {
       this.cartQuantResult$.next(resp);
 
       if(resp.action){
-        this.uptateQuantityItemFromCart(cartItemId, resp.current, cartReload);
+        this.updateQuantityItemFromCart(cartItemId, resp.current, cartReload);
       }
       
     });
   }
 
-  public calculateCartTotal(cart: CartModel) {
-  
-    let totalQuantity = 0;
-    let totalPrice = 0;
-
-    cart.items.forEach(item => {
-      totalQuantity += item.quantity;
-      totalPrice += item.quantity * item.price;
-      if(item.product_bundle && item.product_bundle.id!=undefined){
-        totalPrice += item.product_bundle.discount_price*item.quantity;
-        totalQuantity += item.quantity;
-      }
-    });
-
-    this.$cantCart.set(totalQuantity);
-    this.$totalCart.set(totalPrice);
-
-  }
-
-  private async uptateQuantityItemFromCart(itemId: string, quantity:number, cartReload:boolean){
-
+  private async updateQuantityItemFromCart(itemId: string, quantity:number, cartReload:boolean){
+    console.log("item: ", itemId);
     let cart: CartModel = await this.getCartFromLocalSession();
     
     if (!cart || !cart.items) {
@@ -306,6 +294,128 @@ export class CartService {
     if(cartReload)
       this.$currentCart.set(cart);
 
+  }
+
+  addQuantityVariant(cartItemId:string, cartItemVariantId:string, quantity:number, cartReload:boolean){
+    
+     let add = {cartItemVariantId:cartItemVariantId, quantity:quantity, operation:"add"};
+
+    this.httpClient.put<CartItemQRModel>(`${this.URL}/cart-quantity-change-variant`,add, { responseType: 'json'}).subscribe(resp => {
+      
+      resp.cartItemId = cartItemId;
+      resp.operation="add";
+      this.cartQuantResult$.next(resp);
+
+      if(resp.action){
+        //console.log("entra a actualizar cantidad de item del cart");
+        this.updateQuantityItemFromCartVariant(cartItemId, cartItemVariantId, quantity,cartReload, "add");
+      }
+
+    });
+  }
+
+  remQuantityVariant(cartItemId:string, cartItemVariantId:string, quantity:number, cartReload:boolean){
+  
+    let rem = {cartItemVariantId:cartItemVariantId, quantity:quantity, operation:"rem"};
+
+    this.httpClient.put<CartItemQRModel>(`${this.URL}/cart-quantity-change-variant`,rem, { responseType: 'json'}).subscribe(resp => {
+   
+      resp.cartItemId = cartItemId;
+      resp.operation="rem";
+      this.cartQuantResult$.next(resp);
+
+      if(resp.action){
+        this.updateQuantityItemFromCartVariant(cartItemId, cartItemVariantId, quantity, cartReload, "rem");
+      }
+      
+    });
+  
+  }
+
+  private async updateQuantityItemFromCartVariant(itemId: string, itemVariantId:string, quantity:number, cartReload:boolean, operation:string){
+    
+    let cart: CartModel = await this.getCartFromLocalSession();
+    
+    if (!cart || !cart.items) {
+        //console.warn('Carrito no encontrado o sin elementos');
+        return;
+    }
+
+    const index = cart.items.findIndex(item => item.id === itemId);
+
+    if (index !== -1) {
+      if(operation==='add')
+        cart.items[index].quantity = cart.items[index].quantity + quantity;
+      else
+        cart.items[index].quantity = cart.items[index].quantity - quantity;
+    }
+    
+    const index2 =  cart.items[index].cartVariant?.findIndex(item => item.id === itemVariantId);
+
+    if (index2 !== undefined && index2 !== -1){
+      if(operation==='add')
+        cart.items[index].cartVariant![index2].quantity = cart.items[index].cartVariant![index2].quantity + quantity;
+      else
+        cart.items[index].cartVariant![index2].quantity = cart.items[index].cartVariant![index2].quantity - quantity;
+    }
+   
+    this.setCartFromLocalSession(cart);
+
+    this.cartModelMenu$.next(cart);
+    
+    if(cartReload)
+      this.$currentCart.set(cart);
+
+  }
+
+  public calculateCartTotal(cart: CartModel) {
+  
+    let totalQuantity = 0;
+    let totalPrice = 0;
+
+    cart.items.forEach(item => {
+
+      if(item.cartVariant && item.cartVariant.length>0){
+        item.cartVariant.forEach(variant => {
+          totalPrice += variant.quantity * (variant.price_modifier + item.price);
+          totalQuantity += variant.quantity;
+        });
+
+      }else{
+        totalQuantity += item.quantity;
+        totalPrice += item.quantity * item.price;
+      }
+
+
+
+      if(item.product_bundle && item.product_bundle.id!=undefined){
+        totalPrice += item.product_bundle.discount_price*item.quantity;
+        totalQuantity += item.quantity;
+      }
+
+
+    });
+
+    this.$cantCart.set(totalQuantity);
+    this.$totalCart.set(totalPrice);
+
+  }
+
+  public   extraerDatoVariant(texto: string): string {
+    // Dividir el texto por comas para obtener cada par clave:valor
+    const partes = texto.split(',');
+    
+    // Extraer solo la parte después de los dos puntos de cada parte
+    const valores = partes.map(parte => {
+        const indexDosPuntos = parte.indexOf(':');
+        if (indexDosPuntos !== -1) {
+            return parte.substring(indexDosPuntos + 1).trim();
+        }
+        return '';
+    });
+    
+    // Filtrar valores vacíos y unir con punto y coma
+    return valores.filter(valor => valor !== '').join(';');
   }
   
   // Método para eliminar un item del CartModel
@@ -334,53 +444,80 @@ export class CartService {
 
     if(cart.items.length==0)
       this.goCart();
-
-    
-}
-
-private async removeItemBundleFromCart(itemId: string){
-
-  let cart: CartModel = await this.getCartFromLocalSession();
-    
-  if (!cart || !cart.items) {
-      console.warn('Carrito no encontrado o sin elementos');
-      return;
   }
 
-  const updatedItems = cart.items.map(item => {
-    if (item.id === itemId) {
-      return { ...item, product_bundle : null };
+  private async removeItemVariantFromCart(cartItemId: string, cartItemVariantId: string)  {
+
+    let cart: CartModel = await this.getCartFromLocalSession();
+
+    if (!cart || !cart.items) {
+        console.warn('Carrito no encontrado o sin elementos');
+        return;
     }
-    return item;
-  });
 
-  cart.items = updatedItems;
+    const index = cart.items.findIndex(item => item.id === cartItemId);
 
-  //console.log('cart: ', cart)
+    if (index !== -1 && cart.items[index].cartVariant) {
+      const index2 =  cart.items[index].cartVariant?.findIndex(item => item.id === cartItemVariantId);
+      const quantityRemoved = cart.items[index].cartVariant![index2!].quantity;
+      cart.items[index].quantity = cart.items[index].quantity - quantityRemoved;
+      cart.items[index].cartVariant.splice(index2!, 1);
 
-  // Guardar en almacenamiento local
-  this.setCartFromLocalSession(cart);
-  
-  // Emitir cambio
-  this.$currentCart.set(cart);
-  this.cartModelMenu$.next(cart);
-  this.$itemDeleteBundle.set(itemId);
+      if(cart.items[index].quantity === 0){
+        cart.items.splice(index, 1);
+      }
+    }
 
-  if(cart.items.length==0)
-    this.goCart();
-}
+    //console.log(cart);
+    this.setCartFromLocalSession(cart);
+    this.$currentCart.set(cart);
+    this.cartModelMenu$.next(cart);
 
-private setCartFromLocalSession(cart:CartModel){
-  localStorage.setItem(`cart_${this.business.id}`, JSON.stringify(cart));
-}
+  }
 
-private delCartFromLocalSession(){
-  localStorage.removeItem(`cart_${this.business.id}`);
-}
+  private async removeItemBundleFromCart(itemId: string){
 
-private  goCart(){
-  this.router.navigate(['/cart'])
-}
+    let cart: CartModel = await this.getCartFromLocalSession();
+      
+    if (!cart || !cart.items) {
+        console.warn('Carrito no encontrado o sin elementos');
+        return;
+    }
+
+    const updatedItems = cart.items.map(item => {
+      if (item.id === itemId) {
+        return { ...item, product_bundle : null };
+      }
+      return item;
+    });
+
+    cart.items = updatedItems;
+
+    //console.log('cart: ', cart)
+
+    // Guardar en almacenamiento local
+    this.setCartFromLocalSession(cart);
+    
+    // Emitir cambio
+    this.$currentCart.set(cart);
+    this.cartModelMenu$.next(cart);
+    this.$itemDeleteBundle.set(itemId);
+
+    if(cart.items.length==0)
+      this.goCart();
+  }
+
+  private setCartFromLocalSession(cart:CartModel){
+    localStorage.setItem(`cart_${this.business.id}`, JSON.stringify(cart));
+  }
+
+  private delCartFromLocalSession(){
+    localStorage.removeItem(`cart_${this.business.id}`);
+  }
+
+  private  goCart(){
+    this.router.navigate(['/cart'])
+  }
 
 
 

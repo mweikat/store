@@ -126,7 +126,7 @@ export class OrderService {
 
   }
 
-  getOrderDetails(order_id:string){
+  /*getOrderDetails(order_id:string){
 
     this.httpClient.get<OrderItemModel[]>(`${this.URL}/details/${order_id}`).subscribe(items => {
       
@@ -134,7 +134,7 @@ export class OrderService {
 
     });
 
-  }
+  }*/
 
   getOrderDiscount(order_id:string){
 

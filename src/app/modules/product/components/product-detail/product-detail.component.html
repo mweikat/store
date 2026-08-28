@@ -99,7 +99,7 @@
 
             @if(p.stock > 0){
               <app-product-attributes
-              [product]="p"
+              
               (imageSelected)="changeMainMedia('image', $event)"
               (attributesChanged)="onAttributesChanged($event)"></app-product-attributes>
               <!--p><strong>En stock: </strong>Disponible para envío inmediato</p -->  
@@ -126,18 +126,18 @@
                   
                   @if(isConsulting()){
                     <div class="buy-button d-flex justify-content-start mt-3 d-none d-md-flex">
-                      <button class="btn btn-primary-c1 me-2" >
-                        {{ isAddingToCart() ? 'Agregando...' : 'Agregar al carrito' }}
+                      <button class="btn btn-primary-c1 me-2" [disabled]="isConsulting()" [class.disabled]="isConsulting()">
+                        Consultando...
                       </button>
                         
-                      <button class="btn btn-primary-c2"  >Comprar</button>
+                      <!--button class="btn btn-primary-c2"  >Comprar</button -->
 
                     </div>
                   
                     <!-- Botones para pantallas pequeñas -->
                     <div class="fixed-buttons d-md-none">
-                      <button class="btn btn-primary-c1" >Agregar al carrito</button>
-                      <button class="btn btn-primary-c2" >Comprar</button>
+                      <button class="btn btn-primary-c1" [disabled]="isConsulting()" [class.disabled]="isConsulting()">Consultando...</button>
+                      <!--button class="btn btn-primary-c2" >Comprar</button -->
                     </div>
                   }@else{
                     <!-- Botones para pantallas grandes -->
@@ -152,7 +152,9 @@
                   
                     <!-- Botones para pantallas pequeñas -->
                     <div class="fixed-buttons d-md-none">
-                      <button class="btn btn-primary-c1" (click)="addToCart(p)">Agregar al carrito</button>
+                      <button class="btn btn-primary-c1" (click)="addToCart(p)" [disabled]="isAddingToCart()" [class.disabled]="isAddingToCart()">
+                        {{ isAddingToCart() ? 'Agregando...' : 'Agregar al carrito' }}
+                      </button>
                       <button class="btn btn-primary-c2" (click)="buyNow(p)">Comprar</button>
                     </div>
                   }
