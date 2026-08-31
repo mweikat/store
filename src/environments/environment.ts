@@ -9,9 +9,6 @@ export const environment = {
   api_order:'http://localhost:'+port+'/api/v1/order',
   api_user:'http://localhost:'+port+'/api/v1/user',
   defaultBusinessName:'mipatita',
-  recaptcha: {
-    siteKey: '6Le5aYAqAAAAAIF5xZy5EPN4-LTzA_F3tB_5amKl',
-  },
   url_recaptcha:'https://www.google.com/recaptcha/api.js?render=',
   googleClientIdlogin:'184950648114-63vf1pluj62ru4b3f1n6loo4dshlkuil.apps.googleusercontent.com'
 };
