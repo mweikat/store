@@ -45,7 +45,7 @@
               <!-- Video thumbnail -->
               @if(p.video?.code) {
                 <div (click)="changeMainMedia('video', 'https://www.youtube.com/embed/' + p.video.code)">
-                  <img src="https://img.youtube.com/vi/{{p.video?.code}}/0.jpg" alt="Video" class="thumbnail-img" title="Video del producto">
+                  <img src="https://img.youtube.com/vi/{{p.video.code}}/0.jpg" alt="Video" class="thumbnail-img" title="Video del producto">
                   <i class="bi bi-play-circle-fill position-absolute" style="font-size: 1.5rem; top: 8px; left: 8px; color: white;"></i>
                 </div>
               }
