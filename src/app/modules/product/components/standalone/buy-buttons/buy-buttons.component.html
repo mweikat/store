@@ -1,0 +1,57 @@
+          <!-- Botones de Comprar -->
+            @defer{
+              @if(product().stock > 0){
+                @if(variantStock()!==0){
+                <div class="input-group mb-3" style="width: 150px;">
+                  <span class="input-group-text" style="cursor: pointer;" (click)="restCant()">-</span>
+                  <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)" min="1" max="{{product().stock}}" value="{{cantProduct}}" readonly>
+                  <span class="input-group-text" style="cursor: pointer;" (click)="addCant()">+</span>
+                </div>
+                }
+                @if(variantStock() === 0){
+                  <div class="text-danger">
+                    <!--b>Lo sentimos! </b--> Sin Stock.
+                  </div>
+                }@else {
+                  
+                  @if(isConsulting()){
+                    <div class="buy-button d-flex justify-content-start mt-3 d-none d-md-flex">
+                      <button class="btn btn-primary-c1 me-2" [disabled]="isConsulting()" [class.disabled]="isConsulting()">
+                        Agregar al carrito
+                      </button>
+                        
+                      <button class="btn btn-primary-c2" [disabled]="isConsulting()" [class.disabled]="isConsulting()" >Comprar</button>
+
+                    </div>
+                  
+                    <!-- Botones para pantallas pequeñas -->
+                    <div class="fixed-buttons d-md-none">
+                      <button class="btn btn-primary-c1 btn-sm" [disabled]="isConsulting()" [class.disabled]="isConsulting()">Agregar al carrito</button>
+                      <button class="btn btn-primary-c2 btn-sm" [disabled]="isConsulting()" [class.disabled]="isConsulting()" >Comprar</button>
+                    </div>
+                  }@else{
+                    <!-- Botones para pantallas grandes -->
+                    <div class="buy-button d-flex justify-content-start mt-3 d-none d-md-flex">
+                      <button class="btn btn-primary-c1 me-2" (click)="addToCart(product())" [disabled]="isAddingToCart()" [class.disabled]="isAddingToCart()">
+                        {{ isAddingToCart() ? 'Agregando...' : 'Agregar al carrito' }}
+                      </button>
+                        
+                      <button class="btn btn-primary-c2" (click)="buyNow(product())" [disabled]="isAddingToCart()" [class.disabled]="isAddingToCart()">Comprar</button>
+
+                    </div>
+                  
+                    <!-- Botones para pantallas pequeñas -->
+                    <div class="fixed-buttons d-md-none">
+                      <button class="btn btn-primary-c1 btn-sm" (click)="addToCart(product())" [disabled]="isAddingToCart()" [class.disabled]="isAddingToCart()">
+                        {{ isAddingToCart() ? 'Agregando...' : 'Agregar al carrito' }}
+                      </button>
+                      <button class="btn btn-primary-c2 btn-sm" (click)="buyNow(product())" [disabled]="isAddingToCart()" [class.disabled]="isAddingToCart()">Comprar</button>
+                    </div>
+                  }
+
+                  
+                  
+                }
+                
+              }
+            }

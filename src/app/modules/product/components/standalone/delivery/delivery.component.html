@@ -1,0 +1,14 @@
+<br>
+<select class="form-select" (change)="getDelivery()" [(ngModel)]="methodSelected" style="font-size: small; max-width: 400px;">
+    <option value="0">Seleccione Envío</option>
+    @for(method of shippingMehtods(); track method.id){
+    <option value="{{method.id}}">{{method.name}}</option>
+    }
+</select>
+@if(isShowMethod()){
+    
+    <div class="mt-2" style=" font-size: 12px;">
+    <b>{{deliveryData()?.delivery_text}} </b>
+        {{deliveryData()?.arrival_estimated_time}}
+    </div>
+}

@@ -1,7 +1,7 @@
-@if(this.attributes() && this.attributes().length>0) {
+@if(this.attributes && this.attributes.length>0) {
 
   <div class="attributes-wrapper mt-4">
-    @for(attr of attributes(); track attr.id) {
+    @for(attr of attributes; track attr.id) {
       <div class="attribute-block mb-3">
 
         <div class="attribute-title">

@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { CartModel } from '@models/cart.model';
 import { CartItemModel } from '@models/cartItem.model';
 import { MessageModel } from '@models/message.model';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { MessagesService } from './messages.service';
 import { CartItemQRModel } from '@models/cartItemQR.model';
@@ -132,7 +132,7 @@ export class CartService {
     }
   }
 
-  addToCart(cartItem: CartItemModel, isLogged:boolean) {
+  /*addToCart(cartItem: CartItemModel, isLogged:boolean) {
 
     let cart:CartModel = this.getCartFromLocalSession();
 
@@ -177,7 +177,51 @@ export class CartService {
       }
     }); 
 
+  }*/
+ addToCart(cartItem: CartItemModel, isLogged: boolean): Promise<CartModel> {
+  let cart: CartModel = this.getCartFromLocalSession();
+
+  if (cart != undefined) {
+    cartItem.cartId = cart.id;
   }
+
+  let urlEndopoint = "cart-item";
+  if (isLogged)
+    urlEndopoint = "cart-user-item";
+
+  let toJson = { cartItem };
+
+  return firstValueFrom(
+    this.httpClient.post<CartModel>(`${this.URL}/${urlEndopoint}`, toJson, { responseType: 'json' })
+  ).then(receivedItem => {
+    this.setCartFromLocalSession(receivedItem);
+    this.$currentCart.set(receivedItem);
+    this.cartModelMenu$.next(receivedItem);
+
+    const msgModel = {} as MessageModel;
+    msgModel.msg = "El producto ha sido agregado al carrito.";
+    msgModel.active = 1;
+    msgModel.duration = 2;
+    msgModel.title = "Add to Cart";
+    msgModel.icon = "ok";
+    msgModel.vertical = "top-0";
+    this.messageService.sendMessage(msgModel);
+
+    return receivedItem;
+  }).catch(err => {
+    if (err.status == 422) {
+      const msgModel = {} as MessageModel;
+      msgModel.msg = "No se cuenta con más stock para agregar al carrito.";
+      msgModel.active = 1;
+      msgModel.duration = 3;
+      msgModel.title = "Error on Update Quantity";
+      msgModel.icon = "nok";
+      msgModel.vertical = "top-0";
+      this.messageService.sendMessage(msgModel);
+    }
+    throw err; // Re-lanzar el error para que getService lo maneje
+  });
+}
 
   async addToCartAndGoCheckout(cartItem: CartItemModel, islogged:boolean){
 
@@ -401,7 +445,7 @@ export class CartService {
 
   }
 
-  public   extraerDatoVariant(texto: string): string {
+  public extraerDatoVariant(texto: string): string {
     // Dividir el texto por comas para obtener cada par clave:valor
     const partes = texto.split(',');
     

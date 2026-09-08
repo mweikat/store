@@ -1,20 +1,16 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, Inject, OnDestroy, PLATFORM_ID, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { CartItemModel } from '@models/cartItem.model';
-import { DeliveryModel } from '@models/delivery.model';
+import { ChangeDetectionStrategy, Component, computed, effect, Inject, inject, OnDestroy, PLATFORM_ID, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ProductModel } from '@models/product.model';
 import { ProductBundle } from '@models/productBundle.model';
-import { AuthService } from '@services/auth.service';
-import { CartService } from '@services/cart.service';
 import { CategoriesService } from '@services/categories.service';
-import { DeliveryService } from '@services/delivery.service';
+
 import { ProductsService } from '@services/products.service';
 import { SeoService } from '@services/seo.service';
-import { ShippingBusinessService } from '@services/shipping-business.service';
 import { TenantService } from 'src/app/core/tenants/tenants.service';
 import { Subscription } from 'rxjs';
 import { ProductAttrService } from '@services/product-attr.service';
 import { ProductVariantSkuModel } from '@models/productVariantSku.model';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
     selector: 'app-product-detail',
@@ -27,47 +23,34 @@ export class ProductDetailComponent implements OnDestroy {
 
   private tenantService = inject(TenantService);
   private URL_BUSINESS = this.tenantService.getCurrentBusiness().url; 
-  private deliveryService = inject(DeliveryService);
+ 
   private productService = inject(ProductsService);
   private categoryService = inject(CategoriesService);
-  private cartService = inject(CartService);
   private seoService = inject(SeoService);
-  private businessShippingService = inject(ShippingBusinessService);
-  private authService = inject(AuthService);
+
   private productAttrService = inject(ProductAttrService);
+  //private isConsulting = this.productAttrService.$isConsulting;
 
   //componentes vars
   product = this.productService.$currentProduct;
   mainImage: string = '';
   mainMedia = signal<{ type: 'image' | 'video', src: string }>({ type: 'image', src: '' });
   categories = this.categoryService.categoriesProductDetailSignal;
-  categoriesNames = computed(()=> this.categories().map(category => category.url_name));;
+  categoriesNames = computed(()=> this.categories().map(category => category.url_name));
   categoryIds = computed(()=> this.categories().map(category => category.id));
 
   bundlesArray = this.productService.productBundlesSignal;
   bundle: ProductBundle = {} as ProductBundle;
 
   //states
-  cantProduct:number = 1;
   destroyRoute?:Subscription;
-  isAddingToCart= signal<boolean>(false);
-  isLogged = computed(()=> this.authService.isLoggedIn());
-  shippingMehtods = this.businessShippingService.shippingMethodsSignal;
-
-  deliveryData = this.deliveryService.deliveryDataSignal;
-  localDeliveryData = signal<DeliveryModel | null>(null);
-  methodSelected:number=0;
-  isShowMethod = computed(() => this.localDeliveryData() !== null);
-
+  buttonsBlocked:boolean = true;
   //variants
   variantStock:number = -1;
-  isConsulting = this.productAttrService.$isConsulting;
   priceVariant = 0;
-  variantCartItem: ProductVariantSkuModel | undefined = undefined;
+  variantCartItem :ProductVariantSkuModel|undefined = undefined;
 
-constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATFORM_ID) private platformId: Object ) {
-
-  this.businessShippingService.getShippingMetphods();
+constructor(private route: ActivatedRoute, @Inject(PLATFORM_ID) private platformId: Object ) {
 
   this.destroyRoute = this.route.paramMap.subscribe(params => {
 
@@ -86,18 +69,12 @@ constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATF
     this.priceVariant = 0;    
     this.variantCartItem = undefined;
     this.variantStock= -1;
+
+    if(isPlatformBrowser(this.platformId))
+      this.buttonsBlocked= true;
+    
+    //console.log("entra primera vez cambia id ");
   
-  });
-
-
-  effect(() => {
-
-    const delivery = this.deliveryData();
-
-    if (delivery?.name) {
-      this.localDeliveryData.set(delivery);
-    }
-
   });
 
 
@@ -117,10 +94,9 @@ constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATF
 
     this.setMainImage(product);
 
-    this.cantProduct = 1;
+    //this.cantProduct = 1;
     
     this.categoryService.getCategoriesByProductId(product.id);
-
     
   });
 
@@ -139,20 +115,31 @@ constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATF
 }
 
  onAttributesChanged(event: any) {
-    //console.log(event);
-    this.priceVariant = event.price_modifier;
-    
-    if(event.stock===0){
-      this.variantStock = 0;
-    }else{
-      this.product().stock = event.stock;
+ 
+    //console.log("evento: ", event);
+    if(event === null) {
+      this.priceVariant = 0;
       this.variantStock = -1;
+      this.variantCartItem = undefined;
+     
+    }else{
+      this.priceVariant = event.price_modifier;
+      this.variantCartItem = event;
+      if(event.stock===0){
+        this.variantStock = 0;
+      }else{
+        this.product().stock = event.stock;
+        this.variantStock = -1;
+      }
     }
 
-    this.isConsulting.set(false);
-
+    
+    //this.buttonsBlocked = false;
     //event.quantity = this.cantProduct;
-    this.variantCartItem = event;
+    //this.variantCartItem = event;
+    if(isPlatformBrowser(this.platformId))
+      this.buttonsBlocked=false;
+    //console.log("habilita botones: ", this.buttonsBlocked);
   }
   
   ngOnDestroy(): void {
@@ -166,90 +153,6 @@ constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATF
     this.mainMedia.set({ type, src });
   }
 
-
-  // Lógica para agregar al carrito
-
-  addToCart(product: ProductModel) {
-
-    if (this.isAddingToCart()) return;
-    
-    this.isAddingToCart.set(true);
-    
-
-    if (this.cantProduct > product.stock) {
-      alert(`No se puede agregar más de ${product.stock} unidades de este producto.`);
-      this.restCant();
-      return;
-    }
-
-    //add cant variant
-    if(this.variantCartItem!=undefined){
-      this.variantCartItem.quantity = this.cantProduct;
-    }
-
-    const item: CartItemModel = {
-      id: '',
-      product_id: product.id,
-      product_name: product.name,
-      sku: product.sku,
-      quantity: this.cantProduct,
-      price: product.price,
-      product_bundle: this.bundle,
-      variant: this.variantCartItem || undefined
-    };
-
-    this.cartService.addToCart(item, this.isLogged());
-
-    setTimeout(()=>{ //corrige error NG0100: Expression has changed after it was checked
-        this.isAddingToCart.set(false);
-        //console.log('time out 3000')
-      },1000);
-  
-  }
-
-  // Lógica para comprar directamente
-  buyNow(product: ProductModel) {
-
-    //add cant variant
-    if(this.variantCartItem!=undefined){
-      this.variantCartItem.quantity = this.cantProduct;
-    }
-
-    const item:CartItemModel = {
-      id:'',
-      product_id:product.id,
-      product_name: product.name,
-      sku: product.sku,
-      quantity: this.cantProduct,
-      price:product.price,
-      product_bundle: this.bundle,
-      variant: this.variantCartItem || undefined
-    }
-
-    this.cartService.addToCartAndGoCheckout(item,this.isLogged());
-    
-  }
-
-  restCant(){
-    if(this.cantProduct>1)
-      this.cantProduct--;
-  }
-  
-  addCant(){
-    if(this.cantProduct < this.product().stock)
-      this.cantProduct++;
-  }
-
-  getDelivery(){
-
-    if(this.methodSelected!=0){
-      let price = (this.product().priceSale)?this.product().priceSale:this.product().price;
-
-      this.deliveryService.getDeliveryDate(this.methodSelected,price);
-    }else
-      this.hideDeliveryData();
-   
-  }
 
   validateUuid(uuid: string): boolean {
 
@@ -265,9 +168,7 @@ constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATF
       this.bundle = bundle;
   }
 
-  private hideDeliveryData() {
-    this.localDeliveryData.set(null);
-  }
+
 
   // En tu componente.ts
   scrollToBundles() {
@@ -279,10 +180,10 @@ constructor(private route: ActivatedRoute, private router: Router, @Inject(PLATF
       });
       
       // Efecto visual de destello
-      element.classList.add('highlight-flash');
+      /*element.classList.add('highlight-flash');
       setTimeout(() => {
         element.classList.remove('highlight-flash');
-      }, 2000);
+      }, 2000);*/
     }
   }
 

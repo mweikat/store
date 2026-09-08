@@ -14,6 +14,8 @@ import { ProductNoticeComponent } from './components/standalone/product-notice/p
 import { ProductBundlesComponent } from './components/standalone/product-bundles/product-bundles.component';
 import { ProductAttributesComponent } from './components/standalone/product-attributes/product-attributes.component';
 import { ProductDetailsComponent } from './components/standalone/product-details/product-details.component';
+import { DeliveryComponent } from './components/standalone/delivery/delivery.component';
+import { BuyButtonsComponent } from './components/standalone/buy-buttons/buy-buttons.component';
 
 
 @NgModule({
@@ -35,7 +37,9 @@ import { ProductDetailsComponent } from './components/standalone/product-details
     ProductNoticeComponent,
     ProductBundlesComponent,
     ProductAttributesComponent,
-    ProductDetailsComponent
+    ProductDetailsComponent,
+    DeliveryComponent,
+    BuyButtonsComponent
   ]
 })
 export class ProductModule { }

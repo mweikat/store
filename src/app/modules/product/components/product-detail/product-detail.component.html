@@ -89,19 +89,19 @@
                 </p>
               </div>
               
-              @if(bundlesArray() && bundlesArray().length > 0 && p.stock>0) {
-                <div class="bundle-alert alert alert-warning mt-3" (click)="scrollToBundles()" style="cursor:pointer;">
+              <!-- @if(bundlesArray() && bundlesArray().length > 0 && p.stock>0) {
+                <div class="alert alert-warning mt-3" (click)="scrollToBundles()" style="cursor:pointer;">
                   <i class="bi bi-box-seam me-2"></i>
                   <strong>¡Oferta especial!</strong> Este producto tiene combos con descuento
                 </div>
-              }
+              } -->
             }
 
             @if(p.stock > 0){
-              <app-product-attributes
-              
+              <app-product-attributes (buttonsBlocked)="buttonsBlocked = $event"             
               (imageSelected)="changeMainMedia('image', $event)"
-              (attributesChanged)="onAttributesChanged($event)"></app-product-attributes>
+              (attributesChanged)="onAttributesChanged($event)"
+              ></app-product-attributes>
               <!--p><strong>En stock: </strong>Disponible para envío inmediato</p -->  
             }@if(p.stock === 0){
               <p><strong>Stock: </strong> <span class="text-danger">Agotado</span></p>
@@ -109,79 +109,11 @@
             }
 
             <!-- Botones de Comprar -->
-            @defer{
-              @if(p.stock > 0){
-                @if(variantStock!==0){
-                <div class="input-group mb-3" style="width: 150px;">
-                  <span class="input-group-text" style="cursor: pointer;" (click)="restCant()">-</span>
-                  <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)" min="1" max="{{p.stock}}" value="{{cantProduct}}" readonly>
-                  <span class="input-group-text" style="cursor: pointer;" (click)="addCant()">+</span>
-                </div>
-                }
-                @if(variantStock === 0){
-                  <div class="text-danger">
-                    <!--b>Lo sentimos! </b--> Sin Stock.
-                  </div>
-                }@else {
-                  
-                  @if(isConsulting()){
-                    <div class="buy-button d-flex justify-content-start mt-3 d-none d-md-flex">
-                      <button class="btn btn-primary-c1 me-2" [disabled]="isConsulting()" [class.disabled]="isConsulting()">
-                        Consultando...
-                      </button>
-                        
-                      <!--button class="btn btn-primary-c2"  >Comprar</button -->
-
-                    </div>
-                  
-                    <!-- Botones para pantallas pequeñas -->
-                    <div class="fixed-buttons d-md-none">
-                      <button class="btn btn-primary-c1" [disabled]="isConsulting()" [class.disabled]="isConsulting()">Consultando...</button>
-                      <!--button class="btn btn-primary-c2" >Comprar</button -->
-                    </div>
-                  }@else{
-                    <!-- Botones para pantallas grandes -->
-                    <div class="buy-button d-flex justify-content-start mt-3 d-none d-md-flex">
-                      <button class="btn btn-primary-c1 me-2" (click)="addToCart(p)" [disabled]="isAddingToCart()" [class.disabled]="isAddingToCart()">
-                        {{ isAddingToCart() ? 'Agregando...' : 'Agregar al carrito' }}
-                      </button>
-                        
-                      <button class="btn btn-primary-c2" (click)="buyNow(p)" >Comprar</button>
-
-                    </div>
-                  
-                    <!-- Botones para pantallas pequeñas -->
-                    <div class="fixed-buttons d-md-none">
-                      <button class="btn btn-primary-c1" (click)="addToCart(p)" [disabled]="isAddingToCart()" [class.disabled]="isAddingToCart()">
-                        {{ isAddingToCart() ? 'Agregando...' : 'Agregar al carrito' }}
-                      </button>
-                      <button class="btn btn-primary-c2" (click)="buyNow(p)">Comprar</button>
-                    </div>
-                  }
-
-                  
-                  
-                }
-                
-              
-                <br>
+            <app-buy-buttons [product]="p"  [bundle]="bundle" [variantStock]="variantStock" [variantCartItem]="variantCartItem" [isConsulting]="buttonsBlocked"></app-buy-buttons>
+            @defer(){
                 <!-- despacho-->
-                <select class="form-select" (change)="getDelivery()" [(ngModel)]="methodSelected" style="font-size: small; max-width: 400px;">
-                  <option value="0">Seleccione Envío</option>
-                  @for(method of shippingMehtods(); track method.id){
-                    <option value="{{method.id}}">{{method.name}}</option>
-                  }
-                </select>
-                @if(isShowMethod()){
-                  
-                  <div class="mt-2" style=" font-size: 12px;">
-                    <b>{{deliveryData()?.delivery_text}} </b>
-                      {{deliveryData()?.arrival_estimated_time}}
-                  </div>
+                  <app-delivery [price]="p.priceSale?p.priceSale:p.price"></app-delivery>
                 }
-
-              }
-            }
           </div>
         </div>
       </div>

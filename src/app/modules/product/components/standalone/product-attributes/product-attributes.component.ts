@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, effect, EventEmitter, inject, Output } from '@angular/core';
 import { ProductVariantSkuModel } from '@models/productVariantSku.model';
+import { ProductVariantTypeModel } from '@models/productVariantType.model';
 import { ProductAttrService } from '@services/product-attr.service';
 import { ProductsService } from '@services/products.service';
 
@@ -16,7 +17,8 @@ export class ProductAttributesComponent {
   private productAttrService = inject(ProductAttrService);
   private productService = inject(ProductsService);
 
-  attributes = this.productAttrService.$productAttrArray;
+  //attributes = this.productAttrService.$productAttrArray;
+  attributes:ProductVariantTypeModel[] = [];
   product = this.productService.$currentProduct;
 
   // Para cambiar imagen principal
@@ -24,6 +26,9 @@ export class ProductAttributesComponent {
 
   // Para enviar selección final al padre
   @Output() attributesChanged = new EventEmitter<ProductVariantSkuModel>();
+
+  // Para bloquear botones de comprar
+  @Output() buttonsBlocked = new EventEmitter<boolean>();
 
   selectedAttributes: any = {};
   private skuSelected = this.productAttrService.$skuSelected;
@@ -35,22 +40,35 @@ export class ProductAttributesComponent {
     effect(()=>{
       if(this.product().id){
         //console.log("1 paso", this.product().id);
-        this.attributes.set([]);
-        this.productAttrService.getProductAttrById(this.product().id);
+        //this.attributes.set(null as unknown as any);
+        this.productAttrService.getProductAttrById(this.product().id).then((receivedItem) => {
+          if(receivedItem==null){
+            this.attributes = [];
+            this.attributesChanged.emit(null as unknown as ProductVariantSkuModel);
+          }else{
+            this.attributes = receivedItem;
+             this.initializeDefaults();
+          }
+        });
+        //console.log("limpia****");
+        //this.productAttrService.$productAttrArray.set([]); // Limpiar el array antes de cargar nuevos atributos
       }
     });
 
-    effect(()=>{
+    /*effect(()=>{
 
       if(this.attributes() && this.attributes().length>0){
         //console.log("2 paso si cant attr:", this.attributes());
         this.initializeDefaults();
       }else{
         //console.log('2 paso no cant attr: ', this.attributes());
+        //console.log("emite null", this.attributes());
+        this.attributesChanged.emit(null as unknown as ProductVariantSkuModel);
       }
-    });
+    });*/
 
     effect(()=>{
+      //console.log("3 paso", this.skuSelected());
       if(this.skuSelected() && this.skuSelected().sku!=undefined){
         this.stockVariant.set(-1);
         this.productAttrService.getSkuAttrStock(this.skuSelected().sku);
@@ -67,7 +85,7 @@ export class ProductAttributesComponent {
   initializeDefaults() {
     this.selectedAttributes = {};
 
-    this.attributes()?.forEach(attr => {
+    this.attributes?.forEach(attr => {
 
       const defaultValue = attr.attr?.find((v: any) => v.default) || attr.attr?.[0];
       if (!defaultValue) {
@@ -85,7 +103,7 @@ export class ProductAttributesComponent {
   }
 
   selectValue(attr: any, value: any) {
-
+    this.buttonsBlocked.emit(true);
     this.selectedAttributes[attr.id] = value;
     //if (attr.type === 'image' && value.image) {
       //this.imageSelected.emit(value.image);

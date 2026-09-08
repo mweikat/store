@@ -25,7 +25,7 @@ export class CartListComponent implements OnInit, OnDestroy{
   isReady:boolean = false;
   totalPrice = this.cartService.$totalCartSignal;
 
-  //cartItems: CartItemModel[] = [];
+  isRemoving:boolean = false;
   
   constructor(@Inject(DOCUMENT) private document: Document){
     
@@ -114,7 +114,7 @@ export class CartListComponent implements OnInit, OnDestroy{
   removeItem(item: CartItemModel) {
     
     this.cartService.deleteItem(item.id);
-
+    this.document.getElementById('btnDelete_'+item.id)?.setAttribute("disabled", "true");
   }
 
   extraerValor(texto: string): string {
@@ -139,6 +139,7 @@ export class CartListComponent implements OnInit, OnDestroy{
 
   removeItemVariant(cartVariant: CartItemVariantModel) {
     this.cartService.deleteItemVariant(cartVariant.cart_item_id, cartVariant.id);
+    this.document.getElementById('btnDelete_'+cartVariant.id)?.setAttribute("disabled", "true");
   }
 
   private setEnOrDisAdd(id:string,status:string){

@@ -62,7 +62,7 @@
           
                 <!-- Botón de eliminar -->
                 <div class="col-12 col-md-2 text-md-end mt-2 mt-md-0">
-                  <button class="btn btn-danger btn-sm" (click)="removeItemVariant(cartVariant)">Eliminar</button>
+                  <button id="btnDelete_{{cartVariant.id}}" class="btn btn-danger btn-sm" (click)="removeItemVariant(cartVariant)">Eliminar</button>
                 </div>
               </div>
             </div>
@@ -124,7 +124,7 @@
       
             <!-- Botón de eliminar -->
             <div class="col-12 col-md-2 text-md-end mt-2 mt-md-0">
-              <button class="btn btn-danger btn-sm" (click)="removeItem(item)">Eliminar</button>
+              <button id="btnDelete_{{item.id}}" class="btn btn-danger btn-sm" (click)="removeItem(item)">Eliminar</button>
             </div>
           </div>
         </div>
