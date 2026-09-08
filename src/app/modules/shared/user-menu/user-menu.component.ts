@@ -36,11 +36,6 @@ export class UserMenuComponent implements OnInit, OnDestroy{
         
         this.user = this.authService.getUserFromLocalStorage();
         
-        //setTimeout(() => {
-        
-        //}, 2000);
-
-        
       }
        
 

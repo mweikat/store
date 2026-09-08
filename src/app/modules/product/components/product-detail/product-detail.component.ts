@@ -8,7 +8,6 @@ import { ProductsService } from '@services/products.service';
 import { SeoService } from '@services/seo.service';
 import { TenantService } from 'src/app/core/tenants/tenants.service';
 import { Subscription } from 'rxjs';
-import { ProductAttrService } from '@services/product-attr.service';
 import { ProductVariantSkuModel } from '@models/productVariantSku.model';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -27,9 +26,6 @@ export class ProductDetailComponent implements OnDestroy {
   private productService = inject(ProductsService);
   private categoryService = inject(CategoriesService);
   private seoService = inject(SeoService);
-
-  private productAttrService = inject(ProductAttrService);
-  //private isConsulting = this.productAttrService.$isConsulting;
 
   //componentes vars
   product = this.productService.$currentProduct;
@@ -178,12 +174,6 @@ constructor(private route: ActivatedRoute, @Inject(PLATFORM_ID) private platform
         behavior: 'smooth',
         block: 'start'
       });
-      
-      // Efecto visual de destello
-      /*element.classList.add('highlight-flash');
-      setTimeout(() => {
-        element.classList.remove('highlight-flash');
-      }, 2000);*/
     }
   }
 

@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { CartItemModel } from '@models/cartItem.model';
 import { ProductModel } from '@models/product.model';
 import { ProductVariantSkuModel } from '@models/productVariantSku.model';
@@ -14,7 +14,6 @@ import { ProductAttrService } from '@services/product-attr.service';
 })
 export class BuyButtonsComponent {
 
-  private productAttrService = inject(ProductAttrService);
   private authService = inject(AuthService);
   private cartService = inject(CartService);
   
@@ -23,7 +22,6 @@ export class BuyButtonsComponent {
   variantStock = input.required<number>();
   isConsulting = input.required<boolean>();
   variantCartItem = input<ProductVariantSkuModel | undefined>(undefined);
-  //variantCartItem: ProductVariantSkuModel | undefined = undefined;
   isLogged = computed(()=> this.authService.isLoggedIn());
   isAddingToCart= signal<boolean>(false);
   cantProduct:number = 1;
@@ -62,12 +60,8 @@ export class BuyButtonsComponent {
       };
   
       await this.cartService.addToCart(item, this.isLogged());
-      //console.log("termina");
       this.isAddingToCart.set(false);
-      /*setTimeout(()=>{ //corrige error NG0100: Expression has changed after it was checked
-          this.isAddingToCart.set(false);
-          //console.log('time out 3000')
-      },1000);*/
+
     
   }
 

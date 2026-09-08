@@ -18,12 +18,7 @@ export class TokenInterceptor implements HttpInterceptor {
   constructor(private router:Router,
             private authService:AuthService) {}
 
-  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    /*
-    setTimeout(()=>{ //corrige error NG0100: Expression has changed after it was checked
-      this.spinnerService.isLoading.next(true); 
-    },0);*/
-    
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {   
     
       if(this.authService.isLoggedIn()){
 
