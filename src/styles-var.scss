@@ -13,6 +13,8 @@ $dark-text: black; // Color de texto principal (negro)
 $warning-color: #ffbd59; // Color de advertencia y avisos importantes
 $warning-color-v1:rgba(253,201,13,.25);
 $price-color-1: #e74c3c;
+$rgba-1: rgba(253, 201, 13, 0.5);
+$rgba-2: rgba(253, 201, 13, 0.5);
 
 // Tipografía
 $font-family-main: "Montserrat", sans-serif; // Fuente principal
@@ -53,7 +55,7 @@ $auth-back-link:$link-color;
 
 //cart
 $cart-list-title: $primary-color;
-$cart-list-item-background:#fef1c22b;
+$cart-list-item-background:$rgba-2;
 $cart-list-product-name: $primary-color;
 $cart-list-product-price: $secondary-color;
 $cart-list-quantity-btn: $primary-color;
@@ -101,6 +103,8 @@ $checkout-discount-iterate-border-msg: $link-color;
 $checkout-delivery-data-background-msg:$quaternary-color2;
 $checkout-delivery-data-color-msg:$primary-color-v1;
 $checkout-delivery-data-border-msg:none;
+$checkout-delivery-data-border-select-1:$light-bg;
+$checkout-delivery-data-border-select:$rgba-1;
 
 //spinner
 $spinner-color: $secondary-color;

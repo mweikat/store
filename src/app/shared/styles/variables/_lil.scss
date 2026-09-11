@@ -6,13 +6,16 @@ $primary-color: #000; // Color principal para acentos y detalles
 $primary-color-v1:#f70fc5;
 $secondary-color: #e999d8; // Color secundario para acentos ligeros
 $tertiary-color: #fcc5f0; // Color terciario para fondos suaves
-$quaternary-color: #efe1d1; // Color cuaternario para fondos neutros
-$quaternary-color2: #ffedd9;
+$quaternary-color: #e9a1d9; // Color cuaternario para fondos neutros
+$quaternary-color2: #fae2f5;
+$penta-color: #fff3fc;
 $light-bg: white; // Fondo principal (blanco)
 $dark-text: black; // Color de texto principal (negro)
 $warning-color: #8c52ff; // Color de advertencia y avisos importantes
 $warning-color-v1:rgba(101, 3, 110, 0.185);
 $price-color-1: #e74c3c;
+$rgba-1: rgba(248, 200, 242, 0.5);
+$rgba-2:rgba(255, 255, 255, 0.5);
 
 // Tipografía
 $font-family-main: "Poppins", sans-serif; // Fuente principal
@@ -53,7 +56,7 @@ $auth-back-link:$link-color;
 
 //cart
 $cart-list-title: $primary-color;
-$cart-list-item-background:#fef1c22b;
+$cart-list-item-background:$rgba-2;
 $cart-list-product-name: $primary-color;
 $cart-list-product-price: $secondary-color;
 $cart-list-quantity-btn: $primary-color;
@@ -63,7 +66,7 @@ $cart-list-quantity-hover-color: $light-bg;
 $cart-list-btn-danger: $warning-color;
 $cart-list-btn-danger-border: $warning-color;
 $cart-list-btn-danger-hover-background: $warning-color;
-$cart-list-total: #fff3cd;
+$cart-list-total: $quaternary-color2;
 $cart-list-total-h5: $primary-color;
 $cart-list-total-btn-back: $primary-color;
 $cart-list-total-btn-border: $primary-color;
@@ -80,7 +83,7 @@ $cat-product-card-price-sale: #dc3545;
 
 //check out
 $check-title: $primary-color;
-$check-payment-section: $quaternary-color;
+$check-payment-section: $penta-color;
 $check-payment-section-accordion-collapse: $primary-color;
 $check-confirm-card: $light-bg;
 $check-confirm-h1: $primary-color;
@@ -98,9 +101,11 @@ $checkout-discount-iterate-backgorund-msg: $quaternary-color2;
 $checkout-discount-iterate-color-msg: $primary-color-v1;
 $checkout-discount-iterate-border-msg: $link-color;
 
-$checkout-delivery-data-background-msg:$quaternary-color2;
-$checkout-delivery-data-color-msg:$primary-color-v1;
-$checkout-delivery-data-border-msg:none;
+$checkout-delivery-data-background-msg:$secondary-color;
+$checkout-delivery-data-color-msg:$light-bg;
+$checkout-delivery-data-border-msg:$rgba-1;
+$checkout-delivery-data-border-select-1:$light-bg;
+$checkout-delivery-data-border-select:$rgba-1;
 
 //spinner
 $spinner-color: $secondary-color;

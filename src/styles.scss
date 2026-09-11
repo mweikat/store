@@ -87,7 +87,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 .form-check-input:checked {
     background-color: vars.$secondary-color; /* Cambia el color de fondo cuando está seleccionado */
     border-color: vars.$secondary-color; /* Cambia el color del borde */
-    box-shadow: 0 0 0 0.25rem rgba(253, 201, 13, 0.5); /* Personaliza el efecto de selección */
+    box-shadow: 0 0 0 0.25rem vars.$secondary-color;  /* Personaliza el efecto de selección */
 }
 
 /* Color de fondo y texto del encabezado del acordeón */
@@ -111,7 +111,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 }
 
 /* Para el borde y color de sombra del botón cuando se selecciona */
-.accordion-button:focus {
+.accordion-button:focus { 
     box-shadow: 0 0 0 0.1rem rgba(253, 201, 13, 0.5); /* Personaliza el efecto de selección */
 }
 
@@ -128,8 +128,8 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 .form-select:focus {
     background-color: vars.$light-bg; /* Color de fondo cuando está enfocado */
     color: vars.$primary-color; /* Color del texto cuando está enfocado */
-    border-color: none; /* Borde en foco */
-    box-shadow: 0 0 0 0.25rem rgba(253, 201, 13, 0.5); /* Personaliza el efecto de selección */
+    border-color: vars.$checkout-delivery-data-border-select-1 !important; /* Borde en foco */
+    box-shadow: 0 0 0 0.25rem vars.$checkout-delivery-data-border-select; /* Personaliza el efecto de selección */
 }
 
 //mensaje de invalid form
@@ -395,6 +395,14 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
     }
     .payment-section, .shipping-method, .address-section {
         border: 1px solid vars.$check-payment-section;
+        .input-tel:focus {
+            border-color: vars.$checkout-delivery-data-border-select-1 !important;
+            box-shadow: 0 0 0 0.25rem vars.$checkout-delivery-data-border-select;
+        }
+        i{
+            font-size: 22px;
+            color: vars.$check-payment-section;
+        }
     }
     .payment-section {
         .accordion-collapse {
@@ -456,10 +464,10 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
     color: vars.$checkout-discount-iterate-color-msg !important;
     border-color: vars.$checkout-discount-iterate-border-msg !important;
 }
-.delivery-msg{
-    background-color: vars.$checkout-discount-iterate-backgorund-msg !important;
-    color: vars.$checkout-discount-iterate-color-msg !important;
-    border-color: vars.$checkout-discount-iterate-border-msg !important;
+.delivery-msg{ 
+    background-color: vars.$checkout-delivery-data-background-msg !important;
+    color: vars.$checkout-delivery-data-color-msg !important;
+    border-color: vars.$checkout-delivery-data-border-msg !important;
 }
 /*****************spinner***************************************/
 .spinner{
