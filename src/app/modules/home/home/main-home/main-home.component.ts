@@ -48,9 +48,6 @@ export class MainHomeComponent{
       this.headerService.isToggleButton.next(true);
       this.siteService.getHomeSections();
       this.seoService.setIndexFallow();
-      if(isPlatformBrowser(this.platformId)){
-        this.siteService.setMetaData();
-      }
   }
 
   getComponentsInput(siteHomeSections:SiteHomeSectionsModel): Record<string, unknown> {

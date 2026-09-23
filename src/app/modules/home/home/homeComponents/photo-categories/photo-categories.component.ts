@@ -1,5 +1,5 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, HostListener, inject, Inject, Input, OnChanges, PLATFORM_ID, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, HostListener, inject, Inject, Input, OnChanges, PLATFORM_ID, signal, SimpleChanges } from '@angular/core';
 import { SharedModule } from '@modules/shared/shared.module';
 import { CategoriesService } from '@services/categories.service';
 
@@ -20,25 +20,24 @@ export class PhotoCategoriesComponent implements OnChanges{
   private categoryService = inject(CategoriesService);
   categories = this.categoryService.homeCatSignal;
 
-  categoriesChunks= computed(()=>{
+  chunkSizeSignal = signal<number>(6);
+  showButtons: boolean = false;
+
+  categoriesChunks = computed(() => {
     let categoriesChunksComputed = [];
-    for (let i = 0; i < this.categories().length; i += this.chunkSize) {
-      categoriesChunksComputed.push(this.categories().slice(i, i + this.chunkSize));
+    const size = this.chunkSizeSignal();
+    const cats = this.categories();
+    for (let i = 0; i < cats.length; i += size) {
+      categoriesChunksComputed.push(cats.slice(i, i + size));
     }
     return categoriesChunksComputed;
-  })
-  chunkSize: number = 6;
-  showButtons:boolean = false;
+  });
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object){
-
-    effect(()=>{
-
+    effect(() => {
       if(isPlatformBrowser(this.platformId)){
         this.updateChunkSize();
-        //this.chunkCategories();
       }
-
     });
   }
   ngOnChanges(changes: SimpleChanges): void {
@@ -56,17 +55,23 @@ export class PhotoCategoriesComponent implements OnChanges{
   }
 
   private updateChunkSize(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     const width = window.innerWidth;
+    let newSize = 6;
 
     if (width >= 1200) {
-      this.chunkSize = 6; // Pantallas grandes
-      this.showButtons =  false;
+      newSize = 6; // Pantallas grandes
+      this.showButtons = false;
     } else if (width >= 768) {
-      this.chunkSize = 4; // Tablets
-      this.showButtons =  true;
+      newSize = 4; // Tablets
+      this.showButtons = true;
     } else {
-      this.chunkSize = 3; // Dispositivos móviles
-      this.showButtons =  true;
+      newSize = 3; // Dispositivos móviles
+      this.showButtons = true;
+    }
+
+    if (this.chunkSizeSignal() !== newSize) {
+      this.chunkSizeSignal.set(newSize);
     }
   }
 
