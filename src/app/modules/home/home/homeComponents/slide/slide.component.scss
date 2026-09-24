@@ -61,9 +61,10 @@
     // Dispositivos medianos y pequeños
     @media (max-width: 768px) {
       .carousel-inner .carousel-item img.slide-img {
-        min-height: 250px;
-        max-height: 400px;
-        object-fit: contain; // Evita cortes
+        min-height: 200px;
+        max-height: 380px;
+        object-fit: cover;
+        aspect-ratio: 16 / 9;
       }
   
       .carousel-caption {
@@ -75,9 +76,10 @@
   
     @media (max-width: 576px) {
       .carousel-inner .carousel-item img.slide-img {
-        min-height: 176px;
-        max-height: 350px;
-        object-fit: contain;
+        min-height: 160px;
+        max-height: 280px;
+        object-fit: cover;
+        aspect-ratio: 16 / 9;
       }
   
       .carousel-caption {

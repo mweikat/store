@@ -20,7 +20,7 @@ export class SaleComponent{
 
   private categoryService = inject(CategoriesService);
   category = this.categoryService.categoryModelHome1Signal;
-  products = computed(() => this.category()[0].products);
+  products = computed(() => this.category().length > 0 ? (this.category()[0]?.products || []) : []);
 
   constructor(){
 

@@ -9,7 +9,6 @@ import { BrandsComponent } from '../homeComponents/brands/brands.component';
 import { Sale2Component } from '../homeComponents/sale2/sale2.component';
 import { HomeSectionCode, SiteHomeSectionsModel } from '@models/siteHomeSections.model';
 import { SeoService } from '@services/seo.service';
-import { platformBrowser } from '@angular/platform-browser';
 import { isPlatformBrowser } from '@angular/common';
 
   
@@ -51,6 +50,7 @@ export class MainHomeComponent{
       if(isPlatformBrowser(this.platformId)){
         this.siteService.setMetaData();
       }
+
   }
 
   getComponentsInput(siteHomeSections:SiteHomeSectionsModel): Record<string, unknown> {
