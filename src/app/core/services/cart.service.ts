@@ -276,8 +276,16 @@ export class CartService {
   }
 
   
+  private getBusinessId(): string {
+    if (!this.business || !this.business.id) {
+      this.business = this.businessService.getBusinessStorage();
+    }
+    return this.business?.id || '';
+  }
+
   getCartFromLocalSession(){
-    return JSON.parse(localStorage.getItem(`cart_${this.business.id}`) || '[]');
+    const busId = this.getBusinessId();
+    return JSON.parse(localStorage.getItem(`cart_${busId}`) || '[]');
   }
 
   addQuantity(cartItemId:string, quantity:number, cartReload:boolean){
@@ -552,11 +560,13 @@ export class CartService {
   }
 
   private setCartFromLocalSession(cart:CartModel){
-    localStorage.setItem(`cart_${this.business.id}`, JSON.stringify(cart));
+    const busId = this.getBusinessId();
+    localStorage.setItem(`cart_${busId}`, JSON.stringify(cart));
   }
 
   private delCartFromLocalSession(){
-    localStorage.removeItem(`cart_${this.business.id}`);
+    const busId = this.getBusinessId();
+    localStorage.removeItem(`cart_${busId}`);
   }
 
   private  goCart(){

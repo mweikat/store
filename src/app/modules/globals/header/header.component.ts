@@ -31,10 +31,6 @@ export class HeaderComponent implements OnInit{
   
   constructor( public  headerService:HeaderService){
 
-    this.categoryService.getMenu('menu_header');
-    this.siteService.getLogos();
-    this.siteService.setSiteGoogleTagManager();
-
     this.headerService.isMenu.next(true);
     this.headerService.isSearch.next(true);
     this.headerService.isUser.next(true);
@@ -44,10 +40,10 @@ export class HeaderComponent implements OnInit{
   }
 
   ngOnInit() {
+    this.categoryService.getMenu('menu_header');
+    this.siteService.getLogos();
+    this.siteService.setSiteGoogleTagManager();
     this.buildMenu(this.categories());
-    //console.log('analizando businessModel ', this.businessModel);
-    //this.logo = this.sanitizer.bypassSecurityTrustUrl(this.siteService.homeLogosSignal().logo);
-    //this.logo_phone = this.sanitizer.bypassSecurityTrustUrl(this.siteService.homeLogosSignal().logo_phone);
   }
 
   

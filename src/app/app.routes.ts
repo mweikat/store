@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { LayoutauthComponent } from '@modules/auth/layoutauth/layoutauth.component';
 import { AdminGuard } from './core/guard/admin.guard';
+import { AuthGuard } from './core/guard/auth.guard';
 import { LogoutComponent } from '@modules/pages/logout/logout.component';
 import { LayoutpagesComponent } from '@modules/pages/layoutpages/layoutpages.component';
 import { CartLayoutComponent } from '@modules/cart/cart-layout/cart-layout.component';
@@ -17,7 +18,7 @@ export const routes: Routes = [
     {path:'auth', component:LayoutauthComponent,loadChildren:() => import('@modules/auth/auth.module').then(m => m.AuthModule) },
     {path:'info', component: LayoutpagesComponent, loadChildren:() => import('@modules/pages/pages.module').then(m => m.PagesModule)},
     {path:'cart',component:CartLayoutComponent,loadChildren:() => import('@modules/cart/cart.module').then( m => m.CartModule)},
-    {path:'checkout', canActivate:[AdminGuard], component:CheckoutLayoutComponent,loadChildren:() => import('@modules/checkout/checkout.module').then( m => m.CheckoutModule)},
+    {path:'checkout', canActivate:[AuthGuard], component:CheckoutLayoutComponent,loadChildren:() => import('@modules/checkout/checkout.module').then( m => m.CheckoutModule)},
     {path:'product', component:ProductLayoutComponent,loadChildren:() => import('@modules/product/product.module').then( m => m.ProductModule)},
     {path:'admin',canActivate:[AdminGuard],component:UserAdminLayoutComponent,loadChildren:()=> import('@modules/user-admin/user-admin.module').then(m=>m.UserAdminModule)},
     {path:'logout',canActivate:[AdminGuard],component:LogoutComponent},
