@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, Inject, inject, PLATFORM_ID, Type } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, inject, PLATFORM_ID, Type } from '@angular/core';
 import { HeaderService } from '@services/header.service';
 import { SiteService } from '@services/site.service';
 import { SlideComponent } from '../homeComponents/slide/slide.component';
@@ -9,7 +9,6 @@ import { BrandsComponent } from '../homeComponents/brands/brands.component';
 import { Sale2Component } from '../homeComponents/sale2/sale2.component';
 import { HomeSectionCode, SiteHomeSectionsModel } from '@models/siteHomeSections.model';
 import { SeoService } from '@services/seo.service';
-import { platformBrowser } from '@angular/platform-browser';
 import { isPlatformBrowser } from '@angular/common';
 
   
