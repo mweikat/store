@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { LayoutauthComponent } from '@modules/auth/layoutauth/layoutauth.component';
-import { AdminGuard } from './core/guard/admin.guard';
 import { AuthGuard } from './core/guard/auth.guard';
 import { LogoutComponent } from '@modules/pages/logout/logout.component';
 import { LayoutpagesComponent } from '@modules/pages/layoutpages/layoutpages.component';
@@ -20,8 +19,8 @@ export const routes: Routes = [
     {path:'cart',component:CartLayoutComponent,loadChildren:() => import('@modules/cart/cart.module').then( m => m.CartModule)},
     {path:'checkout', canActivate:[AuthGuard], component:CheckoutLayoutComponent,loadChildren:() => import('@modules/checkout/checkout.module').then( m => m.CheckoutModule)},
     {path:'product', component:ProductLayoutComponent,loadChildren:() => import('@modules/product/product.module').then( m => m.ProductModule)},
-    {path:'admin',canActivate:[AdminGuard],component:UserAdminLayoutComponent,loadChildren:()=> import('@modules/user-admin/user-admin.module').then(m=>m.UserAdminModule)},
-    {path:'logout',canActivate:[AdminGuard],component:LogoutComponent},
+    {path:'admin',canActivate:[AuthGuard],component:UserAdminLayoutComponent,loadChildren:()=> import('@modules/user-admin/user-admin.module').then(m=>m.UserAdminModule)},
+    {path:'logout',canActivate:[AuthGuard],component:LogoutComponent},
     {path:'categories',component:CatLayoutComponent, loadChildren:()=> import('@modules/categories/categories.module').then(m=>m.CategoriesModule)},
     {path:'404', component:NotFoundComponent}
     
