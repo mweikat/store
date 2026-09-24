@@ -19,7 +19,7 @@
                 <div class="col-4 col-md-2 col-lg-2 text-center" *ngFor="let category of chunk">
                   <a [routerLink]="'/categories/' + category.link" class="category-card">
                     <div class="category-image-wrapper mx-auto">
-                      <img [src]="category.image" [alt]="category.name" class="img-fluid"/>
+                      <img [src]="category.image" [alt]="category.name" class="img-fluid" loading="lazy" width="120" height="120"/>
                     </div>
                     <h5 class="category-title mt-3">{{ category.name }}</h5>
                   </a>

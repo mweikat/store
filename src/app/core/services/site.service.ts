@@ -165,7 +165,7 @@ export class SiteService {
 
 private getHomeSlideCall(ttl:string) {
   this.httpClient
-    .get<SiteSlideHomeModel[]>(`${this.URL}/slides?time=${new Date().toString()}`)
+    .get<SiteSlideHomeModel[]>(`${this.URL}/slides`)
     .subscribe(receivedItem => {
 
       this.transferState.set(this.HOME_SLIDE, receivedItem);
@@ -267,8 +267,14 @@ private getHomeSlideCall(ttl:string) {
       this.setMetaDataCall();
     else{
       const meta_data = this.transferState.get(this.META_DATA, {} as MetaDataModel);
-      (meta_data)? this.$meta_data.set(meta_data) : this.getLogosCall();
-      this.seoService.updateFavicon(meta_data.faicon);
+      if (meta_data && meta_data.index_title) {
+        this.$meta_data.set(meta_data);
+      } else {
+        this.setMetaDataCall();
+      }
+      if (meta_data && meta_data.faicon) {
+        this.seoService.updateFavicon(meta_data.faicon);
+      }
       this.injectMetaData();
     }
 

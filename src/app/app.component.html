@@ -8,14 +8,14 @@
         <router-outlet></router-outlet>
         <app-spinner></app-spinner>
         @defer (on idle) {
-        <app-message-toast></app-message-toast>
+          <app-message-toast></app-message-toast>
         }
       </main>
       
     </div>
     @defer (on idle) {
       <app-footer></app-footer>
-    }@placeholder {
-      <div>Loading...</div>
+    } @placeholder {
+      <div class="footer-skeleton-placeholder" aria-hidden="true"></div>
     }
   </div>

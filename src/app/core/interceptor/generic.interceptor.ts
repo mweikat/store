@@ -15,11 +15,17 @@ export class GenericInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
 
-    this.spinnerService.show(); 
+    const shouldShowSpinner = request.method !== 'GET' || request.headers.has('X-Show-Spinner');
+
+    if (shouldShowSpinner) {
+      this.spinnerService.show();
+    }
 
     return next.handle(request).pipe(
-      finalize( () => {
-        this.spinnerService.hide();
+      finalize(() => {
+        if (shouldShowSpinner) {
+          this.spinnerService.hide();
+        }
       })
     );
   }

@@ -50,6 +50,7 @@ export class MainHomeComponent{
       if(isPlatformBrowser(this.platformId)){
         this.siteService.setMetaData();
       }
+
   }
 
   getComponentsInput(siteHomeSections:SiteHomeSectionsModel): Record<string, unknown> {

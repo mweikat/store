@@ -25,16 +25,14 @@
       }
 
       @case ('viewport') {
-       @defer (on viewport) {
-
-        <ng-container
-          *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
-        </ng-container>
-
+        @defer (on viewport) {
+          <ng-container
+            *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
+          </ng-container>
         } @placeholder {
-
-        <div class="home-section-placeholder"></div>
-
+          <div>
+            <ng-container *ngTemplateOutlet="sectionSkeleton; context: { code: section.code }"></ng-container>
+          </div>
         }
       }
 
@@ -43,6 +41,10 @@
           <ng-container
             *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
           </ng-container>
+        } @placeholder {
+          <div>
+            <ng-container *ngTemplateOutlet="sectionSkeleton; context: { code: section.code }"></ng-container>
+          </div>
         }
       }
 
@@ -54,10 +56,10 @@
               *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
             </ng-container>
           } @placeholder {
-            <div class="home-section-placeholder">
+            <div>
+              <ng-container *ngTemplateOutlet="sectionSkeleton; context: { code: section.code }"></ng-container>
             </div>
           }
-
         }
 
         @if(section.defer_time === 5) {
@@ -66,10 +68,10 @@
               *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
             </ng-container>
           } @placeholder {
-            <div class="home-section-placeholder">
+            <div>
+              <ng-container *ngTemplateOutlet="sectionSkeleton; context: { code: section.code }"></ng-container>
             </div>
           }
-
         }
 
         @if(section.defer_time === 10) {
@@ -78,34 +80,25 @@
               *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
             </ng-container>
           } @placeholder {
-            <div class="home-section-placeholder">
+            <div>
+              <ng-container *ngTemplateOutlet="sectionSkeleton; context: { code: section.code }"></ng-container>
             </div>
           }
-
         }
 
         @if(section.defer_time === 15) {
-
           @defer (on timer(15s)) {
             <ng-container
               *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
             </ng-container>
           } @placeholder {
-            <div class="home-section-placeholder">
+            <div>
+              <ng-container *ngTemplateOutlet="sectionSkeleton; context: { code: section.code }"></ng-container>
             </div>
           }
-
         }
         
       }
-
-      <!-- @case ('when') {
-        @defer (when slideActive) {
-          <ng-container
-            *ngComponentOutlet="componentMap[section.code]; inputs: getComponentsInput(section)">
-          </ng-container>
-        }
-      }-->
 
     }
 
@@ -113,13 +106,92 @@
 
 }
 
-
-<!--app-slide></app-slide>
-<app-photo-categories></app-photo-categories>
-<app-sale></app-sale>
-@defer (on immediate) {
-	<app-delivery></app-delivery>
-	<app-brands></app-brands>
-	<app-sale2></app-sale2>	
-}
--->
+<!-- Skeleton reusable para las secciones del Home -->
+<ng-template #sectionSkeleton let-code="code">
+  <div class="skeleton-section" [ngClass]="'skeleton-' + code">
+    @switch (code) {
+      @case ('slide') {
+        <div class="skeleton-box skeleton-slide"></div>
+      }
+      @case ('photo-categories') {
+        <div class="container py-4">
+          <div class="row justify-content-center">
+            @for (item of [1, 2, 3, 4, 5, 6]; track $index) {
+              <div class="col-4 col-md-2 text-center my-2 d-none d-md-block">
+                <div class="skeleton-circle mx-auto"></div>
+                <div class="skeleton-text mt-2 mx-auto" style="width: 60%;"></div>
+              </div>
+            }
+            @for (item of [1, 2, 3]; track $index) {
+              <div class="col-4 text-center my-2 d-block d-md-none">
+                <div class="skeleton-circle mx-auto"></div>
+                <div class="skeleton-text mt-2 mx-auto" style="width: 70%;"></div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      @case ('sale') {
+        <div class="container py-4">
+          <div class="skeleton-text mx-auto mb-4" style="width: 40%; height: 28px;"></div>
+          <div class="row">
+            @for (item of [1, 2, 3, 4]; track $index) {
+              <div class="col-6 col-md-4 col-lg-3 mb-4">
+                <div class="skeleton-card">
+                  <div class="skeleton-image"></div>
+                  <div class="p-2">
+                    <div class="skeleton-text mb-2"></div>
+                    <div class="skeleton-text" style="width: 50%;"></div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      @case ('sale2') {
+        <div class="container py-4">
+          <div class="skeleton-text mx-auto mb-4" style="width: 40%; height: 28px;"></div>
+          <div class="row">
+            @for (item of [1, 2, 3, 4]; track $index) {
+              <div class="col-6 col-md-4 col-lg-3 mb-4">
+                <div class="skeleton-card">
+                  <div class="skeleton-image"></div>
+                  <div class="p-2">
+                    <div class="skeleton-text mb-2"></div>
+                    <div class="skeleton-text" style="width: 50%;"></div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      @case ('delivery') {
+        <div class="container py-4">
+          <div class="row">
+            @for (item of [1, 2, 3]; track $index) {
+              <div class="col-md-4 text-center mb-3">
+                <div class="skeleton-circle mx-auto mb-2" style="width: 48px; height: 48px;"></div>
+                <div class="skeleton-text mx-auto mb-1" style="width: 60%;"></div>
+                <div class="skeleton-text mx-auto" style="width: 40%;"></div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      @case ('brands') {
+        <div class="container py-3">
+          <div class="d-flex justify-content-around align-items-center">
+            @for (item of [1, 2, 3, 4]; track $index) {
+              <div class="skeleton-box my-2" style="width: 100px; height: 50px; border-radius: 8px;"></div>
+            }
+          </div>
+        </div>
+      }
+      @default {
+        <div class="skeleton-box" style="height: 150px;"></div>
+      }
+    }
+  </div>
+</ng-template>
