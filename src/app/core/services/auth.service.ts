@@ -85,21 +85,24 @@ export class AuthService {
 
   }
 
-  setUserItemStorage(user:UserModel){
-    //console.log('Negocio actual en setUserItemStorage 1:', this.business.id);
-    if(this.business.id==undefined)
-      this.business.id = this.businessService.getBusinessStorage().id;
-    //console.log('Negocio actual en setUserItemStorage 2:', this.business.id);
+  private getBusinessId(): string {
+    if (!this.business || !this.business.id) {
+      this.business = this.businessService.getBusinessStorage();
+    }
+    return this.business?.id || '';
+  }
 
-    localStorage.setItem('user_'+this.business.id,JSON.stringify(user));
+  setUserItemStorage(user:UserModel){
+    const busId = this.getBusinessId();
+    localStorage.setItem('user_' + busId, JSON.stringify(user));
     this.user$.next(user);
   }
 
   isLoggedIn() {
 
     if(isPlatformBrowser(this.platformId)){ 
-    
-      if(localStorage.getItem('access_token_'+this.business.id)!=null && localStorage.getItem('user_'+this.business.id)!=null)
+      const busId = this.getBusinessId();
+      if(localStorage.getItem('access_token_' + busId) != null && localStorage.getItem('user_' + busId) != null)
         return true;
       
       return false;
@@ -124,24 +127,26 @@ export class AuthService {
 
   removeLocalStorage(){
     //localStorage.clear();
-    //console.log('Negocio actual en logout:', this.business.id);
-    localStorage.removeItem('access_token_'+this.business.id);
-    localStorage.removeItem('user_'+this.business.id);
-    localStorage.removeItem('cart_'+this.business.id);
+    const busId = this.getBusinessId();
+    localStorage.removeItem('access_token_' + busId);
+    localStorage.removeItem('user_' + busId);
+    localStorage.removeItem('cart_' + busId);
   }
 
   getToken(){
-    const userStorage = localStorage.getItem('access_token_'+this.business.id);
-    return JSON.parse(userStorage!);
+    const busId = this.getBusinessId();
+    const userStorage = localStorage.getItem('access_token_' + busId);
+    return userStorage ? JSON.parse(userStorage) : null;
   }
 
   getUserFromLocalStorage(){
 
     if(isPlatformBrowser(this.platformId)){ 
 
-      const userStorage = localStorage.getItem('user_'+this.business.id);
+      const busId = this.getBusinessId();
+      const userStorage = localStorage.getItem('user_' + busId);
       if(userStorage){
-        const userModel:UserModel = JSON.parse(userStorage!);
+        const userModel:UserModel = JSON.parse(userStorage);
         return userModel;
       }
 
@@ -250,14 +255,9 @@ export class AuthService {
   }
 
   private postLogin(receivedItem:LoginResponseModel, goCheckout:boolean){
-    //console.log('Negocio actual en postLogin 1:', this.business.id);
-    
-    if(this.business.id==undefined)
-      this.business.id = this.businessService.getBusinessStorage().id;
-    
-    //console.log('Negocio actual en postLogin 2:', this.business.id);
+    const busId = this.getBusinessId();
 
-    localStorage.setItem('access_token_'+this.business.id,JSON.stringify(receivedItem.access_token));
+    localStorage.setItem('access_token_' + busId, JSON.stringify(receivedItem.access_token));
 
       const userRecived:UserModel = receivedItem.user;
       this.setUserItemStorage(userRecived);

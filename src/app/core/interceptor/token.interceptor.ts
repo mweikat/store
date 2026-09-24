@@ -42,7 +42,7 @@ export class TokenInterceptor implements HttpInterceptor {
           //return EMPTY; // Esto evita el log en consola y maneja el error de forma silenciosa
         //}
         
-        if (err.status === 403 || err.status === 401 || err.status==0) {
+        if (err.status === 403 || err.status === 401) {
 
           
             this.authService.logout();

@@ -11,11 +11,14 @@ import { SiteService } from '@services/site.service';
     styleUrl: './top-2.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class Top2Component{
+export class Top2Component implements OnInit {
 
   private siteService = inject(SiteService);
   topBanner = this.siteService.top_2Signal;
 
-  constructor(){this.siteService.getBanner('TOP_2');}
- 
+  constructor() {}
+
+  ngOnInit(): void {
+    this.siteService.getBanner('TOP_2');
+  }
 }

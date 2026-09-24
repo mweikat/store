@@ -1,12 +1,12 @@
 // src/app/core/tenants/tenant.service.ts
-import { Injectable, Inject, PLATFORM_ID, DOCUMENT } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, DOCUMENT, TransferState, makeStateKey } from '@angular/core';
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { BusinessModel } from '@models/business.model';
 import { BusinessService } from '@services/business.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-
+const TENANT_KEY = makeStateKey<BusinessModel>('tenant_business');
 
 @Injectable({ providedIn: 'root' })
 export class TenantService {
@@ -22,6 +22,7 @@ export class TenantService {
 
   constructor(
     private businessApi: BusinessService,
+    private transferState: TransferState,
     @Inject(PLATFORM_ID) private platformId: any,
      @Inject(DOCUMENT) private document: Document,
   ) {}
@@ -29,9 +30,8 @@ export class TenantService {
   async initialize(): Promise<void> {
 
     const domain = await this.businessApi.getNameHost();
-    //console.log('🔍 Resolviendo tenant para dominio:', domain);
 
-    // Verificar cache primero
+    // 1. Verificar cache en memoria primero
     const cached = TenantService.domainCache.get(domain);
     if (cached) {
       this.currentBusiness = cached;
@@ -40,22 +40,44 @@ export class TenantService {
       return;
     }
 
+    // 2. Verificar TransferState (cuando el cliente hidrata desde SSR)
+    if (isPlatformBrowser(this.platformId)) {
+      const transferBusiness = this.transferState.get(TENANT_KEY, null);
+      if (transferBusiness && transferBusiness.id) {
+        this.currentBusiness = transferBusiness;
+        TenantService.domainCache.set(domain, transferBusiness);
+        this.businessSubject.next(transferBusiness);
+        await this.loadBusinessStyles(domain);
+        return;
+      }
+
+      // 3. Verificar localStorage si existe
+      const storedBusiness = this.businessApi.getBusinessStorage();
+      if (storedBusiness && storedBusiness.id) {
+        this.currentBusiness = storedBusiness;
+        TenantService.domainCache.set(domain, storedBusiness);
+        this.businessSubject.next(storedBusiness);
+        await this.loadBusinessStyles(domain);
+        return;
+      }
+    }
+
     try {
-      // Llamar al API para obtener datos del business
-      
+      // Llamar al API para obtener datos del business si no estaba en cache/TransferState
       this.currentBusiness = await this.businessApi.getBusinessHost(domain).toPromise();
       
       if (!this.currentBusiness) {
         throw new Error(`No se encontró business para el dominio: ${domain}`);
       }
 
+      if (isPlatformServer(this.platformId)) {
+        this.transferState.set(TENANT_KEY, this.currentBusiness);
+      }
+
       // Cachear el resultado
       TenantService.domainCache.set(domain, this.currentBusiness);
-      this.businessSubject.next(this.currentBusiness); // ← EMITIR GLOBALMENTE
-      // Cargar estilos específicos del business
+      this.businessSubject.next(this.currentBusiness);
       await this.loadBusinessStyles(domain);
-
-      //console.log('✅ Tenant configurado:', this.currentBusiness.url);
       
     } catch (error) {
       console.error('❌ Error inicializando tenant:', error);

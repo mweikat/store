@@ -37,6 +37,18 @@
   }
 }
 
+.quantity-controls {
+  button {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    touch-action: manipulation;
+  }
+}
+
 /* Ajustes responsivos */
 @media (max-width: 768px) {
   .product-bundle {

@@ -20,14 +20,7 @@ export class CartMenuComponent implements OnInit, OnDestroy{
   //cant:number = 0;
   //totalPrice = 0;
 
-  constructor(private authService:AuthService, private cdRef: ChangeDetectorRef){ 
-    
-      if(this.authService.isLoggedIn())
-        this.cartService.getCartLoggedIn()
-      else
-        this.cartService.getCart();
-    
-  }
+  constructor(private authService:AuthService, private cdRef: ChangeDetectorRef){}
 
   ngOnDestroy(): void {
     if(this.destroyCart)
@@ -35,6 +28,11 @@ export class CartMenuComponent implements OnInit, OnDestroy{
   }
 
   ngOnInit(): void {
+
+      if(this.authService.isLoggedIn())
+        this.cartService.getCartLoggedIn()
+      else
+        this.cartService.getCart();
 
       this.destroyCart = this.cartService.currentCartMenu.subscribe(cart => {
         
