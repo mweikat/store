@@ -11,6 +11,8 @@
       aria-controls="search-autocomplete-list"
       aria-describedby="addon-wrapping"
       (input)="onInput($event)"
+      (focus)="onFocus()"
+      (click)="onFocus()"
       (keyup.enter)="search()"
       #searchInput>
     <button
@@ -23,79 +25,110 @@
     </button>
   </div>
 
-  <!-- Dropdown Autocomplete Panel -->
+  <!-- Dropdown Panel (Autocomplete & Recent Searches) -->
   <div
     id="search-autocomplete-list"
     class="search-dropdown-menu shadow rounded mt-1 position-absolute w-100 z-3"
     *ngIf="showDropdown">
 
-    <!-- Loading State -->
-    <div class="p-3 text-center text-muted" *ngIf="isLoading">
-      <div class="spinner-border spinner-border-sm me-2" role="status">
-        <span class="visually-hidden">Cargando...</span>
+    <!-- Recent Searches List (Mercado Libre Look & Feel) -->
+    <div *ngIf="showRecentSearches && recentSearches.length > 0">
+      <div class="px-3 py-2 text-muted small fw-bold border-bottom">
+        Búsquedas recientes
       </div>
-      <span>Buscando productos...</span>
-    </div>
-
-    <!-- Quick Results List -->
-    <div *ngIf="!isLoading && searchResults.length > 0">
       <ul class="list-group list-group-flush border-0">
         <li
-          *ngFor="let product of searchResults"
-          class="list-group-item list-group-item-action p-2">
-          <a
-            [routerLink]="'/product/' + product.url"
-            (click)="selectProduct()"
-            class="d-flex align-items-center text-decoration-none text-dark">
+          *ngFor="let recentTerm of recentSearches"
+          class="list-group-item list-group-item-action p-2 d-flex align-items-center justify-content-between cursor-pointer"
+          (click)="selectRecentSearch(recentTerm)"
+          style="cursor: pointer;">
 
-            <div class="search-img-wrapper me-3 flex-shrink-0" style="width: 40px; height: 40px;">
-              <img
-                *ngIf="product.imgs && product.imgs.length > 0; else fallbackImg"
-                appImgBroken
-                [src]="product.imgs[0].img"
-                [alt]="product.name"
-                class="img-fluid rounded object-fit-cover w-100 h-100">
-              <ng-template #fallbackImg>
-                <img
-                  appImgBroken
-                  [src]="product.imgP || 'assets/images/imgnodisp.webp'"
-                  [alt]="product.name"
-                  class="img-fluid rounded object-fit-cover w-100 h-100">
-              </ng-template>
-            </div>
+          <div class="d-flex align-items-center flex-grow-1 overflow-hidden me-2">
+            <i class="bi bi-clock-history me-3 text-muted"></i>
+            <span class="text-truncate small">{{ recentTerm }}</span>
+          </div>
 
-            <div class="flex-grow-1 overflow-hidden">
-              <div class="text-truncate fw-semibold small product-name-title">{{ product.name }}</div>
-              <div class="small product-price-info">
-                <span [ngClass]="{'text-decoration-line-through text-muted me-1': product.priceSale}">
-                  ${{ product.price | number | comaToDot }}
-                </span>
-                <span class="fw-bold text-danger" *ngIf="product.priceSale">
-                  ${{ product.priceSale | number | comaToDot }}
-                </span>
-                <span class="badge bg-secondary ms-2 small" *ngIf="product.stock === 0">Agotado</span>
-              </div>
-            </div>
-
-          </a>
+          <button
+            type="button"
+            class="btn btn-sm btn-link text-muted text-decoration-none p-0 px-1"
+            title="Eliminar de historial"
+            (click)="removeRecentSearch($event, recentTerm)">
+            <i class="bi bi-x-lg"></i>
+          </button>
         </li>
       </ul>
+    </div>
 
-      <!-- Footer action to see all results -->
-      <div class="p-2 text-center border-top bg-light">
-        <button
-          type="button"
-          class="btn btn-sm btn-link text-decoration-none w-100 fw-semibold"
-          (click)="search()">
-          Ver todos los resultados ({{ totalFound }})
-        </button>
+    <!-- Live Search Autocomplete Results -->
+    <ng-container *ngIf="!showRecentSearches">
+      <!-- Loading State -->
+      <div class="p-3 text-center text-muted" *ngIf="isLoading">
+        <div class="spinner-border spinner-border-sm me-2" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <span>Buscando productos...</span>
       </div>
-    </div>
 
-    <!-- Empty Results State -->
-    <div class="p-3 text-center text-muted small" *ngIf="!isLoading && searchResults.length === 0">
-      No se encontraron productos para esta búsqueda.
-    </div>
+      <!-- Quick Results List -->
+      <div *ngIf="!isLoading && searchResults.length > 0">
+        <ul class="list-group list-group-flush border-0">
+          <li
+            *ngFor="let product of searchResults"
+            class="list-group-item list-group-item-action p-2">
+            <a
+              [routerLink]="'/product/' + product.url"
+              (click)="selectProduct()"
+              class="d-flex align-items-center text-decoration-none text-dark">
+
+              <div class="search-img-wrapper me-3 flex-shrink-0" style="width: 40px; height: 40px;">
+                <img
+                  *ngIf="product.imgs && product.imgs.length > 0; else fallbackImg"
+                  appImgBroken
+                  [src]="product.imgs[0].img"
+                  [alt]="product.name"
+                  class="img-fluid rounded object-fit-cover w-100 h-100">
+                <ng-template #fallbackImg>
+                  <img
+                    appImgBroken
+                    [src]="product.imgP || 'assets/images/imgnodisp.webp'"
+                    [alt]="product.name"
+                    class="img-fluid rounded object-fit-cover w-100 h-100">
+                </ng-template>
+              </div>
+
+              <div class="flex-grow-1 overflow-hidden">
+                <div class="text-truncate fw-semibold small product-name-title">{{ product.name }}</div>
+                <div class="small product-price-info">
+                  <span [ngClass]="{'text-decoration-line-through text-muted me-1': product.priceSale}">
+                    ${{ product.price | number | comaToDot }}
+                  </span>
+                  <span class="fw-bold text-danger" *ngIf="product.priceSale">
+                    ${{ product.priceSale | number | comaToDot }}
+                  </span>
+                  <span class="badge bg-secondary ms-2 small" *ngIf="product.stock === 0">Agotado</span>
+                </div>
+              </div>
+
+            </a>
+          </li>
+        </ul>
+
+        <!-- Footer action to see all results -->
+        <div class="p-2 text-center border-top bg-light">
+          <button
+            type="button"
+            class="btn btn-sm btn-link text-decoration-none w-100 fw-semibold"
+            (click)="search()">
+            Ver todos los resultados ({{ totalFound }})
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty Results State -->
+      <div class="p-3 text-center text-muted small" *ngIf="!isLoading && searchResults.length === 0">
+        No se encontraron productos para esta búsqueda.
+      </div>
+    </ng-container>
 
   </div>
 </div>
