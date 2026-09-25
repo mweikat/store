@@ -191,8 +191,8 @@ export class ProductsService {
     }
     const searchUrl = `${this.URL}/product_search?term=${encodeURIComponent(term.trim())}&page=${page}&per_page=${perPage}`;
     return this.httpClient.get<ProductSearchResponse | ProductModel[]>(searchUrl).pipe(
-      catchError(() => of({ data: [], total: 0, current_page: 1, per_page: perPage, last_page: 1 } as ProductSearchResponse))
-    ) as Observable<ProductSearchResponse>;
+      catchError(() => of({ data: [], total: 0, current_page: 1, per_page: perPage, last_page: 1 } as any))
+    ) as Observable<any>;
   }
 
   goSearchPage(term: string, page: number = 1) {
