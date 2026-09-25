@@ -147,9 +147,9 @@ export class ProductsService {
     this.$searchLoading.set(true);
     this.$searchError.set(false);
 
-    const payload = { term, page, per_page: perPage };
+    const searchUrl = `${this.URL}/product_search?term=${encodeURIComponent(term.trim())}&page=${page}&per_page=${perPage}`;
 
-    this.httpClient.post<ProductSearchResponse | ProductModel[]>(`${this.URL}/product_search`, payload)
+    this.httpClient.get<ProductSearchResponse | ProductModel[]>(searchUrl)
       .subscribe({
         next: (response) => {
           this.$searchLoading.set(false);
@@ -189,11 +189,9 @@ export class ProductsService {
     if (!term || !term.trim()) {
       return of({ data: [], total: 0, current_page: 1, per_page: perPage, last_page: 1 });
     }
-    const payload = { term, page, per_page: perPage };
-    return this.httpClient.post<ProductSearchResponse | ProductModel[]>(`${this.URL}/product_search`, payload).pipe(
-      catchError(() => of({ data: [], total: 0, current_page: 1, per_page: perPage, last_page: 1 } as ProductSearchResponse)),
-      // Normalizar respuesta si viniera un array
-      catchError(() => of({ data: [], total: 0, current_page: 1, per_page: perPage, last_page: 1 }))
+    const searchUrl = `${this.URL}/product_search?term=${encodeURIComponent(term.trim())}&page=${page}&per_page=${perPage}`;
+    return this.httpClient.get<ProductSearchResponse | ProductModel[]>(searchUrl).pipe(
+      catchError(() => of({ data: [], total: 0, current_page: 1, per_page: perPage, last_page: 1 } as ProductSearchResponse))
     ) as Observable<ProductSearchResponse>;
   }
 
