@@ -157,7 +157,7 @@ export class ProductsService {
             const res = response as ProductSearchResponse;
             this.$productModelArray.set(res.data || []);
             this.$searchPagination.set({
-              total: res.total || 0,
+              total: res.total !== undefined ? res.total : (res.data ? res.data.length : 0),
               current_page: res.current_page || page,
               per_page: res.per_page || perPage,
               last_page: res.last_page || 1
@@ -185,7 +185,7 @@ export class ProductsService {
       });
   }
 
-  searchProductObservable(term: string, page: number = 1, perPage: number = 5): Observable<ProductSearchResponse> {
+  searchProductObservable(term: string, page: number = 1, perPage: number = 5): Observable<any> {
     if (!term || !term.trim()) {
       return of({ data: [], total: 0, current_page: 1, per_page: perPage, last_page: 1 });
     }

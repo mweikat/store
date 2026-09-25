@@ -14,27 +14,8 @@
     </div>
   }
 
-  <!-- Filtros -->
-  <div class="row mb-4 align-items-center">
-    <div class="col-md-6 mb-2 mb-md-0">
-      <div class="input-group">
-        <input 
-          type="text" 
-          class="form-control" 
-          placeholder="Filtrar o buscar producto..."
-          [(ngModel)]="searchTerm"
-          (keyup.enter)="filterProducts()"
-          *ngIf="flagsearch"/>
-        <button
-          class="btn btn-outline-secondary"
-          type="button"
-          *ngIf="isSearchMode"
-          (click)="filterProducts()">
-          <i class="bi bi-search"></i> Buscar
-        </button>
-      </div>
-    </div>
-
+  <!-- Ordenamiento -->
+  <div class="row mb-4 justify-content-end">
     <div class="col-md-6 text-md-end">
       <select class="form-select w-auto d-inline-block" [(ngModel)]="sortOption" (change)="sortProducts()">
         <option value="">Ordenar por</option>
@@ -62,7 +43,7 @@
   <!-- Error State -->
   <div class="alert alert-warning text-center my-4 py-4" *ngIf="isSearchMode && searchError() && !searchLoading()">
     <i class="bi bi-exclamation-triangle-fill fs-2 d-block mb-2 text-warning"></i>
-    <h5 class="fw-bold">No pudimos conectar con el servidor</h5>
+    <h5 class="fw-bold">No se encuentra el producto o no se encontraron coincidencias</h5>
     <p class="mb-3 text-muted">Ocurrió un inconveniente al cargar los resultados. Por favor intenta nuevamente.</p>
     <button class="btn btn-primary px-4" (click)="retrySearch()">Reintentar búsqueda</button>
   </div>
@@ -111,8 +92,8 @@
   <!-- Sin resultados -->
   <div class="text-center my-5 py-4" *ngIf="!searchLoading() && !searchError() && displayProducts.length === 0">
     <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
-    <h5 class="fw-semibold">No se encontraron productos</h5>
-    <p class="text-muted">Intenta con otros términos o revisa que las palabras estén bien escritas.</p>
+    <h5 class="fw-semibold">No se encuentra el producto o no se encontraron coincidencias</h5>
+    <p class="text-muted">Intenta con otros términos desde el buscador principal o revisa que las palabras estén bien escritas.</p>
   </div>
 
   <!-- Paginación Backend / Local -->

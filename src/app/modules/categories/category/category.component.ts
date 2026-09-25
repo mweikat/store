@@ -68,10 +68,11 @@ export class CategoryComponent implements OnInit, OnDestroy {
     });
 
     effect(() => {
+      // Read signals unconditionally so Angular tracks them as dependencies from the start
+      const items = this.productsSearchArray();
+      const pageState = this.searchPagination();
+
       if (this.isSearchMode) {
-        const items = this.productsSearchArray();
-        const pageState = this.searchPagination();
-        
         this.productsCategory = this.deduplicateProducts(items);
         this.currentPage = pageState.current_page;
         this.totalPages = pageState.last_page;

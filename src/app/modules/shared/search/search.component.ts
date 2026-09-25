@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ProductsService } from '@services/products.service';
 import { ProductModel } from '@models/product.model';
-import { Subject, Subscription, debounceTime, distinctUntilChanged, switchMap, tap } from 'rxjs';
+import { Subject, Subscription, debounceTime, distinctUntilChanged, of, switchMap, tap } from 'rxjs';
 
 @Component({
     selector: 'app-search',
@@ -39,16 +39,19 @@ export class SearchComponent implements OnInit, OnDestroy {
       }),
       switchMap((term) => {
         if (!term || term.trim().length < 2) {
-          return [];
+          return of({ data: [], total: 0, current_page: 1, per_page: 5, last_page: 1 });
         }
         return this.productService.searchProductObservable(term.trim(), 1, 5);
       })
     ).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.isLoading = false;
-        if (res && res.data) {
+        if (res && res.data && Array.isArray(res.data)) {
           this.searchResults = res.data;
-          this.totalFound = res.total || res.data.length;
+          this.totalFound = res.total !== undefined ? res.total : res.data.length;
+        } else if (Array.isArray(res)) {
+          this.searchResults = res;
+          this.totalFound = res.length;
         } else {
           this.searchResults = [];
           this.totalFound = 0;
