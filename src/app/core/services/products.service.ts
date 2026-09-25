@@ -177,8 +177,11 @@ export class ProductsService {
           }
         },
         error: (err) => {
+          if(err.status!==404){
+            this.$searchError.set(true);
+          }
           this.$searchLoading.set(false);
-          this.$searchError.set(true);
+          
           this.$productModelArray.set([]);
           this.$searchPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
         }

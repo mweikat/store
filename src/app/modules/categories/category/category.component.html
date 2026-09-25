@@ -41,11 +41,10 @@
   </div>
 
   <!-- Error State -->
-  <div class="alert alert-warning text-center my-4 py-4" *ngIf="isSearchMode && searchError() && !searchLoading()">
+  <div class="alert  text-center my-4 py-4" *ngIf="isSearchMode && searchError() && !searchLoading()">
     <i class="bi bi-exclamation-triangle-fill fs-2 d-block mb-2 text-warning"></i>
-    <h5 class="fw-bold">No se encuentra el producto o no se encontraron coincidencias</h5>
     <p class="mb-3 text-muted">Ocurrió un inconveniente al cargar los resultados. Por favor intenta nuevamente.</p>
-    <button class="btn btn-primary px-4" (click)="retrySearch()">Reintentar búsqueda</button>
+    <button class="btn btn-primary-c1 px-4" (click)="retrySearch()">Reintentar búsqueda</button>
   </div>
 
   <!-- Lista de productos -->
