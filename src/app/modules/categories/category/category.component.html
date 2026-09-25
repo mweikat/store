@@ -1,86 +1,115 @@
 <div class="category container py-5">
-    @if(category().length>0){
-      <h4 class="text-center mb-4 category-title">{{ category()[0].name }}</h4>
-  
-      <!-- Texto introductorio -->
-      <p class="text-center category-intro">
-        {{category()[0].desc}}
-      </p>
-    }
-    
+  @if(!isSearchMode && category().length > 0){
+    <h4 class="text-center mb-4 category-title">{{ category()[0].name }}</h4>
+    <p class="text-center category-intro">{{ category()[0].desc }}</p>
+  }
 
-    <!-- Filtros -->
-    <div class="row mb-4">
-      <div class="col-md-6">
-        <input 
-          type="text" 
-          class="form-control" 
-          placeholder="Filtrar producto..." 
-          [(ngModel)]="searchTerm"
-          (input)="filterProducts()" 
-          *ngIf="flagsearch"/>
-      </div>
-  
-      <div class="col-md-6 text-md-end">
-        <select class="form-select" [(ngModel)]="sortOption" (change)="sortProducts()">
-          <option value="">Ordenar por</option>
-          <option value="name">Nombre</option>
-          <option value="priceAsc">Precio: Menor a Mayor</option>
-          <option value="priceDesc">Precio: Mayor a Menor</option>
-          <option value="stock">Con Stock</option>
-        </select>
-      </div>
+  @if(isSearchMode){
+    <div class="mb-4 text-center">
+      <h4 class="category-title mb-1">Resultados de búsqueda</h4>
+      <p class="text-muted small" *ngIf="searchTerm">
+        Mostrando resultados para <strong class="fst-italic">"{{ searchTerm }}"</strong>
+        <span *ngIf="!searchLoading() && !searchError()">({{ totalResults }} productos encontrados)</span>
+      </p>
     </div>
-  
-    <!-- Lista de productos -->
-    <div class="row" *ngIf="paginatedProducts.length > 0">
-  
-      @for(product of paginatedProducts; track product.id){
-        <ng-container>
-          <div class="col-6 col-md-4 col-lg-3 mb-4">
-            <a [routerLink]="'/product/'+product.url">
-            <div class="card h-100 product-card">
-              <div class="product-image-wrapper mt-4">
-                @if(product.imgs.length>0){
-                  <img appImgBroken src="{{product.imgs[0].img}}" class="card-img-top product-image img-fluid" [alt]="product.name"   >
-                }@else{
-                  <img appImgBroken  src="{{product.imgP}}" class="card-img-top product-image img-fluid" [alt]="product.name"   >
-                }
-                <div class="stock-overlay" *ngIf="product.stock == 0">Agotado</div>
-              </div>
-              <div class="card-body text-center">
-                <p class="card-title product-title">{{ product.name }}</p>
-                <p class="card-text product-price">
-                  <span class="normal-price" [ngClass]="{'text-decoration-line-through text-muted': product.priceSale}">${{ product.price | number | comaToDot}}</span>
-                  <span class="text-danger fw-bold sale-price" *ngIf="product.priceSale">
-                    ${{ product.priceSale | number | comaToDot}}
-                  </span>
-                </p>
-                <!-- button class="btn btn-primary add-to-cart-btn">Agregar al carrito</button -->
-              </div>
-            </div>
-          </a>
-          </div>
-        </ng-container>
-      }
+  }
+
+  <!-- Ordenamiento -->
+  <div class="row mb-4 justify-content-end">
+    <div class="col-md-6 text-md-end">
+      <select class="form-select w-auto d-inline-block" [(ngModel)]="sortOption" (change)="sortProducts()">
+        <option value="">Ordenar por</option>
+        <option value="name">Nombre</option>
+        <option value="priceAsc">Precio: Menor a Mayor</option>
+        <option value="priceDesc">Precio: Mayor a Menor</option>
+        <option value="stock">Con Stock</option>
+      </select>
     </div>
-  
-    <div *ngIf="paginatedProducts.length === 0">
-      <p>No se encontraron productos.</p>
-    </div>
-  
-    <!-- Paginación -->
-    <nav *ngIf="filteredProducts.length > pageSize">
-      <ul class="pagination justify-content-center">
-        <li class="page-item" [class.disabled]="currentPage === 1">
-          <a class="page-link" (click)="changePage(currentPage - 1)">Anterior</a>
-        </li>
-        <li class="page-item" *ngFor="let page of totalPagesArray()" [class.active]="currentPage === page">
-          <a class="page-link" (click)="changePage(page)">{{ page }}</a>
-        </li>
-        <li class="page-item" [class.disabled]="currentPage === totalPages">
-          <a class="page-link" (click)="changePage(currentPage + 1)">Siguiente</a>
-        </li>
-      </ul>
-    </nav>
   </div>
+
+  <!-- Loading Skeletons -->
+  <div class="row" *ngIf="isSearchMode && searchLoading()">
+    <div class="col-6 col-md-4 col-lg-3 mb-4" *ngFor="let item of [1,2,3,4,5,6,7,8]">
+      <div class="card h-100 product-card placeholder-glow" aria-hidden="true">
+        <div class="product-image-wrapper mt-3 placeholder bg-secondary opacity-25 rounded" style="height: 180px; width: 100%;"></div>
+        <div class="card-body text-center">
+          <p class="card-title placeholder col-9 mb-2"></p>
+          <p class="card-text placeholder col-5"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="alert  text-center my-4 py-4" *ngIf="isSearchMode && searchError() && !searchLoading()">
+    <i class="bi bi-exclamation-triangle-fill fs-2 d-block mb-2 text-warning"></i>
+    <p class="mb-3 text-muted">Ocurrió un inconveniente al cargar los resultados. Por favor intenta nuevamente.</p>
+    <button class="btn btn-primary-c1 px-4" (click)="retrySearch()">Reintentar búsqueda</button>
+  </div>
+
+  <!-- Lista de productos -->
+  <div class="row" *ngIf="!searchLoading() && !searchError() && displayProducts.length > 0">
+    @for(product of displayProducts; track product.id){
+      <div class="col-6 col-md-4 col-lg-3 mb-4">
+        <a [routerLink]="'/product/' + product.url" class="text-decoration-none">
+          <div class="card h-100 product-card">
+            <div class="product-image-wrapper mt-3">
+              @if(product.imgs && product.imgs.length > 0){
+                <img
+                  appImgBroken
+                  [src]="product.imgs[0].img"
+                  class="card-img-top product-image img-fluid"
+                  [alt]="product.name"
+                  loading="lazy">
+              }@else{
+                <img
+                  appImgBroken
+                  [src]="product.imgP || 'assets/images/imgnodisp.webp'"
+                  class="card-img-top product-image img-fluid"
+                  [alt]="product.name"
+                  loading="lazy">
+              }
+              <div class="stock-overlay" *ngIf="product.stock === 0">Agotado</div>
+            </div>
+            <div class="card-body text-center">
+              <p class="card-title product-title text-truncate" [title]="product.name">{{ product.name }}</p>
+              <p class="card-text product-price">
+                <span class="normal-price" [ngClass]="{'text-decoration-line-through text-muted': product.priceSale}">
+                  ${{ product.price | number | comaToDot }}
+                </span>
+                <span class="text-danger fw-bold sale-price ms-1" *ngIf="product.priceSale">
+                  ${{ product.priceSale | number | comaToDot }}
+                </span>
+              </p>
+            </div>
+          </div>
+        </a>
+      </div>
+    }
+  </div>
+
+  <!-- Sin resultados -->
+  <div class="text-center my-5 py-4" *ngIf="!searchLoading() && !searchError() && displayProducts.length === 0">
+    <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+    <h5 class="fw-semibold">No se encuentra el producto o no se encontraron coincidencias</h5>
+    <p class="text-muted">Intenta con otros términos desde el buscador principal o revisa que las palabras estén bien escritas.</p>
+  </div>
+
+  <!-- Paginación Backend / Local -->
+  <nav class="mt-4" *ngIf="!searchLoading() && !searchError() && totalPages > 1">
+    <ul class="pagination justify-content-center flex-wrap">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="changePage(currentPage - 1)" aria-label="Página anterior">Anterior</button>
+      </li>
+      <li
+        class="page-item"
+        *ngFor="let page of totalPagesArray()"
+        [class.active]="currentPage === page">
+        <button class="page-link" (click)="changePage(page)">{{ page }}</button>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <button class="page-link" (click)="changePage(currentPage + 1)" aria-label="Página siguiente">Siguiente</button>
+      </li>
+    </ul>
+  </nav>
+</div>

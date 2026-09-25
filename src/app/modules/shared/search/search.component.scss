@@ -1,0 +1,28 @@
+.search-container {
+  max-width: 100%;
+}
+
+.search-dropdown-menu {
+  background-color: var(--bs-body-bg, #ffffff);
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  max-height: 380px;
+  overflow-y: auto;
+  left: 0;
+  right: 0;
+}
+
+.search-img-wrapper {
+  background-color: var(--bs-tertiary-bg, #f8f9fa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.product-name-title {
+  color: var(--bs-body-color, #212529);
+}
+
+.product-price-info {
+  font-size: 0.8rem;
+}

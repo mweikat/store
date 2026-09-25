@@ -1,12 +1,11 @@
 import { Component, effect, inject, OnDestroy, OnInit } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryModel } from '@models/category.model';
 import { ProductModel } from '@models/product.model';
 import { CategoriesService } from '@services/categories.service';
 import { ProductsService } from '@services/products.service';
 import { SeoService } from '@services/seo.service';
-import { distinctUntilChanged, Subject, Subscription, takeUntil } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-category',
@@ -14,126 +13,187 @@ import { distinctUntilChanged, Subject, Subscription, takeUntil } from 'rxjs';
     styleUrl: './category.component.scss',
     standalone: false
 })
-export class CategoryComponent implements OnInit,OnDestroy {
+export class CategoryComponent implements OnInit, OnDestroy {
 
-  //services 
+  // services
   private categoryService = inject(CategoriesService);
-  private productService = inject(ProductsService);
+  public productService = inject(ProductsService);
   private seoService = inject(SeoService);
+  private router = inject(Router);
 
-  //signals of categories
+  // signals of categories
   category = this.categoryService.categoryModelSignal;
-  //signals of search products
+  // signals of search products & pagination from service
   productsSearchArray = this.productService.productModelArraySignal;
+  searchPagination = this.productService.searchPaginationSignal;
+  searchLoading = this.productService.searchLoadingSignal;
+  searchError = this.productService.searchErrorSignal;
   
-  //vars
-  productsCategory : ProductModel[] = [];
-  filteredProducts : ProductModel[] = [];
-  paginatedProducts: ProductModel[] = [];
+  // state vars
+  productsCategory: ProductModel[] = [];
+  filteredProducts: ProductModel[] = [];
+  displayProducts: ProductModel[] = [];
 
-  flagsearch:boolean = true;
+  flagsearch = true;
+  isSearchMode = false;
 
   queryParamSub?: Subscription;
+  paramSub?: Subscription;
   private destroy$ = new Subject<void>();
   
   searchTerm = '';
   sortOption = '';
   currentPage = 1;
-  pageSize = 24;
+  pageSize = 12;
   totalPages = 1;
+  totalResults = 0;
 
   constructor(private route: ActivatedRoute) {
 
-    this.route.paramMap.subscribe(params => {
-    const category = params.get('category');
+    this.paramSub = this.route.paramMap.subscribe(params => {
+      const category = params.get('category');
       if (category) {
-        
+        this.isSearchMode = false;
         this.categoryService.getCategoryByName([category]);
-
       }
     });
 
-    effect(()=>{
-      //console.log('category effect', this.category().products);
-      //this.products = this.productsArray();
-      if(this.category().length>0 && this.category()[0].products!= undefined && this.category()[0].products.length>0){
-        this.productsCategory = this.category()[0].products;
-        this.filterProducts();
+    effect(() => {
+      if (!this.isSearchMode && this.category().length > 0 && this.category()[0].products != undefined && this.category()[0].products.length > 0) {
+        this.productsCategory = this.deduplicateProducts(this.category()[0].products);
+        this.totalResults = this.productsCategory.length;
+        this.filterAndSortLocalProducts();
         this.updateMetaTags(this.category()[0]);
       }
     });
 
-    const productsSearchArray$ = toObservable(this.productsSearchArray);
-    productsSearchArray$.pipe(
-      distinctUntilChanged(), // Evita llamadas duplicadas para el mismo valor
-      takeUntil(this.destroy$) // Se completa cuando destroy$ emite
-    ).subscribe(value => {
-      
-      if(value.length>0){
-        
-        this.productsCategory = value;
-        this.filterProducts();
+    effect(() => {
+      // Read signals unconditionally so Angular tracks them as dependencies from the start
+      const items = this.productsSearchArray();
+      const pageState = this.searchPagination();
+
+      if (this.isSearchMode) {
+        this.productsCategory = this.deduplicateProducts(items);
+        this.currentPage = pageState.current_page;
+        this.totalPages = pageState.last_page;
+        this.totalResults = pageState.total;
+        this.pageSize = pageState.per_page;
+
+        this.sortProducts();
       }
     });
   }
 
-
-
   ngOnInit() {
-
     this.queryParamSub = this.route.queryParamMap.subscribe(params => {
-      const term = params.get('term') || null;
-      if (term) {
-        //this.searchTerm = term;
-        this.productService.searchProduct(term);
+      const term = params.get('term');
+      const pageParam = params.get('page');
+      const page = pageParam ? parseInt(pageParam, 10) : 1;
+
+      if (term !== null) {
+        this.isSearchMode = true;
+        this.searchTerm = term;
+        this.currentPage = page;
+        this.seoService.setTitle(`Búsqueda: ${term}`);
+        this.productService.searchProduct(term, page, this.pageSize);
       }
     });
-
   }
 
   ngOnDestroy(): void {
+    this.queryParamSub?.unsubscribe();
+    this.paramSub?.unsubscribe();
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-    if(this.queryParamSub)
-      this.queryParamSub.unsubscribe();
-    this.destroy$.next(); // Emitimos para completar los observables
-    this.destroy$.complete(); // Completamos el subject
+  private deduplicateProducts(products: ProductModel[]): ProductModel[] {
+    if (!products || !Array.isArray(products)) return [];
+    const seen = new Set<string>();
+    return products.filter(item => {
+      if (!item || !item.id) return false;
+      if (seen.has(item.id)) return false;
+      seen.add(item.id);
+      return true;
+    });
   }
 
   filterProducts() {
-    // Filtrar productos por el término de búsqueda
+    if (this.isSearchMode) {
+      // En modo búsqueda por servidor, redirige o busca nueva página 1
+      if (this.searchTerm.trim()) {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { term: this.searchTerm, page: 1 },
+          queryParamsHandling: 'merge'
+        });
+      }
+    } else {
+      this.filterAndSortLocalProducts();
+    }
+  }
+
+  private filterAndSortLocalProducts() {
     this.filteredProducts = this.productsCategory.filter(product =>
       product.name.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
-    this.sortProducts();
-    //this.updatePagination();
+    this.sortLocalProducts();
   }
 
   sortProducts() {
-    // Ordenar los productos según la opción seleccionada
-    if (this.sortOption === 'priceAsc') {
-      this.filteredProducts.sort((a, b) => a.price - b.price);
-    } else if (this.sortOption === 'priceDesc') {
-        this.filteredProducts.sort((a, b) => b.price - a.price);
-    } else if (this.sortOption === 'name') {
-        this.filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
-    } else if(this.sortOption === 'stock'){
-        this.filteredProducts.sort((a, b) => b.stock - a.stock);
+    if (this.isSearchMode) {
+      const sorted = [...this.productsCategory];
+      this.applySort(sorted);
+      this.displayProducts = sorted;
+    } else {
+      this.sortLocalProducts();
     }
-    this.updatePagination();
   }
 
-  updatePagination() {
-    this.totalPages = Math.ceil(this.filteredProducts.length / this.pageSize);
+  private sortLocalProducts() {
+    const sorted = [...this.filteredProducts];
+    this.applySort(sorted);
+    this.filteredProducts = sorted;
+    this.updateLocalPagination();
+  }
+
+  private applySort(arr: ProductModel[]) {
+    if (this.sortOption === 'priceAsc') {
+      arr.sort((a, b) => a.price - b.price);
+    } else if (this.sortOption === 'priceDesc') {
+      arr.sort((a, b) => b.price - a.price);
+    } else if (this.sortOption === 'name') {
+      arr.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (this.sortOption === 'stock') {
+      arr.sort((a, b) => b.stock - a.stock);
+    }
+  }
+
+  private updateLocalPagination() {
+    this.totalPages = Math.ceil(this.filteredProducts.length / this.pageSize) || 1;
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
-    this.paginatedProducts = this.filteredProducts.slice(start, end);
-
+    this.displayProducts = this.filteredProducts.slice(start, end);
   }
 
   changePage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updatePagination();
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+      if (this.isSearchMode) {
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: { page: page },
+          queryParamsHandling: 'merge'
+        });
+      } else {
+        this.currentPage = page;
+        this.updateLocalPagination();
+      }
+    }
+  }
+
+  retrySearch(): void {
+    if (this.isSearchMode && this.searchTerm) {
+      this.productService.searchProduct(this.searchTerm, this.currentPage, this.pageSize);
     }
   }
 
@@ -142,19 +202,13 @@ export class CategoryComponent implements OnInit,OnDestroy {
   }
 
   private updateMetaTags(category: CategoryModel): void {
-   
-    this.seoService.setTitle(category.seoTitle+'');
+    this.seoService.setTitle(category.seoTitle + '');
     this.seoService.setCanonical();
-    this.seoService.setMeta('description',category.seoDesc?category.seoDesc:'',);
+    this.seoService.setMeta('description', category.seoDesc ? category.seoDesc : '');
     this.seoService.setIndexFallow();
-    this.seoService.setMetaPropertie('og:title',category.seoTitle+'');
-    this.seoService.setMetaPropertie('og:description',category.seoDesc?category.seoDesc:'');
-    //this.seoService.setMetaPropertie('og:url',this.$meta_data().url);
-    //this.seoService.setMetaPropertie('og:image',this.$meta_data().rrss_image);
-
-    this.seoService.setMeta('twitter:title',category.seoTitle+'');
-    this.seoService.setMeta('twitter:description',category.seoDesc?category.seoDesc:'');
-    //this.seoService.setMeta('twitter:image',this.$meta_data().rrss_image);
-    
+    this.seoService.setMetaPropertie('og:title', category.seoTitle + '');
+    this.seoService.setMetaPropertie('og:description', category.seoDesc ? category.seoDesc : '');
+    this.seoService.setMeta('twitter:title', category.seoTitle + '');
+    this.seoService.setMeta('twitter:description', category.seoDesc ? category.seoDesc : '');
   }
 }

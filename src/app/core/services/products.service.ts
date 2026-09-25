@@ -10,6 +10,15 @@ import { environment } from 'src/environments/environment';
 import { MessagesService } from './messages.service';
 import { ParamModel } from '@models/param.model';
 import { productDetailsModel } from '@models/productDetails.model';
+import { ProductSearchResponse } from '@models/productSearchResponse.model';
+import { Observable, catchError, of } from 'rxjs';
+
+export interface SearchPaginationState {
+  total: number;
+  current_page: number;
+  per_page: number;
+  last_page: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +34,15 @@ export class ProductsService {
 
   private $productModelArray = signal<ProductModel[]>([]);
   public readonly productModelArraySignal = this.$productModelArray.asReadonly();
+
+  private $searchPagination = signal<SearchPaginationState>({ total: 0, current_page: 1, per_page: 12, last_page: 1 });
+  public readonly searchPaginationSignal = this.$searchPagination.asReadonly();
+
+  private $searchLoading = signal<boolean>(false);
+  public readonly searchLoadingSignal = this.$searchLoading.asReadonly();
+
+  private $searchError = signal<boolean>(false);
+  public readonly searchErrorSignal = this.$searchError.asReadonly();
 
   private readonly PRODUCTS_BUNDLES = makeStateKey<ProductBundle[]>('products_bundles');
   private $productBundles = signal<ProductBundle[]>([]);
@@ -117,24 +135,71 @@ export class ProductsService {
     });
   }
 
-  searchProduct(term:string){
-
-    let termToJson = {term:term};
-
-    this.httpClient.post <ProductModel[]>(`${this.URL}/product_search`,termToJson).subscribe(items => {
-      
-      this.$productModelArray.set(items);
-    }
-    ,err => {
+  searchProduct(term: string, page: number = 1, perPage: number = 12) {
+    if (!term || !term.trim()) {
       this.$productModelArray.set([]);
-    });
+      this.$searchPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
+      this.$searchLoading.set(false);
+      this.$searchError.set(false);
+      return;
+    }
 
+    this.$searchLoading.set(true);
+    this.$searchError.set(false);
+
+    const searchUrl = `${this.URL}/product_search?term=${encodeURIComponent(term.trim())}&page=${page}&per_page=${perPage}`;
+
+    this.httpClient.get<ProductSearchResponse | ProductModel[]>(searchUrl)
+      .subscribe({
+        next: (response) => {
+          this.$searchLoading.set(false);
+          if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
+            const res = response as ProductSearchResponse;
+            this.$productModelArray.set(res.data || []);
+            this.$searchPagination.set({
+              total: res.total !== undefined ? res.total : (res.data ? res.data.length : 0),
+              current_page: res.current_page || page,
+              per_page: res.per_page || perPage,
+              last_page: res.last_page || 1
+            });
+          } else if (Array.isArray(response)) {
+            // Fallback si la API devuelve un array directo
+            this.$productModelArray.set(response);
+            this.$searchPagination.set({
+              total: response.length,
+              current_page: 1,
+              per_page: response.length || perPage,
+              last_page: 1
+            });
+          } else {
+            this.$productModelArray.set([]);
+            this.$searchPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
+          }
+        },
+        error: (err) => {
+          if(err.status!==404){
+            this.$searchError.set(true);
+          }
+          this.$searchLoading.set(false);
+          
+          this.$productModelArray.set([]);
+          this.$searchPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
+        }
+      });
   }
 
-  goSearchPage(term:string){
-    
-    this.router.navigate(['/categories/search'], { queryParams: { term: term } });
+  searchProductObservable(term: string, page: number = 1, perPage: number = 5): Observable<any> {
+    if (!term || !term.trim()) {
+      return of({ data: [], total: 0, current_page: 1, per_page: perPage, last_page: 1 });
+    }
+    const searchUrl = `${this.URL}/product_search?term=${encodeURIComponent(term.trim())}&page=${page}&per_page=${perPage}`;
+    return this.httpClient.get<ProductSearchResponse | ProductModel[]>(searchUrl).pipe(
+      catchError(() => of({ data: [], total: 0, current_page: 1, per_page: perPage, last_page: 1 } as any))
+    ) as Observable<any>;
+  }
 
+  goSearchPage(term: string, page: number = 1) {
+    this.router.navigate(['/categories/search'], { queryParams: { term: term, page: page } });
   }
   
   statusNotificationAlarm(){

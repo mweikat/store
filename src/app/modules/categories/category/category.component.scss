@@ -1,22 +1,22 @@
 .category .product-card {
-  
+
   border-radius: 0.5rem;
   overflow: hidden;
   transition: transform 0.2s ease-in-out;
- 
+
 
   &:hover {
     transform: scale(1.02);
   }
 
   .product-image-wrapper {
-    
+
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-   
+
     .product-image {
       object-fit: cover;
       width: 100%;
