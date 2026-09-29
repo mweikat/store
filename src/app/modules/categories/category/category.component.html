@@ -18,7 +18,7 @@
     <!-- Ordenamiento -->
     <div class="row mb-4 justify-content-end">
       <div class="col-md-6 text-md-end">
-        <select class="form-select w-auto d-inline-block" [(ngModel)]="sortOption" (change)="sortProducts()">
+        <select class="form-select w-auto d-inline-block" [(ngModel)]="sortOption" (change)="applyFilters()">
           <option value="">Ordenar por</option>
           <option value="name">Nombre</option>
           <option value="priceAsc">Precio: Menor a Mayor</option>

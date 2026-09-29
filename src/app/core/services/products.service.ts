@@ -135,7 +135,7 @@ export class ProductsService {
     });
   }
 
-  searchProduct(term: string, page: number = 1, perPage: number = 12) {
+  searchProduct(term: string, page: number = 1, perPage: number = 12, sort:string|null, direction:string|null, stock:string|null) {
     if (!term || !term.trim()) {
       this.$productModelArray.set([]);
       this.$searchPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
@@ -147,7 +147,18 @@ export class ProductsService {
     this.$searchLoading.set(true);
     this.$searchError.set(false);
 
-    const searchUrl = `${this.URL}/product_search?term=${encodeURIComponent(term.trim())}&page=${page}&per_page=${perPage}`;
+    let adicional = null;
+    if(sort)
+      adicional = "&sort="+sort;
+    if(direction)
+      adicional = adicional + "&direction="+direction;
+    if(stock)
+      adicional = adicional + "&stock="+stock;
+    let searchUrl = null;
+    if(adicional)
+      searchUrl = `${this.URL}/product_search?term=${encodeURIComponent(term.trim())}&page=${page}&per_page=${perPage}${adicional}`;
+    else
+      searchUrl = `${this.URL}/product_search?term=${encodeURIComponent(term.trim())}&page=${page}&per_page=${perPage}`;
 
     this.httpClient.get<ProductSearchResponse | ProductModel[]>(searchUrl)
       .subscribe({

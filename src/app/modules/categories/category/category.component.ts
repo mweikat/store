@@ -44,7 +44,7 @@ export class CategoryComponent implements OnInit, OnDestroy {
   searchTerm = '';
   sortOption = '';
   currentPage = 1;
-  pageSize = 12;
+  pageSize = 10;
   totalPages = 1;
   totalResults = 0;
 
@@ -60,10 +60,9 @@ export class CategoryComponent implements OnInit, OnDestroy {
 
     effect(() => {
       if (!this.isSearchMode && this.category().length > 0 && this.category()[0].products != undefined && this.category()[0].products.length > 0) {
-        this.productsCategory = this.deduplicateProducts(this.category()[0].products);
         this.totalResults = this.productsCategory.length;
-        this.filterAndSortLocalProducts();
         this.updateMetaTags(this.category()[0]);
+        this.displayProducts = this.category()[0].products;
       }
     });
 
@@ -73,13 +72,11 @@ export class CategoryComponent implements OnInit, OnDestroy {
       const pageState = this.searchPagination();
 
       if (this.isSearchMode) {
-        this.productsCategory = this.deduplicateProducts(items);
         this.currentPage = pageState.current_page;
         this.totalPages = pageState.last_page;
         this.totalResults = pageState.total;
         this.pageSize = pageState.per_page;
-
-        this.sortProducts();
+        this.displayProducts = items;
       }
     });
   }
@@ -95,7 +92,7 @@ export class CategoryComponent implements OnInit, OnDestroy {
         this.searchTerm = term;
         this.currentPage = page;
         this.seoService.setTitle(`Búsqueda: ${term}`);
-        this.productService.searchProduct(term, page, this.pageSize);
+        this.callToSearch(term, page);
       }
     });
   }
@@ -105,75 +102,6 @@ export class CategoryComponent implements OnInit, OnDestroy {
     this.paramSub?.unsubscribe();
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  private deduplicateProducts(products: ProductModel[]): ProductModel[] {
-    if (!products || !Array.isArray(products)) return [];
-    const seen = new Set<string>();
-    return products.filter(item => {
-      if (!item || !item.id) return false;
-      if (seen.has(item.id)) return false;
-      seen.add(item.id);
-      return true;
-    });
-  }
-
-  filterProducts() {
-    if (this.isSearchMode) {
-      // En modo búsqueda por servidor, redirige o busca nueva página 1
-      if (this.searchTerm.trim()) {
-        this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: { term: this.searchTerm, page: 1 },
-          queryParamsHandling: 'merge'
-        });
-      }
-    } else {
-      this.filterAndSortLocalProducts();
-    }
-  }
-
-  private filterAndSortLocalProducts() {
-    this.filteredProducts = this.productsCategory.filter(product =>
-      product.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-    this.sortLocalProducts();
-  }
-
-  sortProducts() {
-    if (this.isSearchMode) {
-      const sorted = [...this.productsCategory];
-      this.applySort(sorted);
-      this.displayProducts = sorted;
-    } else {
-      this.sortLocalProducts();
-    }
-  }
-
-  private sortLocalProducts() {
-    const sorted = [...this.filteredProducts];
-    this.applySort(sorted);
-    this.filteredProducts = sorted;
-    this.updateLocalPagination();
-  }
-
-  private applySort(arr: ProductModel[]) {
-    if (this.sortOption === 'priceAsc') {
-      arr.sort((a, b) => a.price - b.price);
-    } else if (this.sortOption === 'priceDesc') {
-      arr.sort((a, b) => b.price - a.price);
-    } else if (this.sortOption === 'name') {
-      arr.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (this.sortOption === 'stock') {
-      arr.sort((a, b) => b.stock - a.stock);
-    }
-  }
-
-  private updateLocalPagination() {
-    this.totalPages = Math.ceil(this.filteredProducts.length / this.pageSize) || 1;
-    const start = (this.currentPage - 1) * this.pageSize;
-    const end = start + this.pageSize;
-    this.displayProducts = this.filteredProducts.slice(start, end);
   }
 
   changePage(page: number) {
@@ -186,19 +114,24 @@ export class CategoryComponent implements OnInit, OnDestroy {
         });
       } else {
         this.currentPage = page;
-        this.updateLocalPagination();
       }
     }
   }
 
   retrySearch(): void {
     if (this.isSearchMode && this.searchTerm) {
-      this.productService.searchProduct(this.searchTerm, this.currentPage, this.pageSize);
+      this.callToSearch(this.searchTerm, this.currentPage);
     }
   }
 
   totalPagesArray(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  applyFilters(){
+
+    if(this.isSearchMode)
+      this.callToSearch(this.searchTerm, 1);
   }
 
   private updateMetaTags(category: CategoryModel): void {
@@ -210,5 +143,32 @@ export class CategoryComponent implements OnInit, OnDestroy {
     this.seoService.setMetaPropertie('og:description', category.seoDesc ? category.seoDesc : '');
     this.seoService.setMeta('twitter:title', category.seoTitle + '');
     this.seoService.setMeta('twitter:description', category.seoDesc ? category.seoDesc : '');
+  }
+  private callToSearch(term:string, page:number){
+
+    let sort = null;
+    let direction = null;
+    let stock = null;
+    
+    if(this.sortOption==='name'){
+      sort="name";
+      direction="asc";
+      stock="all";
+    }
+    if(this.sortOption==='priceAsc'){
+      sort="price";
+      direction="asc";
+      stock="all";
+    }
+    if(this.sortOption==='priceDesc'){
+      sort="price";
+      direction="desc";
+      stock="all";
+    }
+    if(this.sortOption==='stock'){
+      stock="available";
+    }
+
+    this.productService.searchProduct(term, page, this.pageSize, sort, direction, stock);
   }
 }
