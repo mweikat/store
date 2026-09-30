@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, inject, Input } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { SharedModule } from '@modules/shared/shared.module';
 import { CategoriesService } from '@services/categories.service';
 
@@ -8,7 +7,7 @@ import { CategoriesService } from '@services/categories.service';
     selector: 'app-sale',
     templateUrl: './sale.component.html',
     styleUrl: './sale.component.scss',
-    imports:[CommonModule, RouterLink, SharedModule],
+    imports:[CommonModule, SharedModule],
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush
 })

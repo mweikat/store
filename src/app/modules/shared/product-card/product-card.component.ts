@@ -1,16 +1,11 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { ProductModel } from '@models/product.model';
-import { ImgBrokenDirective } from '@directives/img-broken.directive';
-import { ComaToDotPipe } from '@pipes/coma-to-dot.pipe';
 
 @Component({
   selector: 'app-product-card',
-  standalone: true,
-  imports: [CommonModule, RouterLink, ImgBrokenDirective, ComaToDotPipe],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss',
+  standalone: false,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductCardComponent {

@@ -22,13 +22,13 @@ import { ProductCardComponent } from './product-card/product-card.component';
     UserMenuComponent,
     CartMenuComponent,
     SearchComponent,
-    CheckoutStepsComponent
+    CheckoutStepsComponent,
+    ProductCardComponent
   ],
   imports: [
     CommonModule,
     RouterLink,
-    NgOptimizedImage,
-    ProductCardComponent
+    NgOptimizedImage
   ],
   exports:[
     CartMenuComponent,
