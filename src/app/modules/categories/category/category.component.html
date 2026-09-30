@@ -1,4 +1,8 @@
 <div class="category container py-5">
+  <div class="mb-3" *ngIf="!isSearchMode">
+    <app-bread-crumb [categories]="category()"></app-bread-crumb>
+  </div>
+
   @if(!isSearchMode && category().length > 0){
     <h4 class="text-center mb-4 category-title">{{ category()[0].name }}</h4>
     <p class="text-center category-intro">{{ category()[0].desc }}</p>

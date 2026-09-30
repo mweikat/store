@@ -343,6 +343,12 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
     }
 }
 /*****************category & product-card******************/
+.category {
+    .product-card {
+        border: 1px solid vars.$cat-product-card-border !important;
+    }
+}
+
 .product-card {
     border: 1px solid vars.$cat-product-card-border;
     background-color: vars.$cat-product-card-background;

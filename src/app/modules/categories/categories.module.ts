@@ -6,6 +6,7 @@ import { CatLayoutComponent } from './cat-layout/cat-layout.component';
 import { SharedModule } from '@modules/shared/shared.module';
 import { CategoryComponent } from './category/category.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BreadCrumbComponent } from '../product/components/standalone/bread-crumb/bread-crumb.component';
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     CategoriesRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    SharedModule
+    SharedModule,
+    BreadCrumbComponent
   ]
 })
 export class CategoriesModule { }
