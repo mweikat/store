@@ -9,27 +9,39 @@
       <h4 class="category-title mb-1">Resultados de búsqueda</h4>
       <p class="text-muted small" *ngIf="searchTerm">
         Mostrando resultados para <strong class="fst-italic">"{{ searchTerm }}"</strong>
-        <span *ngIf="!searchLoading() && !searchError()">({{ totalResults }} productos encontrados)</span>
+        <span *ngIf="!isLoading && !isError">({{ totalResults }} productos encontrados)</span>
       </p>
     </div>
   }
 
-  @if(displayProducts.length>0){
-    <!-- Ordenamiento -->
-    <div class="row mb-4 justify-content-end">
-      <div class="col-md-6 text-md-end">
-        <select class="form-select w-auto d-inline-block" [(ngModel)]="sortOption" (change)="applyFilters()">
-          <option value="">Ordenar por</option>
-          <option value="name">Nombre</option>
-          <option value="priceAsc">Precio: Menor a Mayor</option>
-          <option value="priceDesc">Precio: Mayor a Menor</option>
-          <option value="stock">Con Stock</option>
-        </select>
-      </div>
+  <!-- Filtros y Ordenamiento -->
+  <div class="row mb-4 justify-content-between align-items-center g-3">
+    <div class="col-6 col-md-auto">
+      <span class="text-muted small" *ngIf="!isLoading && !isError">
+        {{ totalResults }} {{ totalResults === 1 ? 'producto' : 'productos' }}
+      </span>
     </div>
-  }
+    <div class="col-12 col-md-auto d-flex flex-wrap gap-2 justify-content-end">
+      <!-- Filtro de Stock -->
+      <select class="form-select w-auto" [(ngModel)]="stockOption" (change)="applyFilters()" aria-label="Filtrar por disponibilidad">
+        <option value="all">Todos los productos</option>
+        <option value="available">Disponibles</option>
+        <option value="out">Sin stock</option>
+      </select>
+
+      <!-- Ordenamiento -->
+      <select class="form-select w-auto" [(ngModel)]="sortOption" (change)="applyFilters()" aria-label="Ordenar productos por">
+        <option value="relevance">Relevancia</option>
+        <option value="priceAsc">Precio: Menor a Mayor</option>
+        <option value="priceDesc">Precio: Mayor a Menor</option>
+        <option value="nameAsc">Nombre: A - Z</option>
+        <option value="nameDesc">Nombre: Z - A</option>
+      </select>
+    </div>
+  </div>
+
   <!-- Loading Skeletons -->
-  <div class="row" *ngIf="isSearchMode && searchLoading()">
+  <div class="row" *ngIf="isLoading">
     <div class="col-6 col-md-4 col-lg-3 mb-4" *ngFor="let item of [1,2,3,4,5,6,7,8]">
       <div class="card h-100 product-card placeholder-glow" aria-hidden="true">
         <div class="product-image-wrapper mt-3 placeholder bg-secondary opacity-25 rounded" style="height: 180px; width: 100%;"></div>
@@ -42,14 +54,14 @@
   </div>
 
   <!-- Error State -->
-  <div class="alert  text-center my-4 py-4" *ngIf="isSearchMode && searchError() && !searchLoading()">
+  <div class="alert text-center my-4 py-4" *ngIf="isError && !isLoading">
     <i class="bi bi-exclamation-triangle-fill fs-2 d-block mb-2 text-warning"></i>
-    <p class="mb-3 text-muted">Ocurrió un inconveniente al cargar los resultados. Por favor intenta nuevamente.</p>
-    <button class="btn btn-primary-c1 px-4" (click)="retrySearch()">Reintentar búsqueda</button>
+    <p class="mb-3 text-muted">Ocurrió un inconveniente al cargar los productos. Por favor intenta nuevamente.</p>
+    <button class="btn btn-primary-c1 px-4" (click)="isSearchMode ? retrySearch() : retryCategory()">Reintentar</button>
   </div>
 
   <!-- Lista de productos -->
-  <div class="row" *ngIf="!searchLoading() && !searchError() && displayProducts.length > 0">
+  <div class="row" *ngIf="!isLoading && !isError && displayProducts.length > 0">
     @for(product of displayProducts; track product.id){
       <div class="col-6 col-md-4 col-lg-3 mb-4">
         <a [routerLink]="'/product/' + product.url" class="text-decoration-none">
@@ -90,14 +102,15 @@
   </div>
 
   <!-- Sin resultados -->
-  <div class="text-center my-5 py-4" *ngIf="!searchLoading() && !searchError() && displayProducts.length === 0">
+  <div class="text-center my-5 py-4" *ngIf="!isLoading && !isError && displayProducts.length === 0">
     <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
-    <h5 class="fw-semibold">No se encuentra el producto o no se encontraron coincidencias</h5>
-    <p class="text-muted">Intenta con otros términos desde el buscador principal o revisa que las palabras estén bien escritas.</p>
+    <h5 class="fw-semibold">No se encontraron productos</h5>
+    <p class="text-muted" *ngIf="isSearchMode">Intenta con otros términos desde el buscador principal o revisa que las palabras estén bien escritas.</p>
+    <p class="text-muted" *ngIf="!isSearchMode">No hay productos disponibles para esta categoría o filtro seleccionado.</p>
   </div>
 
-  <!-- Paginación Backend / Local -->
-  <nav class="mt-4" *ngIf="!searchLoading() && !searchError() && totalPages > 1">
+  <!-- Paginación -->
+  <nav class="mt-4" *ngIf="!isLoading && !isError && totalPages > 1">
     <ul class="pagination justify-content-center flex-wrap">
       <li class="page-item" [class.disabled]="currentPage === 1">
         <button class="page-link" (click)="changePage(currentPage - 1)" aria-label="Página anterior">Anterior</button>

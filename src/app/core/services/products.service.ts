@@ -1,5 +1,5 @@
 import { isPlatformServer } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable, makeStateKey, PLATFORM_ID, signal, TransferState } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageModel } from '@models/message.model';
@@ -11,7 +11,8 @@ import { MessagesService } from './messages.service';
 import { ParamModel } from '@models/param.model';
 import { productDetailsModel } from '@models/productDetails.model';
 import { ProductSearchResponse } from '@models/productSearchResponse.model';
-import { Observable, catchError, of } from 'rxjs';
+import { CategoryProductsResponse } from '@models/categoryProductsResponse.model';
+import { Observable, catchError, of, Subscription } from 'rxjs';
 
 export interface SearchPaginationState {
   total: number;
@@ -28,10 +29,9 @@ export class ProductsService {
   private readonly URL = environment.api_store;
   
   private readonly CURRENT_PRODUCT = makeStateKey<ProductModel>('currentProduct');
-  //private readonly CURRENT_PRODUCT_ID = makeStateKey<string>('currentProductId');
-  //private readonly CURRENT_PRODUCT_URL = makeStateKey<string>('currentProductUrl');
   public $currentProduct = signal<ProductModel>({} as ProductModel);
 
+  // Search signals
   private $productModelArray = signal<ProductModel[]>([]);
   public readonly productModelArraySignal = this.$productModelArray.asReadonly();
 
@@ -43,6 +43,23 @@ export class ProductsService {
 
   private $searchError = signal<boolean>(false);
   public readonly searchErrorSignal = this.$searchError.asReadonly();
+
+  // Category products signals
+  private $categoryProductsArray = signal<ProductModel[]>([]);
+  public readonly categoryProductsArraySignal = this.$categoryProductsArray.asReadonly();
+
+  private $categoryPagination = signal<SearchPaginationState>({ total: 0, current_page: 1, per_page: 12, last_page: 1 });
+  public readonly categoryPaginationSignal = this.$categoryPagination.asReadonly();
+
+  private $categoryLoading = signal<boolean>(false);
+  public readonly categoryLoadingSignal = this.$categoryLoading.asReadonly();
+
+  private $categoryError = signal<boolean>(false);
+  public readonly categoryErrorSignal = this.$categoryError.asReadonly();
+
+  // Active HTTP subscriptions for cancellation
+  private searchSub?: Subscription;
+  private categoryProductsSub?: Subscription;
 
   private readonly PRODUCTS_BUNDLES = makeStateKey<ProductBundle[]>('products_bundles');
   private $productBundles = signal<ProductBundle[]>([]);
@@ -62,7 +79,6 @@ export class ProductsService {
   
   getProduct(param:string, isUuid:boolean){
 
-    
     if(isPlatformServer(this.platformId)){
       this.getProductByIdCall(param);
       return;
@@ -71,31 +87,23 @@ export class ProductsService {
     const current_product = this.transferState.get(this.CURRENT_PRODUCT, null);
     
     if(current_product && (current_product.id != param) && (current_product.url != param)){
-      //console.log('tnego producto')
       this.getProductByIdCall(param);
       return;
-        
-    }else
-        if(current_product){
-          this.$currentProduct.set(current_product);
-          this.transferState.remove(this.CURRENT_PRODUCT);
-          return;
-        }
+    }else if(current_product){
+      this.$currentProduct.set(current_product);
+      this.transferState.remove(this.CURRENT_PRODUCT);
+      return;
+    }
 
     this.getProductByIdCall(param);
-    
   }
 
   private getProductByIdCall(param:string){
-
     this.httpClient.get <ProductModel>(`${this.URL}/product/${param}`).subscribe(receivedItem => {
       this.transferState.set(this.CURRENT_PRODUCT, receivedItem);
       this.$currentProduct.set(receivedItem);
     },err => {
-            
       this.go404();
-
-          
     })
   }
 
@@ -103,12 +111,12 @@ export class ProductsService {
  async getProductsBundles(productId: string, categories:string[]) {
 
   if (isPlatformServer(this.platformId)) {
-    await this.getProductsBundlesCall(productId, categories); // Espera a que termine
+    await this.getProductsBundlesCall(productId, categories);
   } else {
     const product_bundles = this.transferState.get(this.PRODUCTS_BUNDLES, null);    
     
     if (product_bundles == null) {
-      await this.getProductsBundlesCall(productId, categories); // Espera a que termine
+      await this.getProductsBundlesCall(productId, categories);
     } else {
       this.$productBundles.set(product_bundles);
     }
@@ -117,25 +125,27 @@ export class ProductsService {
   }
 }
 
-  // Devuelve un Promise<void> para poder usar await
   private getProductsBundlesCall(productId: string, categories:string[]): Promise<void> {
     
     return new Promise((resolve, reject) => {
-
       const toJsonPost = {productId:productId,categories:categories};
 
       this.httpClient.post<ProductBundle[]>(`${this.URL}/product-bundle`,toJsonPost).subscribe({
         next: (receivedItem) => {
           this.transferState.set(this.PRODUCTS_BUNDLES, receivedItem);
           this.$productBundles.set(receivedItem);
-          resolve(); // Resuelve la promesa cuando se completa
+          resolve();
         },
-        error: (err) => reject(err), // Rechaza si hay error
+        error: (err) => reject(err),
       });
     });
   }
 
-  searchProduct(term: string, page: number = 1, perPage: number = 12, sort:string|null, direction:string|null, stock:string|null) {
+  searchProduct(term: string, page: number = 1, perPage: number = 12, sort:string|null = null, direction:string|null = null, stock:string|null = null) {
+    if (this.searchSub) {
+      this.searchSub.unsubscribe();
+    }
+
     if (!term || !term.trim()) {
       this.$productModelArray.set([]);
       this.$searchPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
@@ -147,20 +157,22 @@ export class ProductsService {
     this.$searchLoading.set(true);
     this.$searchError.set(false);
 
-    let adicional = null;
-    if(sort)
-      adicional = "&sort="+sort;
-    if(direction)
-      adicional = adicional + "&direction="+direction;
-    if(stock)
-      adicional = adicional + "&stock="+stock;
-    let searchUrl = null;
-    if(adicional)
-      searchUrl = `${this.URL}/product_search?term=${encodeURIComponent(term.trim())}&page=${page}&per_page=${perPage}${adicional}`;
-    else
-      searchUrl = `${this.URL}/product_search?term=${encodeURIComponent(term.trim())}&page=${page}&per_page=${perPage}`;
+    let params = new HttpParams()
+      .set('term', term.trim())
+      .set('page', page.toString())
+      .set('per_page', perPage.toString());
 
-    this.httpClient.get<ProductSearchResponse | ProductModel[]>(searchUrl)
+    if (sort) {
+      params = params.set('sort', sort);
+    }
+    if (direction) {
+      params = params.set('direction', direction);
+    }
+    if (stock) {
+      params = params.set('stock', stock);
+    }
+
+    this.searchSub = this.httpClient.get<ProductSearchResponse | ProductModel[]>(`${this.URL}/product_search`, { params })
       .subscribe({
         next: (response) => {
           this.$searchLoading.set(false);
@@ -174,7 +186,6 @@ export class ProductsService {
               last_page: res.last_page || 1
             });
           } else if (Array.isArray(response)) {
-            // Fallback si la API devuelve un array directo
             this.$productModelArray.set(response);
             this.$searchPagination.set({
               total: response.length,
@@ -188,13 +199,88 @@ export class ProductsService {
           }
         },
         error: (err) => {
-          if(err.status!==404){
+          if (err.status !== 404) {
             this.$searchError.set(true);
           }
           this.$searchLoading.set(false);
-          
           this.$productModelArray.set([]);
           this.$searchPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
+        }
+      });
+  }
+
+  getCategoryProducts(
+    slug: string,
+    page: number = 1,
+    perPage: number = 12,
+    sort: string | null = null,
+    direction: string | null = null,
+    stock: string | null = null
+  ) {
+    if (this.categoryProductsSub) {
+      this.categoryProductsSub.unsubscribe();
+    }
+
+    if (!slug || !slug.trim()) {
+      this.$categoryProductsArray.set([]);
+      this.$categoryPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
+      this.$categoryLoading.set(false);
+      this.$categoryError.set(false);
+      return;
+    }
+
+    this.$categoryLoading.set(true);
+    this.$categoryError.set(false);
+
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('per_page', perPage.toString());
+
+    if (sort) {
+      params = params.set('sort', sort);
+    }
+    if (direction) {
+      params = params.set('direction', direction);
+    }
+    if (stock) {
+      params = params.set('stock', stock);
+    }
+
+    const categoryUrl = `${this.URL}/category-products/${encodeURIComponent(slug.trim())}`;
+
+    this.categoryProductsSub = this.httpClient.get<CategoryProductsResponse | ProductModel[]>(categoryUrl, { params })
+      .subscribe({
+        next: (response) => {
+          this.$categoryLoading.set(false);
+          if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
+            const res = response as CategoryProductsResponse;
+            this.$categoryProductsArray.set(res.data || []);
+            this.$categoryPagination.set({
+              total: res.total !== undefined ? res.total : (res.data ? res.data.length : 0),
+              current_page: res.current_page || page,
+              per_page: res.per_page || perPage,
+              last_page: res.last_page || 1
+            });
+          } else if (Array.isArray(response)) {
+            this.$categoryProductsArray.set(response);
+            this.$categoryPagination.set({
+              total: response.length,
+              current_page: 1,
+              per_page: response.length || perPage,
+              last_page: 1
+            });
+          } else {
+            this.$categoryProductsArray.set([]);
+            this.$categoryPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
+          }
+        },
+        error: (err) => {
+          if (err.status !== 404) {
+            this.$categoryError.set(true);
+          }
+          this.$categoryLoading.set(false);
+          this.$categoryProductsArray.set([]);
+          this.$categoryPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
         }
       });
   }
@@ -214,75 +300,49 @@ export class ProductsService {
   }
   
   statusNotificationAlarm(){
-    
     if(isPlatformServer(this.platformId)){
       this.statusNotificationCall();
     }else{
-
       const status_noti = this.transferState.get(this.STATUS_NOTI, null);
-      
       if(status_noti===null){
         this.statusNotificationCall();
       }else{
         this.$status_noti.set(status_noti);
       }
     }
-
   }
 
   private statusNotificationCall(){
-
     this.httpClient.get<ParamModel>(`${this.URL}/product/notification-alarm-status`).subscribe(receivedItem => {
-              
       this.transferState.set(this.STATUS_NOTI, receivedItem);    
       this.$status_noti.set(receivedItem);
-                  
     });
   }
 
   saveNotificationAlarm(noti:NotificationAlarmModel){
-
     this.httpClient.post(`${this.URL}/product/notification-alarm`,noti).subscribe(items => {
-      //console.log("ok");  
       this.sendMessageService("Mensaje enviado!","Menssage Created","ok");
-    }
-    ,err => {
-      //console.log("Nok");  
-       this.sendMessageService("No se pudo enviar el mensaje","Error","Nok");
+    },err => {
+      this.sendMessageService("No se pudo enviar el mensaje","Error","Nok");
     });
-
   }
 
   getProductDetails(productId:string ){
-
     if(isPlatformServer(this.platformId)){
       this.getProductDetailsCall(productId);
     }else{
-      //this.getProductDetailsCall(productId);
       const productDetails = this.transferState.get(this.PRODUCT_DETAILS, null);
-      //console.log("product details from transfer state: ", productDetails);
       if(productDetails===null){
         this.getProductDetailsCall(productId);
       }else{
-        
-        //const current_product = this.transferState.get(this.CURRENT_PRODUCT, null);
-        //console.log("current product from transfer state: ", current_product?.id);
-        
-        /*if(current_product && current_product.id === productId){
-          this.getProductDetailsCall(productId);
-          return;
-        }*/
-
         this.$productDetail.set(productDetails);
         this.transferState.set(this.PRODUCT_DETAILS,null);
       }
     }
-
   }
 
   private getProductDetailsCall(productId:string){
     this.httpClient.get <productDetailsModel[]>(`${this.URL}/product-details/${productId}`).subscribe(receivedItem => {
-      //console.log('product details: ', receivedItem);
       this.transferState.set(this.PRODUCT_DETAILS, receivedItem);
       this.$productDetail.set(receivedItem);
     });
@@ -293,7 +353,6 @@ export class ProductsService {
   }
 
   private sendMessageService(msg:string, title:string, icon:string){
-
     let msgModel = {} as MessageModel;
     msgModel.msg=msg;
     msgModel.active=1;
