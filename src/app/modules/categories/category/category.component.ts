@@ -21,8 +21,13 @@ export class CategoryComponent implements OnInit, OnDestroy {
   private seoService = inject(SeoService);
   private router = inject(Router);
 
-  // signals of categories
+  // signals of categories & category products
   category = this.categoryService.categoryModelSignal;
+  categoryProducts = this.categoryService.categoryProductsSignal;
+  categoryPagination = this.categoryService.categoryProductsPaginationSignal;
+  categoryLoading = this.categoryService.categoryProductsLoadingSignal;
+  categoryError = this.categoryService.categoryProductsErrorSignal;
+
   // signals of search products & pagination from service
   productsSearchArray = this.productService.productModelArraySignal;
   searchPagination = this.productService.searchPaginationSignal;
@@ -30,12 +35,11 @@ export class CategoryComponent implements OnInit, OnDestroy {
   searchError = this.productService.searchErrorSignal;
   
   // state vars
-  productsCategory: ProductModel[] = [];
-  filteredProducts: ProductModel[] = [];
   displayProducts: ProductModel[] = [];
 
   flagsearch = true;
   isSearchMode = false;
+  currentCategorySlug = '';
 
   queryParamSub?: Subscription;
   paramSub?: Subscription;
@@ -44,30 +48,50 @@ export class CategoryComponent implements OnInit, OnDestroy {
   searchTerm = '';
   sortOption = '';
   currentPage = 1;
-  pageSize = 10;
+  pageSize = 12;
   totalPages = 1;
   totalResults = 0;
 
   constructor(private route: ActivatedRoute) {
 
     this.paramSub = this.route.paramMap.subscribe(params => {
+      //console.log("detecta cambio params: ");
       const category = params.get('category');
       if (category) {
         this.isSearchMode = false;
-        this.categoryService.getCategoryByName([category]);
+        if (this.currentCategorySlug !== category) {
+          this.currentCategorySlug = category;
+        }
+        //this.categoryService.getCategoryByName([category]);
+        const page = Number(this.route.snapshot.queryParamMap.get('page'))      || undefined;
+        if (page===undefined){
+          console.log("carga productos sin pag");
+          this.callToCategoryProducts(category, 1);
+        }
+        
       }
     });
 
     effect(() => {
-      if (!this.isSearchMode && this.category().length > 0 && this.category()[0].products != undefined && this.category()[0].products.length > 0) {
-        this.totalResults = this.productsCategory.length;
+      if (!this.isSearchMode && this.category().length > 0) {
         this.updateMetaTags(this.category()[0]);
-        this.displayProducts = this.category()[0].products;
       }
     });
 
     effect(() => {
-      // Read signals unconditionally so Angular tracks them as dependencies from the start
+      const items = this.categoryProducts();
+      const pageState = this.categoryPagination();
+
+      if (!this.isSearchMode) {
+        this.currentPage = pageState.current_page;
+        this.totalPages = pageState.last_page;
+        this.totalResults = pageState.total;
+        this.pageSize = pageState.per_page;
+        this.displayProducts = items;
+      }
+    });
+
+    effect(() => {
       const items = this.productsSearchArray();
       const pageState = this.searchPagination();
 
@@ -83,6 +107,12 @@ export class CategoryComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.queryParamSub = this.route.queryParamMap.subscribe(params => {
+      
+      if (params.keys.length === 0) {
+        //console.log('No hay query params');
+        return ;
+      } 
+      console.log("carga productos con pag");
       const term = params.get('term');
       const pageParam = params.get('page');
       const page = pageParam ? parseInt(pageParam, 10) : 1;
@@ -93,6 +123,42 @@ export class CategoryComponent implements OnInit, OnDestroy {
         this.currentPage = page;
         this.seoService.setTitle(`Búsqueda: ${term}`);
         this.callToSearch(term, page);
+      } else {
+        const categorySlug = this.route.snapshot.paramMap.get('category') || this.currentCategorySlug;
+        if (categorySlug) {
+          this.isSearchMode = false;
+          this.currentCategorySlug = categorySlug;
+          this.currentPage = page;
+
+          const sort = params.get('sort');
+          const direction = params.get('direction');
+          const stock = params.get('stock');
+          const sortOptionParam = params.get('sortOption');
+
+          if (sortOptionParam) {
+            this.sortOption = sortOptionParam;
+          } else if (sort === 'price' && direction === 'asc') {
+            this.sortOption = 'priceAsc';
+          } else if (sort === 'price' && direction === 'desc') {
+            this.sortOption = 'priceDesc';
+          } else if (sort === 'name' && direction === 'asc') {
+            this.sortOption = 'name';
+          } else if (sort === 'name' && direction === 'desc') {
+            this.sortOption = 'nameDesc';
+          } else if (sort === 'relevance') {
+            this.sortOption = 'relevance';
+          } else if (stock === 'available') {
+            this.sortOption = 'stockAvailable';
+          } else if (stock === 'out') {
+            this.sortOption = 'stockOut';
+          } else if (stock === 'all') {
+            this.sortOption = 'stockAll';
+          } else {
+            this.sortOption = '';
+          }
+          if(this.sortOption.length>0)
+            this.callToCategoryProducts(categorySlug, page);
+        }
       }
     });
   }
@@ -104,8 +170,17 @@ export class CategoryComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  get isLoading(): boolean {
+    return this.isSearchMode ? this.searchLoading() : this.categoryLoading();
+  }
+
+  get isError(): boolean {
+    return this.isSearchMode ? this.searchError() : this.categoryError();
+  }
+
   changePage(page: number) {
     if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+      this.currentPage = page;
       if (this.isSearchMode) {
         this.router.navigate([], {
           relativeTo: this.route,
@@ -113,25 +188,86 @@ export class CategoryComponent implements OnInit, OnDestroy {
           queryParamsHandling: 'merge'
         });
       } else {
-        this.currentPage = page;
+        this.updateCategoryUrlQueryParams(page);
       }
     }
   }
 
-  retrySearch(): void {
+  retry(): void {
     if (this.isSearchMode && this.searchTerm) {
       this.callToSearch(this.searchTerm, this.currentPage);
+    } else if (!this.isSearchMode && this.currentCategorySlug) {
+      this.callToCategoryProducts(this.currentCategorySlug, this.currentPage);
     }
+  }
+
+  retrySearch(): void {
+    this.retry();
   }
 
   totalPagesArray(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
-  applyFilters(){
-
-    if(this.isSearchMode)
+  applyFilters() {
+    this.currentPage = 1;
+    if (this.isSearchMode) {
       this.callToSearch(this.searchTerm, 1);
+    } else if (this.currentCategorySlug) {
+      this.updateCategoryUrlQueryParams(1);
+    }
+  }
+
+  private updateCategoryUrlQueryParams(page: number) {
+    const { sort, direction, stock } = this.getFilterParams();
+    const queryParams: any = {};
+    if (page > 1) {
+      queryParams.page = page;
+    }
+    if (sort) {
+      queryParams.sort = sort;
+    }
+    if (direction) {
+      queryParams.direction = direction;
+    }
+    if (stock) {
+      queryParams.stock = stock;
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: queryParams
+    });
+  }
+
+  private getFilterParams(): { sort: string | null, direction: string | null, stock: string | null } {
+    let sort: string | null = null;
+    let direction: string | null = null;
+    let stock: string | null = null;
+
+    if (this.sortOption === 'relevance') {
+      sort = 'relevance';
+    } else if (this.sortOption === 'name') {
+      sort = 'name';
+      direction = 'asc';
+    } else if (this.sortOption === 'nameDesc') {
+      sort = 'name';
+      direction = 'desc';
+    } else if (this.sortOption === 'priceAsc') {
+      sort = 'price';
+      direction = 'asc';
+    } else if (this.sortOption === 'priceDesc') {
+      sort = 'price';
+      direction = 'desc';
+    } else if (this.sortOption === 'stock' || this.sortOption === 'stockAvailable' || this.sortOption === 'available') {
+      stock = 'available';
+    } else if (this.sortOption === 'stockOut' || this.sortOption === 'out') {
+      stock = 'out';
+    } else if (this.sortOption === 'stockAll' || this.sortOption === 'all') {
+      stock = 'all';
+    }
+
+    return { sort, direction, stock };
   }
 
   private updateMetaTags(category: CategoryModel): void {
@@ -144,31 +280,14 @@ export class CategoryComponent implements OnInit, OnDestroy {
     this.seoService.setMeta('twitter:title', category.seoTitle + '');
     this.seoService.setMeta('twitter:description', category.seoDesc ? category.seoDesc : '');
   }
-  private callToSearch(term:string, page:number){
 
-    let sort = null;
-    let direction = null;
-    let stock = null;
-    
-    if(this.sortOption==='name'){
-      sort="name";
-      direction="asc";
-      stock="all";
-    }
-    if(this.sortOption==='priceAsc'){
-      sort="price";
-      direction="asc";
-      stock="all";
-    }
-    if(this.sortOption==='priceDesc'){
-      sort="price";
-      direction="desc";
-      stock="all";
-    }
-    if(this.sortOption==='stock'){
-      stock="available";
-    }
+  private callToCategoryProducts(slug: string, page: number) {
+    const { sort, direction, stock } = this.getFilterParams();
+    this.categoryService.getCategoryProducts(slug, page, this.pageSize, sort, direction, stock);
+  }
 
+  private callToSearch(term: string, page: number) {
+    const { sort, direction, stock } = this.getFilterParams();
     this.productService.searchProduct(term, page, this.pageSize, sort, direction, stock);
   }
 }

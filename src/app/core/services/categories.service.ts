@@ -1,13 +1,16 @@
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable, makeStateKey, PLATFORM_ID, signal, TransferState } from '@angular/core';
 import { CategoryModel } from '@models/category.model';
 import { CategoryHomeModel } from '@models/categoryHome.model';
+import { ProductModel } from '@models/product.model';
+import { ProductSearchResponse } from '@models/productSearchResponse.model';
 import { Observable, Subject } from 'rxjs';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { environment } from 'src/environments/environment';
 import { BusinessService } from './business.service';
 import { StorageService } from './storage.service';
+import { SearchPaginationState } from './products.service';
 
 const CATEGORY_KEY = makeStateKey<CategoryModel>('category');
 
@@ -53,6 +56,20 @@ export class CategoriesService {
   private readonly HOME_CAT = makeStateKey<CategoryHomeModel[]>('home_cat');
   private $homeCat = signal<CategoryHomeModel[]>([]);
   public readonly homeCatSignal = this.$homeCat.asReadonly(); 
+
+  private readonly CATEGORY_PRODUCTS_KEY = makeStateKey<ProductSearchResponse | ProductModel[]>('category_products');
+  private readonly CATEGORY_PRODUCTS_KEY_PARAMS = makeStateKey<string>('category_products_params');
+  private $categoryProducts = signal<ProductModel[]>([]);
+  public readonly categoryProductsSignal = this.$categoryProducts.asReadonly();
+
+  private $categoryProductsPagination = signal<SearchPaginationState>({ total: 0, current_page: 1, per_page: 12, last_page: 1 });
+  public readonly categoryProductsPaginationSignal = this.$categoryProductsPagination.asReadonly();
+
+  private $categoryProductsLoading = signal<boolean>(false);
+  public readonly categoryProductsLoadingSignal = this.$categoryProductsLoading.asReadonly();
+
+  private $categoryProductsError = signal<boolean>(false);
+  public readonly categoryProductsErrorSignal = this.$categoryProductsError.asReadonly();
   
   constructor(private httpClient:HttpClient, private transferState: TransferState, @Inject(PLATFORM_ID) private platformId: Object, 
               private businessService: BusinessService,
@@ -192,7 +209,7 @@ export class CategoriesService {
 
   }*/
 
-  getCategoryByName(categoryName:string[]){
+  /*getCategoryByName(categoryName:string[]){
 
     if(isPlatformServer(this.platformId)){
       this.getCategoryByNameCall(categoryName);
@@ -227,7 +244,7 @@ export class CategoriesService {
       this.$categoryModel.set(receivedItem);            
     });
     
-  }
+  }*/
 
   getCategoryByNameProdRel(categoryName:string[]){
 
@@ -261,6 +278,100 @@ export class CategoriesService {
       this.transferState.set(this.CATEGORY_KEY_PROD_REL, receivedItem);
       this.$categoryModelProdRel.set(receivedItem);            
     });
+  }
+
+  getCategoryProducts(slug: string, page: number = 1, perPage: number = 12, sort?: string | null, direction?: string | null, stock?: string | null) {
+    if (!slug || !slug.trim()) {
+      this.$categoryProducts.set([]);
+      this.$categoryProductsPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
+      this.$categoryProductsLoading.set(false);
+      this.$categoryProductsError.set(false);
+      return;
+    }
+
+    const paramsKey = `${slug}_p${page}_pp${perPage}_s${sort || ''}_d${direction || ''}_st${stock || ''}`;
+
+    if (isPlatformServer(this.platformId)) {
+      this.getCategoryProductsCall(slug, page, perPage, sort, direction, stock, paramsKey);
+      return;
+    }
+
+    if (isPlatformBrowser(this.platformId)) {
+      const cachedResponse = this.transferState.get(this.CATEGORY_PRODUCTS_KEY, null);
+      const cachedParamsKey = this.transferState.get(this.CATEGORY_PRODUCTS_KEY_PARAMS, '');
+
+      if (cachedResponse !== null && cachedParamsKey === paramsKey) {
+        this.processCategoryProductsResponse(cachedResponse, page, perPage);
+        this.transferState.remove(this.CATEGORY_PRODUCTS_KEY);
+        this.transferState.remove(this.CATEGORY_PRODUCTS_KEY_PARAMS);
+        return;
+      }
+
+      this.getCategoryProductsCall(slug, page, perPage, sort, direction, stock, paramsKey);
+    }
+  }
+
+  private getCategoryProductsCall(slug: string, page: number, perPage: number, sort?: string | null, direction?: string | null, stock?: string | null, paramsKey: string = '') {
+    this.$categoryProductsLoading.set(true);
+    this.$categoryProductsError.set(false);
+
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('per_page', perPage.toString());
+
+    if (sort) {
+      params = params.set('sort', sort);
+    }
+    if (direction) {
+      params = params.set('direction', direction);
+    }
+    if (stock) {
+      params = params.set('stock', stock);
+    }
+
+    const categoryProductsUrl = `${this.URL}/category-products/${encodeURIComponent(slug.trim())}`;
+
+    this.httpClient.get<ProductSearchResponse | ProductModel[]>(categoryProductsUrl, { params })
+      .subscribe({
+        next: (response) => {
+          this.transferState.set(this.CATEGORY_PRODUCTS_KEY, response);
+          this.transferState.set(this.CATEGORY_PRODUCTS_KEY_PARAMS, paramsKey);
+          this.processCategoryProductsResponse(response, page, perPage);
+        },
+        error: (err) => {
+          if (err.status !== 404) {
+            this.$categoryProductsError.set(true);
+          }
+          this.$categoryProductsLoading.set(false); 
+          this.$categoryProducts.set([]);
+          this.$categoryProductsPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
+        }
+      });
+  }
+
+  private processCategoryProductsResponse(response: ProductSearchResponse | ProductModel[], page: number, perPage: number) {
+    this.$categoryProductsLoading.set(false);
+    if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
+      const res = response as ProductSearchResponse;
+      this.$categoryProducts.set(res.data || []);
+      this.$categoryProductsPagination.set({
+        total: res.total !== undefined ? res.total : (res.data ? res.data.length : 0),
+        current_page: res.current_page || page,
+        per_page: res.per_page || perPage,
+        last_page: res.last_page || 1
+      });
+    } else if (Array.isArray(response)) {
+      this.$categoryProducts.set(response);
+      this.$categoryProductsPagination.set({
+        total: response.length,
+        current_page: 1,
+        per_page: response.length || perPage,
+        last_page: 1
+      });
+    } else {
+      this.$categoryProducts.set([]);
+      this.$categoryProductsPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
+    }
   }
 
 
