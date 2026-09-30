@@ -57,6 +57,8 @@ export class CategoriesService {
   private $homeCat = signal<CategoryHomeModel[]>([]);
   public readonly homeCatSignal = this.$homeCat.asReadonly(); 
 
+  private readonly CATEGORY_PRODUCTS_KEY = makeStateKey<ProductSearchResponse | ProductModel[]>('category_products');
+  private readonly CATEGORY_PRODUCTS_KEY_PARAMS = makeStateKey<string>('category_products_params');
   private $categoryProducts = signal<ProductModel[]>([]);
   public readonly categoryProductsSignal = this.$categoryProducts.asReadonly();
 
@@ -287,6 +289,29 @@ export class CategoriesService {
       return;
     }
 
+    const paramsKey = `${slug}_p${page}_pp${perPage}_s${sort || ''}_d${direction || ''}_st${stock || ''}`;
+
+    if (isPlatformServer(this.platformId)) {
+      this.getCategoryProductsCall(slug, page, perPage, sort, direction, stock, paramsKey);
+      return;
+    }
+
+    if (isPlatformBrowser(this.platformId)) {
+      const cachedResponse = this.transferState.get(this.CATEGORY_PRODUCTS_KEY, null);
+      const cachedParamsKey = this.transferState.get(this.CATEGORY_PRODUCTS_KEY_PARAMS, '');
+
+      if (cachedResponse !== null && cachedParamsKey === paramsKey) {
+        this.processCategoryProductsResponse(cachedResponse, page, perPage);
+        this.transferState.remove(this.CATEGORY_PRODUCTS_KEY);
+        this.transferState.remove(this.CATEGORY_PRODUCTS_KEY_PARAMS);
+        return;
+      }
+
+      this.getCategoryProductsCall(slug, page, perPage, sort, direction, stock, paramsKey);
+    }
+  }
+
+  private getCategoryProductsCall(slug: string, page: number, perPage: number, sort?: string | null, direction?: string | null, stock?: string | null, paramsKey: string = '') {
     this.$categoryProductsLoading.set(true);
     this.$categoryProductsError.set(false);
 
@@ -309,28 +334,9 @@ export class CategoriesService {
     this.httpClient.get<ProductSearchResponse | ProductModel[]>(categoryProductsUrl, { params })
       .subscribe({
         next: (response) => {
-          this.$categoryProductsLoading.set(false);
-          if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
-            const res = response as ProductSearchResponse;
-            this.$categoryProducts.set(res.data || []);
-            this.$categoryProductsPagination.set({
-              total: res.total !== undefined ? res.total : (res.data ? res.data.length : 0),
-              current_page: res.current_page || page,
-              per_page: res.per_page || perPage,
-              last_page: res.last_page || 1
-            });
-          } else if (Array.isArray(response)) {
-            this.$categoryProducts.set(response);
-            this.$categoryProductsPagination.set({
-              total: response.length,
-              current_page: 1,
-              per_page: response.length || perPage,
-              last_page: 1
-            });
-          } else {
-            this.$categoryProducts.set([]);
-            this.$categoryProductsPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
-          }
+          this.transferState.set(this.CATEGORY_PRODUCTS_KEY, response);
+          this.transferState.set(this.CATEGORY_PRODUCTS_KEY_PARAMS, paramsKey);
+          this.processCategoryProductsResponse(response, page, perPage);
         },
         error: (err) => {
           if (err.status !== 404) {
@@ -341,6 +347,31 @@ export class CategoriesService {
           this.$categoryProductsPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
         }
       });
+  }
+
+  private processCategoryProductsResponse(response: ProductSearchResponse | ProductModel[], page: number, perPage: number) {
+    this.$categoryProductsLoading.set(false);
+    if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
+      const res = response as ProductSearchResponse;
+      this.$categoryProducts.set(res.data || []);
+      this.$categoryProductsPagination.set({
+        total: res.total !== undefined ? res.total : (res.data ? res.data.length : 0),
+        current_page: res.current_page || page,
+        per_page: res.per_page || perPage,
+        last_page: res.last_page || 1
+      });
+    } else if (Array.isArray(response)) {
+      this.$categoryProducts.set(response);
+      this.$categoryProductsPagination.set({
+        total: response.length,
+        current_page: 1,
+        per_page: response.length || perPage,
+        last_page: 1
+      });
+    } else {
+      this.$categoryProducts.set([]);
+      this.$categoryProductsPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
+    }
   }
 
 

@@ -60,10 +60,8 @@ export class CategoryComponent implements OnInit, OnDestroy {
         this.isSearchMode = false;
         if (this.currentCategorySlug !== category) {
           this.currentCategorySlug = category;
-          this.currentPage = 1;
         }
         this.categoryService.getCategoryByName([category]);
-        this.callToCategoryProducts(category, this.currentPage);
       }
     });
 
@@ -112,6 +110,42 @@ export class CategoryComponent implements OnInit, OnDestroy {
         this.currentPage = page;
         this.seoService.setTitle(`Búsqueda: ${term}`);
         this.callToSearch(term, page);
+      } else {
+        const categorySlug = this.route.snapshot.paramMap.get('category') || this.currentCategorySlug;
+        if (categorySlug) {
+          this.isSearchMode = false;
+          this.currentCategorySlug = categorySlug;
+          this.currentPage = page;
+
+          const sort = params.get('sort');
+          const direction = params.get('direction');
+          const stock = params.get('stock');
+          const sortOptionParam = params.get('sortOption');
+
+          if (sortOptionParam) {
+            this.sortOption = sortOptionParam;
+          } else if (sort === 'price' && direction === 'asc') {
+            this.sortOption = 'priceAsc';
+          } else if (sort === 'price' && direction === 'desc') {
+            this.sortOption = 'priceDesc';
+          } else if (sort === 'name' && direction === 'asc') {
+            this.sortOption = 'name';
+          } else if (sort === 'name' && direction === 'desc') {
+            this.sortOption = 'nameDesc';
+          } else if (sort === 'relevance') {
+            this.sortOption = 'relevance';
+          } else if (stock === 'available') {
+            this.sortOption = 'stockAvailable';
+          } else if (stock === 'out') {
+            this.sortOption = 'stockOut';
+          } else if (stock === 'all') {
+            this.sortOption = 'stockAll';
+          } else {
+            this.sortOption = '';
+          }
+
+          this.callToCategoryProducts(categorySlug, page);
+        }
       }
     });
   }
@@ -141,7 +175,7 @@ export class CategoryComponent implements OnInit, OnDestroy {
           queryParamsHandling: 'merge'
         });
       } else {
-        this.callToCategoryProducts(this.currentCategorySlug, page);
+        this.updateCategoryUrlQueryParams(page);
       }
     }
   }
@@ -167,8 +201,30 @@ export class CategoryComponent implements OnInit, OnDestroy {
     if (this.isSearchMode) {
       this.callToSearch(this.searchTerm, 1);
     } else if (this.currentCategorySlug) {
-      this.callToCategoryProducts(this.currentCategorySlug, 1);
+      this.updateCategoryUrlQueryParams(1);
     }
+  }
+
+  private updateCategoryUrlQueryParams(page: number) {
+    const { sort, direction, stock } = this.getFilterParams();
+    const queryParams: any = {};
+    if (page > 1) {
+      queryParams.page = page;
+    }
+    if (sort) {
+      queryParams.sort = sort;
+    }
+    if (direction) {
+      queryParams.direction = direction;
+    }
+    if (stock) {
+      queryParams.stock = stock;
+    }
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: queryParams
+    });
   }
 
   private getFilterParams(): { sort: string | null, direction: string | null, stock: string | null } {
