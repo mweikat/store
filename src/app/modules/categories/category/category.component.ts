@@ -55,13 +55,20 @@ export class CategoryComponent implements OnInit, OnDestroy {
   constructor(private route: ActivatedRoute) {
 
     this.paramSub = this.route.paramMap.subscribe(params => {
+      //console.log("detecta cambio params: ");
       const category = params.get('category');
       if (category) {
         this.isSearchMode = false;
         if (this.currentCategorySlug !== category) {
           this.currentCategorySlug = category;
         }
-        this.categoryService.getCategoryByName([category]);
+        //this.categoryService.getCategoryByName([category]);
+        const page = Number(this.route.snapshot.queryParamMap.get('page'))      || undefined;
+        if (page===undefined){
+          console.log("carga productos sin pag");
+          this.callToCategoryProducts(category, 1);
+        }
+        
       }
     });
 
@@ -100,6 +107,12 @@ export class CategoryComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.queryParamSub = this.route.queryParamMap.subscribe(params => {
+      
+      if (params.keys.length === 0) {
+        //console.log('No hay query params');
+        return ;
+      } 
+      console.log("carga productos con pag");
       const term = params.get('term');
       const pageParam = params.get('page');
       const page = pageParam ? parseInt(pageParam, 10) : 1;
@@ -143,8 +156,8 @@ export class CategoryComponent implements OnInit, OnDestroy {
           } else {
             this.sortOption = '';
           }
-
-          this.callToCategoryProducts(categorySlug, page);
+          if(this.sortOption.length>0)
+            this.callToCategoryProducts(categorySlug, page);
         }
       }
     });

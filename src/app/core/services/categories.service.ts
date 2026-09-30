@@ -209,7 +209,7 @@ export class CategoriesService {
 
   }*/
 
-  getCategoryByName(categoryName:string[]){
+  /*getCategoryByName(categoryName:string[]){
 
     if(isPlatformServer(this.platformId)){
       this.getCategoryByNameCall(categoryName);
@@ -244,7 +244,7 @@ export class CategoriesService {
       this.$categoryModel.set(receivedItem);            
     });
     
-  }
+  }*/
 
   getCategoryByNameProdRel(categoryName:string[]){
 
@@ -342,7 +342,7 @@ export class CategoriesService {
           if (err.status !== 404) {
             this.$categoryProductsError.set(true);
           }
-          this.$categoryProductsLoading.set(false);
+          this.$categoryProductsLoading.set(false); 
           this.$categoryProducts.set([]);
           this.$categoryProductsPagination.set({ total: 0, current_page: 1, per_page: perPage, last_page: 1 });
         }
