@@ -145,23 +145,6 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
   font-size: vars.$font-07;
 }
 
-/*product stock*/
-.stock-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(255, 0, 0, 0.8); // Fondo rojo con opacidad
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1rem; // Ajusta el tamaño de la fuente según sea necesario
-    text-transform: uppercase; // Hace que el texto esté en mayúsculas
-    z-index: 1; // Asegura que esté por encima de la imagen
-    height: 10%;
-}
 
 .product-details{
     .nav-tabs .nav-link {
@@ -359,26 +342,31 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
       }
     }
 }
-/*****************category******************/
-.category{
-
+/*****************category & product-card******************/
+.category {
     .product-card {
-        border: 1px solid vars.$cat-product-card-border;
-        background-color: vars.$cat-product-card-background;
+        border: 1px solid vars.$cat-product-card-border !important;
+    }
+}
 
-        .product-image-wrapper {
-            background-color: vars.$cat-product-card-img-back; // Fondo neutro para mejor contraste
-            border-bottom: 2px solid vars.$cat-product-card-img-border;
+.product-card {
+    border: 1px solid vars.$cat-product-card-border;
+    background-color: vars.$cat-product-card-background;
+
+    .product-image-wrapper {
+        background-color: vars.$cat-product-card-img-back;
+        border-bottom: 2px solid vars.$cat-product-card-img-border;
+    }
+    .card-body {
+        .product-title {
+            color: vars.$cat-product-title;
         }
-        .card-body {
-            .product-title{
-                  color: vars.$cat-product-title;
-            }
-            .product-price {
-                .normal-price {
-                    &.text-decoration-line-through {
-                        color: vars.$cat-product-card-price !important; // Color más suave para el precio tachado
-                    }
+        .product-price {
+            .normal-price {
+                color: vars.$home-sale-normal-price;
+
+                &.text-decoration-line-through {
+                    color: vars.$cat-product-card-price !important;
                 }
             }
             .sale-price {
@@ -386,7 +374,6 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
             }
         }
     }
-
 }
 /*****************check out******************/
 .check-out{
@@ -601,69 +588,23 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
     }
 }
 /*****************sale***********************/
-.sale{
+.sale {
     .productos-destacados {
         background-color: vars.$home-sale-background;
 
         .section-title {
             font-family: vars.$font-family-main;
-        }
-        .product-card{
-            border: 1px solid vars.$home-sale-product-border;
-            background-color: vars.$home-sale-product-background;
-
-            .product-image-wrapper {
-                background-color: vars.$home-sale-product-img-background;
-                border-bottom: 2px solid vars.$home-sale-product-img-border;
-            }
-        }
-        .card-body {
-            .product-title {
-                color: vars.$home-sale-product-title;
-            }
-            .product-price {
-                .normal-price {
-                    color: vars.$home-sale-normal-price;
-
-                    &.text-decoration-line-through {
-                        color: vars.$home-sale-text-decoration !important;
-                    }
-                }
-            }
         }
     }
 }
 
 /*******************sale2**************************/
-.sale2{
+.sale2 {
     .productos-destacados {
         background-color: vars.$home-sale-background;
 
         .section-title {
             font-family: vars.$font-family-main;
-        }
-        .product-card{
-            border: 1px solid vars.$home-sale-product-border;
-            background-color: vars.$home-sale-product-background;
-
-            .product-image-wrapper {
-                background-color: vars.$home-sale-product-img-background;
-                border-bottom: 2px solid vars.$home-sale-product-img-border;
-            }
-        }
-        .card-body {
-            .product-title {
-                color: vars.$home-sale-product-title;
-            }
-            .product-price {
-                .normal-price {
-                    color: vars.$home-sale-normal-price;
-
-                    &.text-decoration-line-through {
-                        color: vars.$home-sale-text-decoration !important;
-                    }
-                }
-            }
         }
     }
 }

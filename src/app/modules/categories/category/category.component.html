@@ -1,4 +1,8 @@
 <div class="category container py-5">
+  <div class="mb-3" *ngIf="!isSearchMode">
+    <app-bread-crumb [categories]="category()"></app-bread-crumb>
+  </div>
+
   @if(!isSearchMode && category().length > 0){
     <h4 class="text-center mb-4 category-title">{{ category()[0].name }}</h4>
     <p class="text-center category-intro">{{ category()[0].desc }}</p>
@@ -57,39 +61,7 @@
   <div class="row" *ngIf="!isLoading && !isError && displayProducts.length > 0">
     @for(product of displayProducts; track product.id){
       <div class="col-6 col-md-4 col-lg-3 mb-4">
-        <a [routerLink]="'/product/' + product.url" class="text-decoration-none">
-          <div class="card h-100 product-card">
-            <div class="product-image-wrapper mt-3">
-              @if(product.imgs && product.imgs.length > 0){
-                <img
-                  appImgBroken
-                  [src]="product.imgs[0].img"
-                  class="card-img-top product-image img-fluid"
-                  [alt]="product.name"
-                  loading="lazy">
-              }@else{
-                <img
-                  appImgBroken
-                  [src]="product.imgP || 'assets/images/imgnodisp.webp'"
-                  class="card-img-top product-image img-fluid"
-                  [alt]="product.name"
-                  loading="lazy">
-              }
-              <div class="stock-overlay" *ngIf="product.stock === 0">Agotado</div>
-            </div>
-            <div class="card-body text-center">
-              <p class="card-title product-title text-truncate" [title]="product.name">{{ product.name }}</p>
-              <p class="card-text product-price">
-                <span class="normal-price" [ngClass]="{'text-decoration-line-through text-muted': product.priceSale}">
-                  ${{ product.price | number | comaToDot }}
-                </span>
-                <span class="text-danger fw-bold sale-price ms-1" *ngIf="product.priceSale">
-                  ${{ product.priceSale | number | comaToDot }}
-                </span>
-              </p>
-            </div>
-          </div>
-        </a>
+        <app-product-card [product]="product"></app-product-card>
       </div>
     }
   </div>

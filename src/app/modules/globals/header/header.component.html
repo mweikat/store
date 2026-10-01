@@ -36,7 +36,7 @@
                   }@else{
                   <!-- Solo muestra las categorías principales (sin padre) -->
                   <li class="nav-item dropdown" *ngIf="!category.parent">
-                    <a class="nav-link dropdown-toggle " href="#" [id]="category.url_name + 'Dropdown'" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" (click)="$event.preventDefault()" [id]="category.url_name + 'Dropdown'" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       {{ category.name }}
                     </a>
               
@@ -98,7 +98,7 @@
         </li>
         }@else{
         <li class="nav-item dropdown" *ngIf="!category.parent">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <a class="nav-link dropdown-toggle" href="javascript:void(0)" (click)="$event.preventDefault()" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             {{ category.name }}
           </a>
           <ul class="dropdown-menu">

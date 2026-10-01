@@ -10,8 +10,7 @@ import { CartMenuComponent } from './cart-menu/cart-menu.component';
 import { SearchComponent } from './search/search.component';
 import { OrderStatus } from '@pipes/orderStatus.pipe';
 import { CheckoutStepsComponent } from './checkout-steps/checkout-steps.component';
-
-
+import { ProductCardComponent } from './product-card/product-card.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +22,8 @@ import { CheckoutStepsComponent } from './checkout-steps/checkout-steps.componen
     UserMenuComponent,
     CartMenuComponent,
     SearchComponent,
-    CheckoutStepsComponent
+    CheckoutStepsComponent,
+    ProductCardComponent
   ],
   imports: [
     CommonModule,
@@ -41,6 +41,7 @@ import { CheckoutStepsComponent } from './checkout-steps/checkout-steps.componen
     SearchComponent,
     UserMenuComponent,
     CheckoutStepsComponent,
+    ProductCardComponent,
     RouterLink
   ]
 })
