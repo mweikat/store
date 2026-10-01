@@ -1,4 +1,4 @@
-<div class="card h-100 product-card shadow-sm border-0">
+<div class="card h-100 product-card shadow-sm border-0" [ngClass]="{ 'opacity-50': product.stock === 0 }">
   <a [routerLink]="'/product/' + product.url" class="text-decoration-none text-dark d-flex flex-column h-100">
     <div class="product-image-wrapper p-2 bg-white rounded-top position-relative">
       <img
@@ -17,7 +17,7 @@
 
       <!-- Stock Overlay / Badge -->
       <div class="stock-overlay d-flex align-items-center justify-content-center" *ngIf="product.stock === 0">
-        <span class="badge bg-secondary px-3 py-2 fs-6 shadow-sm">Agotado</span>
+        <span class="badge bg-danger px-3 py-2 fs-6 shadow-sm">Agotado</span>
       </div>
     </div>
 
