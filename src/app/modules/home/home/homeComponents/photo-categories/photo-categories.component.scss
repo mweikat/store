@@ -46,7 +46,20 @@
   }
 
   .carousel-control-next, .carousel-control-prev {
-    width: 20px;
+    width: 44px;
+    min-height: 44px;
+    opacity: 0.8;
+
+    &:hover, &:focus {
+      opacity: 1;
+    }
+  }
+
+  .custom-carousel-icon {
+    background-color: rgba(108, 117, 125, 0.7);
+    border-radius: 50%;
+    padding: 12px;
+    background-size: 50% 50%;
   }
 
   // Responsividad

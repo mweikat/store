@@ -3,12 +3,12 @@
     <div class="container-fluid category-carousel py-5">
       <div id="categoryCarousel" class="carousel slide" data-bs-ride="carousel">
           <!-- Botones de navegación -->
-          <button *ngIf="showButtons" class="carousel-control-prev custom-control-prev"  type="button" data-bs-target="#categoryCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true" style="background-color: grey;"></span>
+          <button *ngIf="showButtons" class="carousel-control-prev custom-control-prev" type="button" data-bs-target="#categoryCarousel" data-bs-slide="prev" aria-label="Categorías anteriores">
+            <span class="carousel-control-prev-icon custom-carousel-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Anterior</span>
           </button>
-          <button *ngIf="showButtons" class="carousel-control-next custom-control-next" type="button" data-bs-target="#categoryCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true" style="background-color: grey;"></span>
+          <button *ngIf="showButtons" class="carousel-control-next custom-control-next" type="button" data-bs-target="#categoryCarousel" data-bs-slide="next" aria-label="Categorías siguientes">
+            <span class="carousel-control-next-icon custom-carousel-icon" aria-hidden="true"></span>
             <span class="visually-hidden">Siguiente</span>
           </button>
       
