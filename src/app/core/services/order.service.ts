@@ -10,6 +10,7 @@ import { OrderLastModel } from '@models/orderLast.model';
 import { OrderShippedModel } from '@models/orderShipped.model';
 import { OrderTotalAmountModel } from '@models/orderTotalAmount.model';
 import { PaymentModel } from '@models/payment.model';
+import { CartService } from '@services/cart.service';
 import { PaymentProcessorService } from '@services/payment-processor.service';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -63,7 +64,8 @@ export class OrderService {
     @Inject(DOCUMENT) private document: Document,
     private transferState: TransferState,
     @Inject(PLATFORM_ID) private platformId: Object,
-    private paymentProcessorService: PaymentProcessorService
+    private paymentProcessorService: PaymentProcessorService,
+    private cartService: CartService
   ) { }
 
   getTotalAmount(cartId:string, businessShippingId:number){
@@ -90,6 +92,7 @@ export class OrderService {
       next: (item) => {
         const outcome = this.paymentProcessorService.processPaymentResponse(payment, item.body);
         if (outcome.success) {
+          this.cartService.clearCart();
           this.paymentProcessorService.executeNavigation(outcome);
         } else {
           this.paymentError$.next(true);

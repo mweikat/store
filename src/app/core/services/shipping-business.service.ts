@@ -21,6 +21,9 @@ export class ShippingBusinessService {
   private $shippingMethods = signal<ShippingBusiness[]>([]);
   public readonly shippingMethodsSignal = this.$shippingMethods.asReadonly(); 
 
+  private $shippingCost = signal<number>(0);
+  public readonly shippingCostSignal = this.$shippingCost.asReadonly();
+
   private readonly shippingCost$: Subject<number> = new Subject();
   public readonly shippingCost: Observable<number> = this.shippingCost$.asObservable();
 
@@ -67,7 +70,7 @@ export class ShippingBusinessService {
     let termToJson = {cartId:cartId,shippingBusinessId:shippingBusinessId,totalCartCost:totalCartCost};
 
     this.httpClient.post<number>(`${this.URL}/cost`,termToJson).subscribe(item => {
-      
+      this.$shippingCost.set(item);
       this.shippingCost$.next(item);
     });
 
