@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { CartService } from '@services/cart.service';
 import { OrderService } from '@services/order.service';
 import { Subscription } from 'rxjs';
 
@@ -13,11 +14,18 @@ export class ConfirmComponent implements OnInit,OnDestroy{
 
   orderNum:string|null="";
   message:string = "";
+  orderStatus:string = "";
+  isSuccess:boolean = true;
+  isLoading:boolean = true;
 
   destroyRoute?:Subscription;
   destroyOrder?:Subscription;
 
-  constructor(private orderService:OrderService, private route: ActivatedRoute,){}
+  constructor(
+    private orderService:OrderService,
+    private route: ActivatedRoute,
+    private cartService: CartService
+  ){}
 
   ngOnInit(): void {
 
@@ -28,7 +36,20 @@ export class ConfirmComponent implements OnInit,OnDestroy{
     });
 
     this.destroyOrder = this.orderService.orderNumberData.subscribe(data => {
-      this.message = data.body.message;
+      this.isLoading = false;
+      const body = data?.body;
+      if (body) {
+        this.message = body.message || "";
+        this.orderStatus = (body.status || body.order_status || body.order?.status || "").toUpperCase();
+
+        const invalidStatuses = ['CANCELLED', 'CANCELED', 'REJECTED', 'FAILED', 'INVALID', 'ERROR'];
+        if (invalidStatuses.includes(this.orderStatus) || body.success === false) {
+          this.isSuccess = false;
+        } else {
+          this.isSuccess = true;
+          this.cartService.clearCart();
+        }
+      }
     });
     
   }

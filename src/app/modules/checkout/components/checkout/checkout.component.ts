@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, computed, effect, inject, Inject, OnDestroy, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { CartModel } from '@models/cart.model';
 import { PaymentModel } from '@models/payment.model';
@@ -49,17 +49,32 @@ export class CheckoutComponent implements OnInit, OnDestroy{
   shippingAddress:ShippingAddress = {} as ShippingAddress;
   
   //step2
-  selectedPaymentMethod:PaymentModel = {} as PaymentModel;
+  selectedPaymentMethodSignal = signal<PaymentModel>({} as PaymentModel);
+  get selectedPaymentMethod(): PaymentModel {
+    return this.selectedPaymentMethodSignal();
+  }
+  set selectedPaymentMethod(val: PaymentModel) {
+    this.selectedPaymentMethodSignal.set(val);
+  }
   isSubmitting = false;
 
-    
+  paymentsMethodsSignal = this.paymentService.paymentsMethodsSignal;
+
+  isPaymentReady = computed(() => {
+    const methods = this.paymentsMethodsSignal();
+    const hasMethods = methods && methods.length > 0;
+    const selected = this.selectedPaymentMethodSignal();
+    const hasSelectedMethod = !!(selected && selected.id != null);
+    const hasTotal = this.totalOrderPrice() !== undefined && this.totalOrderPrice() !== null;
+    return hasMethods && hasSelectedMethod && hasTotal;
+  });
+
   //amount
   private orderService = inject(OrderService);
   amountModel = this.orderService.totalAmountSignal;
   applyDiscountText = computed(()=> (this.amountModel().disc_text)?this.amountModel().disc_text:'');
   disc_amount = computed(()=> (this.amountModel().disc_amount!=undefined)?this.amountModel().disc_amount:0);
   discountValue = computed(()=> (this.amountModel().disc_percentage!=undefined)?this.amountModel().disc_percentage:0.1);
-  ;
   totalOrderPrice = computed(()=> this.amountModel().total_amount);
 
   constructor(){
@@ -117,8 +132,10 @@ export class CheckoutComponent implements OnInit, OnDestroy{
 
     this.destroyShipBusiness = this.shippingBusinessService.shippingCost.subscribe(price=>{
       this.shipping_price = price;
-      this.calculateTotalProce();
-      
+      if (this.cart().id != undefined && this.selectedShippingMethod.id != undefined) {
+        this.orderService.getTotalAmount(this.cart().id, this.selectedShippingMethod.id);
+        this.paymentService.getPayments();
+      }
     });
 
 
@@ -174,7 +191,7 @@ export class CheckoutComponent implements OnInit, OnDestroy{
   }
 
   getPaymentMethod($event:PaymentModel){
-    this.selectedPaymentMethod = $event;
+    this.selectedPaymentMethodSignal.set($event);
   }
 
   setSelectedAddress(event:ShippingAddress){
@@ -188,6 +205,7 @@ export class CheckoutComponent implements OnInit, OnDestroy{
 
   private calculateTotalProce():void{
     if(this.cart().id!=undefined && this.selectedShippingMethod.id!=undefined){
+      this.shippingBusinessService.getCost(this.cart().id, this.selectedShippingMethod.id, this.sub_total_price());
       this.orderService.getTotalAmount(this.cart().id, this.selectedShippingMethod.id);
       this.paymentService.getPayments();
     }

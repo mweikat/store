@@ -564,6 +564,17 @@ export class CartService {
     localStorage.setItem(`cart_${busId}`, JSON.stringify(cart));
   }
 
+  public clearCart() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.delCartFromLocalSession();
+      this.$currentCart.set({ items: [] } as unknown as CartModel);
+      this.cartModelMenu$.next({ items: [] } as unknown as CartModel);
+      this.$cantCart.set(0);
+      this.$totalCart.set(0);
+      this.$totalPriceCart.set(0);
+    }
+  }
+
   private delCartFromLocalSession(){
     const busId = this.getBusinessId();
     localStorage.removeItem(`cart_${busId}`);

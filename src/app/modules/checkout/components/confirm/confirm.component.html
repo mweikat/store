@@ -1,51 +1,84 @@
 <div class="checkout-success container py-5 text-center">
     <div class="card shadow-sm p-4">
       <div class="card-body">
-        <div class="mb-4">
-          <i class="bi bi-check2-circle success-icon"></i>
-        </div>
-        <h1 class="text-primary-c1 title">¡Gracias por tu compra!</h1>
-        <p class="text-secondary mt-3">
-          Tu pedido ha sido procesado con éxito. Te hemos enviado un correo de confirmación con los detalles de tu compra.
-        </p>
 
-        <p class="text-secondary mt-3">
-          Podras revisar el estado de tus compras en tu perfil.
-        </p>
+        <div class="mb-4">
+          <i *ngIf="isSuccess; else failureIcon" class="bi bi-check2-circle success-icon text-success"></i>
+          <ng-template #failureIcon>
+            <i class="bi bi-x-circle text-danger fs-1"></i>
+          </ng-template>
+        </div>
+
+        <ng-container *ngIf="isSuccess; else failureHeader">
+          <h1 class="text-primary-c1 title">¡Gracias por tu compra!</h1>
+          <p class="text-secondary mt-3">
+            Tu pedido ha sido procesado con éxito. Te hemos enviado un correo de confirmación con los detalles de tu compra.
+          </p>
+          <p class="text-secondary mt-3">
+            Podrás revisar el estado de tus compras en tu perfil.
+          </p>
+        </ng-container>
+
+        <ng-template #failureHeader>
+          <h1 class="text-danger title">Ocurrió un problema con tu pedido</h1>
+          <p class="text-secondary mt-3">
+            El pedido no pudo ser procesado o la transacción fue cancelada (Estado: {{ orderStatus || 'CANCELADO' }}).
+          </p>
+          <p class="text-secondary mt-3">
+            Si tuviste un problema durante el pago, por favor intenta nuevamente o selecciona otro medio de pago.
+          </p>
+        </ng-template>
         
         <!-- Resumen del Pedido -->
         <div class="order-summary my-4">
           <h5 class="text-dark mb-3">El número de tu orden es: <b>{{orderNum}}</b></h5>
           <ul class="list-group">
             <li class="list-group-item d-flex justify-content-center">
-            <span *ngIf="message; else loadingMessage">
-              {{ message }}
-            </span>
+              <span *ngIf="message; else loadingMessage">
+                {{ message }}
+              </span>
 
-            <ng-template #loadingMessage>
-              <span class="message-placeholder">&nbsp;</span>
-            </ng-template>
-          </li>
+              <ng-template #loadingMessage>
+                <span class="message-placeholder">&nbsp;</span>
+              </ng-template>
+            </li>
           </ul>
         </div>
   
         <!-- Botones de acción -->
         <div class="mt-4">
-          <div class="d-flex flex-column flex-sm-row gap-2 gap-sm-0">
+          <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
             <a 
+              *ngIf="isSuccess"
               routerLink="/" 
               class="btn btn-primary-c1 w-100 w-sm-auto me-sm-2"
             >
               Seguir comprando
             </a>
             <a 
+              *ngIf="isSuccess"
               routerLink="/admin/orders" 
               class="btn btn-outline-secondary w-100 w-sm-auto"
             >
               Ver mis pedidos
             </a>
+            <a
+              *ngIf="!isSuccess"
+              routerLink="/checkout"
+              class="btn btn-primary-c1 w-100 w-sm-auto me-sm-2"
+            >
+              Intentar de nuevo
+            </a>
+            <a
+              *ngIf="!isSuccess"
+              routerLink="/"
+              class="btn btn-outline-secondary w-100 w-sm-auto"
+            >
+              Ir al inicio
+            </a>
           </div>
         </div>
+
       </div>
     </div>
   </div>
