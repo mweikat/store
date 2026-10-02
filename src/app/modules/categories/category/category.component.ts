@@ -65,7 +65,6 @@ export class CategoryComponent implements OnInit, OnDestroy {
         //this.categoryService.getCategoryByName([category]);
         const page = Number(this.route.snapshot.queryParamMap.get('page'))      || undefined;
         if (page===undefined){
-          console.log("carga productos sin pag");
           this.callToCategoryProducts(category, 1);
         }
         
@@ -112,7 +111,6 @@ export class CategoryComponent implements OnInit, OnDestroy {
         //console.log('No hay query params');
         return ;
       } 
-      console.log("carga productos con pag");
       const term = params.get('term');
       const pageParam = params.get('page');
       const page = pageParam ? parseInt(pageParam, 10) : 1;

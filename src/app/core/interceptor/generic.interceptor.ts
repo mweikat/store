@@ -5,7 +5,7 @@ import {
   HttpEvent,
   HttpInterceptor
 } from '@angular/common/http';
-import { finalize, Observable } from 'rxjs';
+import { catchError, finalize, Observable, throwError, EMPTY } from 'rxjs';
 import { SpinnerService } from '@services/spinner.service';
 
 @Injectable()
@@ -22,6 +22,16 @@ export class GenericInterceptor implements HttpInterceptor {
     }
 
     return next.handle(request).pipe(
+      catchError((error) => {
+        if (
+          error?.name === 'AbortError' ||
+          error?.message?.includes('signal is aborted') ||
+          error?.error?.name === 'AbortError'
+        ) {
+          return EMPTY;
+        }
+        return throwError(() => error);
+      }),
       finalize(() => {
         if (shouldShowSpinner) {
           this.spinnerService.hide();
