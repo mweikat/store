@@ -10,6 +10,7 @@ import { OrderLastModel } from '@models/orderLast.model';
 import { OrderShippedModel } from '@models/orderShipped.model';
 import { OrderTotalAmountModel } from '@models/orderTotalAmount.model';
 import { PaymentModel } from '@models/payment.model';
+import { PaymentProcessorService } from '@services/payment-processor.service';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
@@ -57,7 +58,13 @@ export class OrderService {
 
   noStockErrorModel:ProductNStockError = {} as ProductNStockError;
 
-  constructor(private httpClient:HttpClient, @Inject(DOCUMENT) private document: Document,private transferState: TransferState, @Inject(PLATFORM_ID) private platformId: Object) { }
+  constructor(
+    private httpClient: HttpClient,
+    @Inject(DOCUMENT) private document: Document,
+    private transferState: TransferState,
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private paymentProcessorService: PaymentProcessorService
+  ) { }
 
   getTotalAmount(cartId:string, businessShippingId:number){
 
@@ -79,34 +86,30 @@ export class OrderService {
       "contact":contact
     }
 
-    this.httpClient.post<any>(`${this.URL}`,toJson,{observe: 'response', responseType: 'json'}).subscribe(item => {
-      
-      if(payment.code=='khipu'){
+    this.httpClient.post<any>(`${this.URL}`,toJson,{observe: 'response', responseType: 'json'}).subscribe({
+      next: (item) => {
+        const outcome = this.paymentProcessorService.processPaymentResponse(payment, item.body);
+        if (outcome.success) {
+          this.paymentProcessorService.executeNavigation(outcome);
+        } else {
+          this.paymentError$.next(true);
+          this.postOk$.next(false);
+        }
+      },
+      error: (err) => {
+        if(err.status==422){
+          this.noStockErrorModel = err.error[0];
+          this.noStockError$.next(this.noStockErrorModel);
+        }
         
-        if(item.body.success)
-          this.document.location.href = item.body.url;
+        if(err.status==402){
+          this.paymentError$.next(true);
+        } else if (err.status !== 422) {
+          this.paymentError$.next(true);
+        }
 
-      }else{
-        this.document.location.href = '/checkout/confirm/'+item.body.order_number;
+        this.postOk$.next(false);
       }
-
-      
-
-    }, (err)=>{
-
-      if(err.status==422){
-
-        this.noStockErrorModel = err.error[0];
-
-        this.noStockError$.next(this.noStockErrorModel);
-      }
-      
-      if(err.status==402){
-        this.paymentError$.next(true);
-      }
-
-      this.postOk$.next(false);
-
     });
 
   }
