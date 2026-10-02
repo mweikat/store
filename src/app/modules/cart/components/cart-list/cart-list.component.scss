@@ -49,6 +49,14 @@
   }
 }
 
+.cart-total {
+  .btn-checkout {
+    width: 100%;
+    max-width: 320px;
+    display: inline-block;
+  }
+}
+
 /* Ajustes responsivos */
 @media (max-width: 768px) {
   .product-bundle {
