@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Inject, Injectable, makeStateKey, PLATFORM_ID, signal, TransferState, DOCUMENT } from '@angular/core';
 import { ProductNStockError } from '@models/error/productNStockError.model';
 import { OrderModel } from '@models/order.model';
@@ -34,9 +34,9 @@ export class OrderService {
   private readonly paymentError$: Subject<boolean> = new Subject();
   public readonly paymentError: Observable<boolean> = this.paymentError$.asObservable();
 
-  private readonly MY_ORDERS = makeStateKey<OrderModel[]>('myorders');
-  private readonly myOrders$: Subject<OrderModel[]> = new Subject();
-  public readonly myOrders: Observable<OrderModel[]> = this.myOrders$.asObservable();
+  private readonly MY_ORDERS = makeStateKey<any>('myorders');
+  private readonly myOrders$: Subject<any> = new Subject();
+  public readonly myOrders: Observable<any> = this.myOrders$.asObservable();
 
   private readonly orderDetails$: Subject<OrderItemModel[]> = new Subject();
   public readonly orderDetails: Observable<OrderItemModel[]> = this.orderDetails$.asObservable();
@@ -162,37 +162,40 @@ export class OrderService {
 
   }
 
-  getMyOrderList(){
+  getMyOrderList(page: number = 1, perPage: number = 10, sort: string = 'created_at', direction: string = 'desc'){
 
     if(isPlatformBrowser(this.platformId)){
 
-      this.getMyOrderListCall();
-    }
-
-    if(isPlatformBrowser(this.platformId)){
-
-       const cachedOrders = this.transferState.get(this.MY_ORDERS, {} as OrderModel[]);
+      const cachedOrders = this.transferState.get(this.MY_ORDERS, null);
               
-      if(cachedOrders.length!=0){
-        
+      if(cachedOrders && Array.isArray(cachedOrders) && cachedOrders.length > 0 && page === 1 && sort === 'created_at' && direction === 'desc'){
         this.myOrders$.next(cachedOrders);
         this.transferState.remove(this.MY_ORDERS);
       }
       else{
-        
-        this.getMyOrderListCall();
+        this.getMyOrderListCall(page, perPage, sort, direction);
       }
     }
 
   }
 
-  private getMyOrderListCall(){
+  private getMyOrderListCall(page: number = 1, perPage: number = 10, sort: string = 'created_at', direction: string = 'desc'){
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('per_page', perPage.toString())
+      .set('sort', sort)
+      .set('direction', direction);
 
-    this.httpClient.get<OrderModel[]>(`${this.URL}`).subscribe(items => {
-      
-      this.myOrders$.next(items);
-      this.transferState.set(this.MY_ORDERS, items);
-
+    this.httpClient.get<any>(`${this.URL}`, { params }).subscribe({
+      next: (items) => {
+        this.myOrders$.next(items);
+        if (page === 1) {
+          this.transferState.set(this.MY_ORDERS, items);
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching order list:', err);
+      }
     });
   }
 

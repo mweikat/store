@@ -6,17 +6,22 @@
         @if(item.cartVariant && item.cartVariant.length > 0){
           
           @for(cartVariant of item.cartVariant; track cartVariant.id){
-            <div class="cart-item mb-3 p-3">
+            <div class="cart-item position-relative mb-3 p-3">
+              <!-- Botón eliminar móvil en la esquina superior derecha -->
+              <button id="btnDelete_mobile_var_{{cartVariant.id}}" class="btn btn-outline-danger btn-sm rounded-circle btn-delete-mobile d-md-none" (click)="removeItemVariant(cartVariant)" aria-label="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+
               <div class="row align-items-center">
                 <!-- Imagen del producto -->
-                <div class="col-3 col-md-2">
+                <div class="col-12 col-md-2 text-center text-md-start mb-2 mb-md-0">
                   <a [routerLink]="'/product/'+item.product_id">
-                    <img appImgBroken [src]="item.image" alt="{{ item.image }}" class="img-fluid rounded">
+                    <img appImgBroken [src]="item.image" alt="{{ item.image }}" class="cart-item-img img-fluid rounded">
                   </a>
                 </div>
                 
                 <!-- Nombre y detalles del producto -->
-                <div class="col-6 col-md-5">
+                <div class="col-12 col-md-5 mb-2 mb-md-0">
                   <h5 class="product-name">{{ item.product_name }}</h5>
                   <span class="badge bg-light text-dark">{{ extraerValor(cartVariant.data) }}</span>
                   <p class="product-price mb-1"><b>Precio: {{ item.price + cartVariant.price_modifier | number | comaToDot}}</b></p>
@@ -52,16 +57,16 @@
                 </div>
           
                 <!-- Controles de cantidad -->
-                <div class="col-3 col-md-3 text-center quantity-controls">
-                  <div class="d-flex align-items-center justify-content-center">
+                <div class="col-12 col-md-3 quantity-controls">
+                  <div class="d-flex align-items-center justify-content-end justify-content-md-center">
                     <button class="btn btn-outline-secondary btn-sm" id="btd_{{cartVariant.id}}" (click)="decreaseQuantityVariant(cartVariant)">-</button>
                     <span class="px-2">{{ cartVariant.quantity }}</span>
                     <button class="btn btn-outline-secondary btn-sm" id="btn_{{cartVariant.id}}" (click)="increaseQuantityVariant(cartVariant)">+</button>
                   </div>
                 </div>
           
-                <!-- Botón de eliminar -->
-                <div class="col-12 col-md-2 text-md-end mt-2 mt-md-0">
+                <!-- Botón de eliminar (desktop) -->
+                <div class="col-md-2 text-md-end d-none d-md-block">
                   <button id="btnDelete_{{cartVariant.id}}" class="btn btn-danger btn-sm" (click)="removeItemVariant(cartVariant)">Eliminar</button>
                 </div>
               </div>
@@ -69,17 +74,22 @@
           }
 
         }@else{
-        <div class="cart-item mb-3 p-3">
+        <div class="cart-item position-relative mb-3 p-3">
+          <!-- Botón eliminar móvil en la esquina superior derecha -->
+          <button id="btnDelete_mobile_{{item.id}}" class="btn btn-outline-danger btn-sm rounded-circle btn-delete-mobile d-md-none" (click)="removeItem(item)" aria-label="Eliminar">
+            <i class="bi bi-trash"></i>
+          </button>
+
           <div class="row align-items-center">
             <!-- Imagen del producto -->
-            <div class="col-3 col-md-2">
+            <div class="col-12 col-md-2 text-center text-md-start mb-2 mb-md-0">
               <a [routerLink]="'/product/'+item.product_id">
-                <img appImgBroken [src]="item.image" alt="{{ item.image }}" class="img-fluid rounded">
+                <img appImgBroken [src]="item.image" alt="{{ item.image }}" class="cart-item-img img-fluid rounded">
               </a>
             </div>
             
             <!-- Nombre y detalles del producto -->
-            <div class="col-6 col-md-5">
+            <div class="col-12 col-md-5 mb-2 mb-md-0">
               <h5 class="product-name">{{ item.product_name }}</h5>
               <p class="product-price mb-1"><b>Precio: {{ item.price | number | comaToDot}}</b></p>
               
@@ -114,16 +124,16 @@
             </div>
       
             <!-- Controles de cantidad -->
-            <div class="col-3 col-md-3 text-center quantity-controls">
-              <div class="d-flex align-items-center justify-content-center">
+            <div class="col-12 col-md-3 quantity-controls">
+              <div class="d-flex align-items-center justify-content-end justify-content-md-center">
                 <button class="btn btn-outline-secondary btn-sm" id="btd_{{item.id}}" (click)="decreaseQuantity(item)">-</button>
                 <span class="px-2">{{ item.quantity }}</span>
                 <button class="btn btn-outline-secondary btn-sm" id="btn_{{item.id}}" (click)="increaseQuantity(item)">+</button>
               </div>
             </div>
       
-            <!-- Botón de eliminar -->
-            <div class="col-12 col-md-2 text-md-end mt-2 mt-md-0">
+            <!-- Botón de eliminar (desktop) -->
+            <div class="col-md-2 text-md-end d-none d-md-block">
               <button id="btnDelete_{{item.id}}" class="btn btn-danger btn-sm" (click)="removeItem(item)">Eliminar</button>
             </div>
           </div>
@@ -137,9 +147,9 @@
           </div>
           <div class="text-center">
             @if(isLooged){
-            <button class="btn btn-primary w-10 mt-3" [routerLink]="'/checkout'">Proceder al Pago</button>
+            <button class="btn btn-primary btn-checkout mt-3 py-2 px-4" [routerLink]="'/checkout'">Proceder al Pago</button>
             }@else{
-              <button class="btn btn-primary w-10 mt-3" [routerLink]="'info'">Proceder al Pago</button>
+              <button class="btn btn-primary btn-checkout mt-3 py-2 px-4" [routerLink]="'info'">Proceder al Pago</button>
             }
           </div>
         </div>

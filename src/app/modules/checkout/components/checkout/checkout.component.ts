@@ -47,6 +47,7 @@ export class CheckoutComponent implements OnInit, OnDestroy{
   whatsappNumber = '';
   shipping_price:number = 0;
   shippingAddress:ShippingAddress = {} as ShippingAddress;
+  step1Error = signal<string>('');
   
   //step2
   selectedPaymentMethodSignal = signal<PaymentModel>({} as PaymentModel);
@@ -166,13 +167,23 @@ export class CheckoutComponent implements OnInit, OnDestroy{
   }
 
   next(){
-   
     if(this.currentStep==1){
-      
-      if (this.selectedShippingMethod.id!=-1 && this.selectedAddress!='' && this.selectedAddress!=undefined && this.whatsappNumber!=''){
-        this.currentStep++;
-        this.scrollToTop();
+      if (!this.selectedShippingMethod || this.selectedShippingMethod.id === undefined || this.selectedShippingMethod.id === -1) {
+        this.step1Error.set('Por favor seleccione un método de envío.');
+        return;
       }
+      if (!this.selectedAddress || this.selectedAddress === '') {
+        this.step1Error.set('Por favor seleccione o ingrese una dirección de despacho.');
+        return;
+      }
+      if (!this.whatsappNumber || this.whatsappNumber.trim() === '') {
+        this.step1Error.set('Por favor ingrese un teléfono de contacto / WhatsApp.');
+        return;
+      }
+
+      this.step1Error.set('');
+      this.currentStep++;
+      this.scrollToTop();
     }
   }
 
