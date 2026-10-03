@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, Output, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-pagination',
@@ -14,11 +15,17 @@ export class PaginationComponent {
 
   @Output() pageChange = new EventEmitter<number>();
 
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
   goToPage(page: number): void {
     if (page < 1 || page > this.totalPages || page === this.currentPage) {
       return;
     }
     this.pageChange.emit(page);
+
+    if (isPlatformBrowser(this.platformId)) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   prevPage(): void {
