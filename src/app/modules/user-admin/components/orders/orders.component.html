@@ -91,28 +91,8 @@
         }
       </div>
 
-      <!-- Paginación -->
-      @if(totalPages > 1){
-        <nav class="d-flex justify-content-center mt-4 mb-2" aria-label="Navegación de órdenes">
-          <ul class="pagination pagination-sm flex-wrap justify-content-center">
-            <li class="page-item" [class.disabled]="currentPage === 1">
-              <button class="page-link" (click)="prevPage()" [disabled]="currentPage === 1" aria-label="Anterior">
-                <span aria-hidden="true">&laquo;</span>
-              </button>
-            </li>
-            @for(page of pagesArray; track page){
-              <li class="page-item" [class.active]="page === currentPage">
-                <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
-              </li>
-            }
-            <li class="page-item" [class.disabled]="currentPage === totalPages">
-              <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages" aria-label="Siguiente">
-                <span aria-hidden="true">&raquo;</span>
-              </button>
-            </li>
-          </ul>
-        </nav>
-      }
+      <!-- Paginación Global -->
+      <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" (pageChange)="goToPage($event)"></app-pagination>
     </div>
    
     <app-order-details [order]="orderSelected" (isShowDetails)="hideDetails()" [class.d-none]="!showDetails"></app-order-details>

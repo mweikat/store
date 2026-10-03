@@ -1,0 +1,34 @@
+@use 'src/styles-var.scss' as vars;
+
+.pagination-component {
+  .page-link {
+    cursor: pointer;
+    color: vars.$primary-color;
+    background-color: vars.$light-bg;
+    border-color: vars.$quaternary-color2;
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      background-color: vars.$warning-color-v1;
+      color: vars.$primary-color-v1;
+      border-color: vars.$warning-color;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 0.2rem vars.$warning-color-v1;
+    }
+  }
+
+  .page-item.active .page-link {
+    background-color: vars.$primary-color;
+    border-color: vars.$primary-color;
+    color: vars.$light-bg;
+  }
+
+  .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+    cursor: not-allowed;
+  }
+}
