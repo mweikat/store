@@ -1,0 +1,53 @@
+@if(totalPages > 1){
+  <nav aria-label="Navegación de páginas" class="d-flex justify-content-center my-3">
+    <ul class="pagination pagination-component flex-wrap justify-content-center"
+        [class.pagination-sm]="size === 'sm'"
+        [class.pagination-lg]="size === 'lg'">
+
+      <!-- Botón Anterior -->
+      <li class="page-item" [class.disabled]="currentPage <= 1">
+        <button class="page-link" (click)="prevPage()" [disabled]="currentPage <= 1" aria-label="Anterior">
+          <span aria-hidden="true">&laquo;</span>
+        </button>
+      </li>
+
+      <!-- Primera página si la lista truncada no la incluye -->
+      @if(pagesArray.length > 0 && pagesArray[0] > 1){
+        <li class="page-item" [class.active]="currentPage === 1">
+          <button class="page-link" (click)="goToPage(1)">1</button>
+        </li>
+        @if(pagesArray[0] > 2){
+          <li class="page-item disabled">
+            <span class="page-link">&hellip;</span>
+          </li>
+        }
+      }
+
+      <!-- Páginas numeradas -->
+      @for(page of pagesArray; track page){
+        <li class="page-item" [class.active]="page === currentPage">
+          <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+        </li>
+      }
+
+      <!-- Última página si la lista truncada no la incluye -->
+      @if(pagesArray.length > 0 && pagesArray[pagesArray.length - 1] < totalPages){
+        @if(pagesArray[pagesArray.length - 1] < totalPages - 1){
+          <li class="page-item disabled">
+            <span class="page-link">&hellip;</span>
+          </li>
+        }
+        <li class="page-item" [class.active]="currentPage === totalPages">
+          <button class="page-link" (click)="goToPage(totalPages)">{{ totalPages }}</button>
+        </li>
+      }
+
+      <!-- Botón Siguiente -->
+      <li class="page-item" [class.disabled]="currentPage >= totalPages">
+        <button class="page-link" (click)="nextPage()" [disabled]="currentPage >= totalPages" aria-label="Siguiente">
+          <span aria-hidden="true">&raquo;</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+}

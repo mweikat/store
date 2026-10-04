@@ -74,20 +74,10 @@
   </div>
 
   <!-- Paginación Backend -->
-  <nav class="mt-4" *ngIf="!isLoading && !isError && totalPages > 1">
-    <ul class="pagination justify-content-center flex-wrap">
-      <li class="page-item" [class.disabled]="currentPage === 1">
-        <button class="page-link" (click)="changePage(currentPage - 1)" aria-label="Página anterior">Anterior</button>
-      </li>
-      <li
-        class="page-item"
-        *ngFor="let page of totalPagesArray()"
-        [class.active]="currentPage === page">
-        <button class="page-link" (click)="changePage(page)">{{ page }}</button>
-      </li>
-      <li class="page-item" [class.disabled]="currentPage === totalPages">
-        <button class="page-link" (click)="changePage(currentPage + 1)" aria-label="Página siguiente">Siguiente</button>
-      </li>
-    </ul>
-  </nav>
+  <app-pagination
+    *ngIf="!isLoading && !isError && totalPages > 1"
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    (pageChange)="changePage($event)">
+  </app-pagination>
 </div>

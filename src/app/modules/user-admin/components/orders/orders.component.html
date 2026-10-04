@@ -1,10 +1,28 @@
 <div class="orders-section container">
   <h5 class="card-title text-center mb-4">Mis Compras</h5>
-  @if(orders.length > 0){
+  @if(totalOrders > 0 || orders.length > 0){
     
     <div [class.d-none]="showDetails">
+      <!-- Barra superior: Conteo y Ordenamiento -->
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2 orders-controls-bar">
+        <div class="text-muted small fw-medium">
+          @if(totalOrders > 0){
+            <span>{{ totalOrders }} {{ totalOrders === 1 ? 'orden' : 'órdenes' }} registrada(s)</span>
+          }
+        </div>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <label for="orderSort" class="form-label mb-0 small text-nowrap fw-semibold">Ordenar por:</label>
+          <select id="orderSort" class="form-select form-select-sm sort-select" [ngModel]="sortOption" (ngModelChange)="onSortChange($event)">
+            <option value="created_at_desc">Más recientes primero</option>
+            <option value="created_at_asc">Más antiguas primero</option>
+            <option value="total_amount_desc">Monto: Mayor a menor</option>
+            <option value="total_amount_asc">Monto: Menor a mayor</option>
+          </select>
+        </div>
+      </div>
+
       <div class="row g-3">
-                @for(order of orders; track order.id; let i = $index){
+        @for(order of orders; track order.id; let i = $index){
           <div class="col-12">
             <div class="card shadow-sm mb-3">
               <div class="card-header bg-light d-flex justify-content-between align-items-center">
@@ -72,6 +90,9 @@
           </div>
         }
       </div>
+
+      <!-- Paginación Global -->
+      <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" (pageChange)="goToPage($event)"></app-pagination>
     </div>
    
     <app-order-details [order]="orderSelected" (isShowDetails)="hideDetails()" [class.d-none]="!showDetails"></app-order-details>
