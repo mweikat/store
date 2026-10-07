@@ -17,6 +17,7 @@ export class ConfirmComponent implements OnInit,OnDestroy{
   orderStatus:string = "";
   isSuccess:boolean = true;
   isLoading:boolean = true;
+  httpErrorCode:number|null=null;
 
   destroyRoute?:Subscription;
   destroyOrder?:Subscription;
@@ -36,6 +37,7 @@ export class ConfirmComponent implements OnInit,OnDestroy{
     });
 
     this.destroyOrder = this.orderService.orderNumberData.subscribe(data => {
+      
       this.isLoading = false;
       const body = data?.body;
       if (body) {
@@ -49,6 +51,13 @@ export class ConfirmComponent implements OnInit,OnDestroy{
           this.isSuccess = true;
           this.cartService.clearCart();
         }
+      }else{
+        
+        if(data.status===402){
+          this.httpErrorCode = 402;
+          this.cartService.clearCart();
+        }
+        this.isSuccess = false;
       }
     });
     

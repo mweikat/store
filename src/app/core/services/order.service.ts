@@ -127,6 +127,8 @@ export class OrderService {
 
         this.orderNumberData$.next(item);
 
+      },error => {
+        this.orderNumberData$.next(error);
       });
     }
 

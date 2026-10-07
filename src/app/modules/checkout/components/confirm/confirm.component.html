@@ -20,13 +20,24 @@
         </ng-container>
 
         <ng-template #failureHeader>
-          <h1 class="text-danger title">Ocurrió un problema con tu pedido</h1>
-          <p class="text-secondary mt-3">
-            El pedido no pudo ser procesado o la transacción fue cancelada (Estado: {{ orderStatus || 'CANCELADO' }}).
-          </p>
-          <p class="text-secondary mt-3">
-            Si tuviste un problema durante el pago, por favor intenta nuevamente o selecciona otro medio de pago.
-          </p>
+          @if(httpErrorCode === 402){
+             <h1 class="text-danger title">Ocurrió un problema con tu pedido</h1>
+              <p class="text-secondary mt-3">
+                El pedido no pudo ser procesado aún porque el estado no pudo ser verificado, antes de comprar, revisa tus ordenes.
+              </p>
+            <p class="text-secondary mt-3">
+              Si tuviste un problema durante el pago, y no lo alcanzaste a realizar, por favor intenta nuevamente o selecciona otro medio de pago.
+            </p>  
+          }@else {
+            <h1 class="text-danger title">Ocurrió un problema con tu pedido</h1>
+              <p class="text-secondary mt-3">
+              El pedido no pudo ser procesado o la transacción fue cancelada (Estado: {{ orderStatus || 'CANCELADO' }}).
+            </p>
+            <p class="text-secondary mt-3">
+              Si tuviste un problema durante el pago, por favor intenta nuevamente o selecciona otro medio de pago.
+            </p>  
+          }
+          
         </ng-template>
         
         <!-- Resumen del Pedido -->
