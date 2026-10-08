@@ -1,23 +1,44 @@
-// Paleta de colores principales
-$invalid-form-color: red;
-$link-color: #efbc98; // Color para enlaces
+// Paleta de colores principales con CSS Custom Properties y valores por defecto
+:root {
+  --color-invalid-form: red;
+  --color-link: #efbc98;
 
-$primary-color: #917f6e; // Color principal para acentos y detalles
-$primary-color-v1:#6d5742;
-$secondary-color: #efbc98; // Color secundario para acentos ligeros
-$tertiary-color: #efd2be; // Color terciario para fondos suaves
-$quaternary-color: #efe1d1; // Color cuaternario para fondos neutros
-$quaternary-color2: #ffedd9;
-$light-bg: white; // Fondo principal (blanco)
-$dark-text: black; // Color de texto principal (negro)
-$warning-color: #ffbd59; // Color de advertencia y avisos importantes
-$warning-color-v1:rgba(253,201,13,.25);
-$price-color-1: #e74c3c;
-$rgba-1: rgba(253, 201, 13, 0.5);
-$rgba-2: rgba(253, 201, 13, 0.5);
+  --color-primary: #917f6e;
+  --color-primary-v1: #6d5742;
+  --color-secondary: #efbc98;
+  --color-tertiary: #efd2be;
+  --color-quaternary: #efe1d1;
+  --color-quaternary-v2: #ffedd9;
+  --color-light-bg: white;
+  --color-dark-text: black;
+  --color-warning: #ffbd59;
+  --color-warning-v1: rgba(253, 201, 13, 0.25);
+  --color-price-1: #e74c3c;
+  --color-rgba-1: rgba(253, 201, 13, 0.5);
+  --color-rgba-2: rgba(253, 201, 13, 0.5);
+
+  --font-family-main: "Montserrat", sans-serif;
+}
+
+$invalid-form-color: var(--color-invalid-form, red);
+$link-color: var(--color-link, #efbc98);
+
+$primary-color: var(--color-primary, #917f6e);
+$primary-color-v1: var(--color-primary-v1, #6d5742);
+$secondary-color: var(--color-secondary, #efbc98);
+$tertiary-color: var(--color-tertiary, #efd2be);
+$quaternary-color: var(--color-quaternary, #efe1d1);
+$quaternary-color2: var(--color-quaternary-v2, #ffedd9);
+$light-bg: var(--color-light-bg, white);
+$dark-text: var(--color-dark-text, black);
+$warning-color: var(--color-warning, #ffbd59);
+$warning-color-v1: var(--color-warning-v1, rgba(253, 201, 13, 0.25));
+$price-color-1: var(--color-price-1, #e74c3c);
+$rgba-1: var(--color-rgba-1, rgba(253, 201, 13, 0.5));
+$rgba-2: var(--color-rgba-2, rgba(253, 201, 13, 0.5));
 
 // Tipografía
-$font-family-main: "Montserrat", sans-serif; // Fuente principal
+$font-family-main: var(--font-family-main, "Montserrat", sans-serif);
 $font-weight-main: 500;
 $font-05: 0.5rem;
 $font-07: 0.7rem;
