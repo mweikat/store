@@ -17,6 +17,7 @@ export class ConfirmComponent implements OnInit,OnDestroy{
   orderStatus:string = "";
   isSuccess:boolean = true;
   isLoading:boolean = true;
+  isKiphu:boolean = false;
   httpErrorCode:number|null=null;
 
   destroyRoute?:Subscription;
@@ -40,6 +41,7 @@ export class ConfirmComponent implements OnInit,OnDestroy{
       
       this.isLoading = false;
       const body = data?.body;
+      //console.log(data);
       if (body) {
         this.message = body.message || "";
         this.orderStatus = (body.status || body.order_status || body.order?.status || "").toUpperCase();
@@ -50,6 +52,10 @@ export class ConfirmComponent implements OnInit,OnDestroy{
         } else {
           this.isSuccess = true;
           this.cartService.clearCart();
+          if(body.is_khipu){
+            
+            this.isKiphu = true;
+          }
         }
       }else{
         

@@ -10,13 +10,22 @@
         </div>
 
         <ng-container *ngIf="isSuccess; else failureHeader">
-          <h1 class="text-primary-c1 title">¡Gracias por tu compra!</h1>
-          <p class="text-secondary mt-3">
-            Tu pedido ha sido procesado con éxito. Te hemos enviado un correo de confirmación con los detalles de tu compra.
-          </p>
-          <p class="text-secondary mt-3">
-            Podrás revisar el estado de tus compras en tu perfil.
-          </p>
+          @if(isKiphu){
+            <h1 class="text-primary-c1 title">¡Gracias por tu compra!</h1>
+            <p class="text-secondary mt-3">
+              {{message}}
+            </p>
+            
+          }@else{
+              <h1 class="text-primary-c1 title">¡Gracias por tu compra!</h1>
+              <p class="text-secondary mt-3">
+                {{message}}
+              </p>
+              <p class="text-secondary mt-3">
+                Podrás revisar el estado de tus compras en tu perfil.
+              </p>
+          }
+
         </ng-container>
 
         <ng-template #failureHeader>
@@ -31,7 +40,7 @@
           }@else {
             <h1 class="text-danger title">Ocurrió un problema con tu pedido</h1>
               <p class="text-secondary mt-3">
-              El pedido no pudo ser procesado o la transacción fue cancelada (Estado: {{ orderStatus || 'CANCELADO' }}).
+              {{message}} (Estado: {{ orderStatus || 'CANCELADO' }}).
             </p>
             <p class="text-secondary mt-3">
               Si tuviste un problema durante el pago, por favor intenta nuevamente o selecciona otro medio de pago.
@@ -42,16 +51,12 @@
         
         <!-- Resumen del Pedido -->
         <div class="order-summary my-4">
-          <h5 class="text-dark mb-3">El número de tu orden es: <b>{{orderNum}}</b></h5>
+          
           <ul class="list-group">
             <li class="list-group-item d-flex justify-content-center">
-              <span *ngIf="message; else loadingMessage">
-                {{ message }}
-              </span>
 
-              <ng-template #loadingMessage>
-                <span class="message-placeholder">&nbsp;</span>
-              </ng-template>
+            El número de tu orden es: <b>{{orderNum}}</b>
+              
             </li>
           </ul>
         </div>
