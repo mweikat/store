@@ -1,5 +1,4 @@
 @use 'src/styles-var.scss' as vars ;
-@use 'sass:color';
 
 body {
     font-family: vars.$font-family-main;
@@ -22,7 +21,7 @@ a:hover{
     border-color: vars.$primary-color !important;
     color: vars.$light-bg !important;
     &:hover {
-      background-color: color.adjust(vars.$primary-color, $lightness:5%) !important;
+      background-color: color-mix(in srgb, vars.$primary-color 90%, white) !important;
     }
 }
 .btn-primary-c1:hover {
@@ -34,7 +33,7 @@ a:hover{
     border-color: vars.$warning-color;
     color: vars.$light-bg;
     &:hover {
-      background-color: color.adjust(vars.$warning-color, $lightness:5%);
+      background-color: color-mix(in srgb, vars.$warning-color 90%, white);
     }
     &:focus{
         box-shadow: rgba(253, 201, 13, 0.25) !important;
@@ -227,7 +226,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
         color: vars.$autn-input-forgot-link;
         font-size: vars.$font-07;
         &:hover {
-            color: color.adjust(vars.$autn-input-forgot-link, $lightness:10%);
+            color: color-mix(in srgb, vars.$autn-input-forgot-link 80%, white);
             text-decoration: underline;
         }
     }
@@ -237,7 +236,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
         color: vars.$link-color;
         
         &:hover {
-            color: color.adjust(vars.$link-color, $lightness:10%);
+            color: color-mix(in srgb, vars.$link-color 80%, white);
             text-decoration: underline;
         }
         }
@@ -273,7 +272,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
         color: vars.$auth-terms-conditions-link;
         font-size: vars.$font-07;
         &:hover {
-            color: color.adjust(vars.$auth-terms-conditions-link, $lightness:10%);
+            color: color-mix(in srgb, vars.$auth-terms-conditions-link 80%, white);
             text-decoration: underline;
         } 
     }
@@ -319,7 +318,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
             border-color: vars.$cart-list-btn-danger-border;
     
             &:hover {
-                background-color: color.adjust(vars.$cart-list-btn-danger-hover-background, $lightness:10%);
+                background-color: color-mix(in srgb, vars.$cart-list-btn-danger-hover-background 80%, white);
             }
         }
     }
@@ -337,7 +336,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
         border-color: vars.$cart-list-total-btn-border;
   
         &:hover {
-          background-color: color.adjust(vars.$cart-list-total-btn-hover, $lightness:10%);
+          background-color: color-mix(in srgb, vars.$cart-list-total-btn-hover 80%, white);
         }
       }
     }
@@ -773,7 +772,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
             color: vars.$header-menu-cart-btn-color !important;
 
             &:hover {
-                background-color: color.adjust(vars.$header-menu-cart-btn-back-hover,  $lightness:5%);
+                background-color: color-mix(in srgb, vars.$header-menu-cart-btn-back-hover 90%, white);
                 color: vars.$header-menu-cart-btn-color !important;
             }
         }
@@ -828,7 +827,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
         color: vars.$header-user-menu-btn-text !important;
 
         &:hover {
-          background-color: color.adjust(vars.$header-user-menu-btn-background, $lightness:5%);
+          background-color: color-mix(in srgb, vars.$header-user-menu-btn-background 90%, white);
           color: vars.$header-user-menu-btn-text;
         }   
     }

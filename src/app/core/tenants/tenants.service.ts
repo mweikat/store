@@ -1,12 +1,32 @@
-// src/app/core/tenants/tenant.service.ts
+// src/app/core/tenants/tenants.service.ts
 import { Injectable, Inject, PLATFORM_ID, DOCUMENT, TransferState, makeStateKey } from '@angular/core';
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
-import { BusinessModel } from '@models/business.model';
+import { BusinessModel, BusinessThemeColorsModel, BusinessThemeTypographyModel } from '@models/business.model';
 import { BusinessService } from '@services/business.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 const TENANT_KEY = makeStateKey<BusinessModel>('tenant_business');
+
+const DEFAULT_COLORS: Required<BusinessThemeColorsModel> = {
+  primary: '#917f6e',
+  primary_v1: '#6d5742',
+  secondary: '#efbc98',
+  tertiary: '#efd2be',
+  quaternary: '#efe1d1',
+  quaternary_v2: '#ffedd9',
+  light_bg: '#ffffff',
+  dark_text: '#000000',
+  warning: '#ffbd59',
+  warning_v1: 'rgba(253, 201, 13, 0.25)',
+  price_color_1: '#e74c3c',
+  link_color: '#efbc98',
+  invalid_form_color: 'red'
+};
+
+const DEFAULT_TYPOGRAPHY: Required<BusinessThemeTypographyModel> = {
+  font_family_main: '"Montserrat", sans-serif'
+};
 
 @Injectable({ providedIn: 'root' })
 export class TenantService {
@@ -14,7 +34,6 @@ export class TenantService {
   private readonly ENVIRONMENT = environment.production;
   private currentBusiness: BusinessModel | undefined = undefined;
   private static readonly domainCache = new Map<string, BusinessModel>();
-  private styleElement: HTMLLinkElement | null = null;
 
   // BehaviorSubject para compartir globalmente
   private businessSubject = new BehaviorSubject<BusinessModel | null>(null);
@@ -24,7 +43,7 @@ export class TenantService {
     private businessApi: BusinessService,
     private transferState: TransferState,
     @Inject(PLATFORM_ID) private platformId: any,
-     @Inject(DOCUMENT) private document: Document,
+    @Inject(DOCUMENT) private document: Document,
   ) {}
 
   async initialize(): Promise<void> {
@@ -36,7 +55,7 @@ export class TenantService {
     if (cached) {
       this.currentBusiness = cached;
       this.businessSubject.next(cached);
-      await this.loadBusinessStyles(domain);
+      await this.loadBusinessStyles();
       return;
     }
 
@@ -47,7 +66,7 @@ export class TenantService {
         this.currentBusiness = transferBusiness;
         TenantService.domainCache.set(domain, transferBusiness);
         this.businessSubject.next(transferBusiness);
-        await this.loadBusinessStyles(domain);
+        await this.loadBusinessStyles();
         return;
       }
 
@@ -57,7 +76,7 @@ export class TenantService {
         this.currentBusiness = storedBusiness;
         TenantService.domainCache.set(domain, storedBusiness);
         this.businessSubject.next(storedBusiness);
-        await this.loadBusinessStyles(domain);
+        await this.loadBusinessStyles();
         return;
       }
     }
@@ -77,7 +96,7 @@ export class TenantService {
       // Cachear el resultado
       TenantService.domainCache.set(domain, this.currentBusiness);
       this.businessSubject.next(this.currentBusiness);
-      await this.loadBusinessStyles(domain);
+      await this.loadBusinessStyles();
       
     } catch (error) {
       console.error('❌ Error inicializando tenant:', error);
@@ -99,56 +118,42 @@ export class TenantService {
     return this.currentBusiness;
   }
 
-  /*private async loadBusinessStyles_(): Promise<void> {
-
+  private async loadBusinessStyles(): Promise<void> {
     if (!this.currentBusiness) return;
+
+    const theme = this.currentBusiness.settings?.theme;
+    const colors = { ...DEFAULT_COLORS, ...theme?.colors };
+    const typography = { ...DEFAULT_TYPOGRAPHY, ...theme?.typography };
+
+    const cssContent = `
+      :root {
+        --color-primary: ${colors.primary};
+        --color-primary-v1: ${colors.primary_v1};
+        --color-secondary: ${colors.secondary};
+        --color-tertiary: ${colors.tertiary};
+        --color-quaternary: ${colors.quaternary};
+        --color-quaternary-v2: ${colors.quaternary_v2};
+        --color-light-bg: ${colors.light_bg};
+        --color-dark-text: ${colors.dark_text};
+        --color-warning: ${colors.warning};
+        --color-warning-v1: ${colors.warning_v1};
+        --color-price-1: ${colors.price_color_1};
+        --color-link: ${colors.link_color};
+        --color-invalid-form: ${colors.invalid_form_color};
+        --font-family-main: ${typography.font_family_main};
+      }
+    `.replace(/\s+/g, ' ').trim();
+
+    let styleElement = this.document.getElementById('site-tenant-tokens') as HTMLStyleElement | null;
+    if (!styleElement) {
+      styleElement = this.document.createElement('style');
+      styleElement.id = 'site-tenant-tokens';
+      this.document.head.appendChild(styleElement);
+    }
+    styleElement.textContent = cssContent;
 
     if (isPlatformBrowser(this.platformId)) {
-      // Remover estilos anteriores si existen
-      if (this.styleElement) {
-        document.head.removeChild(this.styleElement);
-        this.styleElement = null;
-      }
-
-      // Cargar nuevos estilos del business
-      this.styleElement = document.createElement('link');
-      this.styleElement.rel = 'stylesheet';
-      this.styleElement.href = `/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`;
-      
-      // Esperar a que los estilos se carguen
-      await new Promise((resolve, reject) => {
-        this.styleElement!.onload = resolve;
-        this.styleElement!.onerror = reject;
-        document.head.appendChild(this.styleElement!);
-      });
-    }
-  }*/
-
-  private async loadBusinessStyles(domain:string){
-
-    if (!this.currentBusiness) return;
-
-    if (isPlatformServer(this.platformId)) {
-      // Remover estilos anteriores si existen
-      if (this.styleElement) {
-        this.document.head.removeChild(this.styleElement);
-        this.styleElement = null;
-      }
-
-      // Cargar nuevos estilos del business
-      this.styleElement = this.document.createElement('link');
-      this.styleElement.rel = 'stylesheet';
-      //this.styleElement.href = `/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`;
-      if(this.ENVIRONMENT){
-        //console.log('Entra production: ', `https://${domain}.cl/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`);
-        this.styleElement.href = `https://${domain}.cl/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`;
-      }else
-        this.styleElement.href = `http://localhost:4000/assets/styles/${this.currentBusiness.url}/${this.currentBusiness.url}.css`;
-
-      this.document.head.appendChild(this.styleElement);
-      
-    }else{
-      await this.businessApi.setBusiness(this.currentBusiness);
+      this.businessApi.setBusiness(this.currentBusiness);
     }
   }
 
