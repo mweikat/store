@@ -50,9 +50,14 @@ export interface BusinessThemeModel {
     ui?: BusinessThemeUIModel;
 }
 
+export interface BusinessThemeConfigWrapperModel {
+    theme?: BusinessThemeModel;
+}
+
 export interface BusinessSettingsModel {
     template_key?: string;
     template_version?: string;
+    theme_config?: BusinessThemeConfigWrapperModel;
     theme?: BusinessThemeModel;
 }
 

@@ -22,7 +22,7 @@ const DEFAULT_COLORS: Required<BusinessThemeColorsModel> = {
   dark_text: '#000000',
   text_dark: '#000000',
   warning: '#ffbd59',
-  warning_v1: '#fdc90d',
+  warning_v1: 'rgba(253, 201, 13, 0.25)',
   price_1: '#e74c3c',
   price_2: '#dc3545',
   price_color_1: '#e74c3c',
@@ -141,7 +141,7 @@ export class TenantService {
   private async loadBusinessStyles(): Promise<void> {
     if (!this.currentBusiness) return;
 
-    const theme = this.currentBusiness.settings?.theme;
+    const theme = this.currentBusiness.settings?.theme_config?.theme || this.currentBusiness.settings?.theme;
     const colors = { ...DEFAULT_COLORS, ...theme?.colors };
     const typography = { ...DEFAULT_TYPOGRAPHY, ...theme?.typography };
     const ui = { ...DEFAULT_UI, ...theme?.ui };
