@@ -1,8 +1,4 @@
 import { BusinessInfoModel } from "./businessInfo.model";
-import { BusinessPaymentsModel } from "./businessPayments.model";
-import { BusinessRrssModel } from "./businessRrss.model";
-import { BusinessShippingModel } from "./businessShipping.model";
-import { SnackMessageModel } from "./snack_message.model";
 
 export interface BusinessThemeColorsModel {
     primary?: string;
