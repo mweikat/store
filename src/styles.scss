@@ -217,9 +217,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 
 /*****************auth******************/
 .auth{
-    .auth-title{
-        color: vars.$auth-title;
-    }
+
     .input-group-text {
         background-color: vars.$autn-input-group-text-b;
         color: vars.$autn-input-group-text-c;
