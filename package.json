@@ -7,11 +7,10 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "build:styles": "node build-styles.js",
-    "dev:with-styles": "npm run build:styles && ng serve",
-    "build:prod": "npm run build:styles && ng build --configuration=production",
+    "dev:with-styles": "ng serve",
+    "build:prod": "ng build --configuration=production",
     "serve:ssr:store": "node dist/store/server/server.mjs",
-    "build:dev": "npm run build:styles && ng build"
+    "build:dev": "ng build"
   },
   "private": true,
   "dependencies": {
