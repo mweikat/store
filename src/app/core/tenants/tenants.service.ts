@@ -42,13 +42,19 @@ export class TenantService implements OnDestroy {
     this.stopThemePreviewListener();
   }
 
+  private hasValidThemeConfig(business: BusinessModel | null | undefined): boolean {
+    if (!business || !business.settings) return false;
+    const theme = business.settings.theme_config?.theme || business.settings.theme;
+    return !!(theme && theme.colors && Object.keys(theme.colors).length > 0);
+  }
+
   async initialize(): Promise<void> {
 
     const domain = await this.businessApi.getNameHost();
 
     // 1. Verificar cache en memoria primero
     const cached = TenantService.domainCache.get(domain);
-    if (cached && cached.settings) {
+    if (cached && this.hasValidThemeConfig(cached)) {
       this.currentBusiness = cached;
       this.businessSubject.next(cached);
       await this.loadBusinessStyles();
@@ -59,7 +65,7 @@ export class TenantService implements OnDestroy {
     // 2. Verificar TransferState (cuando el cliente hidrata desde SSR)
     if (isPlatformBrowser(this.platformId)) {
       const transferBusiness = this.transferState.get(TENANT_KEY, null);
-      if (transferBusiness && transferBusiness.id && transferBusiness.settings) {
+      if (transferBusiness && transferBusiness.id && this.hasValidThemeConfig(transferBusiness)) {
         this.currentBusiness = transferBusiness;
         TenantService.domainCache.set(domain, transferBusiness);
         this.businessSubject.next(transferBusiness);
@@ -68,9 +74,9 @@ export class TenantService implements OnDestroy {
         return;
       }
 
-      // 3. Verificar localStorage si existe y tiene settings
+      // 3. Verificar localStorage si existe y tiene un tema válido
       const storedBusiness = this.businessApi.getBusinessStorage();
-      if (storedBusiness && storedBusiness.id && storedBusiness.settings) {
+      if (storedBusiness && storedBusiness.id && this.hasValidThemeConfig(storedBusiness)) {
         this.currentBusiness = storedBusiness;
         TenantService.domainCache.set(domain, storedBusiness);
         this.businessSubject.next(storedBusiness);
@@ -81,7 +87,7 @@ export class TenantService implements OnDestroy {
     }
 
     try {
-      // Llamar al API para obtener datos del business si no estaba en cache/TransferState
+      // Llamar al API para obtener datos del business si no estaba en cache/TransferState o si la caché carecía de tema
       this.currentBusiness = await this.businessApi.getBusinessHost(domain).toPromise();
       
       if (!this.currentBusiness) {

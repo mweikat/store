@@ -143,7 +143,7 @@ describe('TenantService', () => {
     });
   });
 
-  describe('C. Configuración ausente', () => {
+  describe('C. Configuración ausente o incompleta en caché', () => {
     it('should apply default theme values when settings is missing/empty without throwing errors', async () => {
       const mockBusinessNoSettings: BusinessModel = {
         id: 'bus-300',
@@ -165,6 +165,30 @@ describe('TenantService', () => {
       expect(cssText).toContain('--color-quaternary: #efe1d1');
       expect(cssText).toContain('--font-family-main: "Montserrat", sans-serif');
       expect(cssText).toContain('--card-radius: 8px');
+    });
+
+    it('should bypass incomplete storedBusiness in localStorage that lacks a theme and fetch full theme from getBusinessHost', async () => {
+      const incompleteStoredBusiness: BusinessModel = {
+        id: 'bus-301',
+        name: 'Incomplete LocalStorage Store',
+        url: 'incomplete.cl',
+        desc: 'Has settings but no theme',
+        info: {} as any,
+        settings: {
+          template_key: 'default',
+          template_version: '1.0.0'
+        }
+      };
+
+      mockBusinessService.getBusinessStorage.and.returnValue(incompleteStoredBusiness);
+      mockBusinessService.getBusinessHost.and.returnValue(of(mockBusinessCanonical));
+
+      await service.initialize();
+
+      expect(mockBusinessService.getBusinessHost).toHaveBeenCalled();
+      const styleEl = document.getElementById('site-tenant-tokens');
+      const cssText = styleEl?.textContent || '';
+      expect(cssText).toContain('--color-primary: #112233');
     });
   });
 
