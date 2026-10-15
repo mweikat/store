@@ -1,6 +1,7 @@
 const port = 8080;
 export const environment = {
   production: false,
+  admin_url: 'http://localhost:4200',
   api_store:'http://localhost:'+port+'/api/v1/catalog',
   apiAuth:'http://localhost:'+port+'/api/v1/auth',
   api_business:'http://localhost:'+port+'/api/v1/business',

@@ -1,7 +1,7 @@
 // src/app/core/tenants/tenants.service.ts
-import { Injectable, Inject, PLATFORM_ID, DOCUMENT, TransferState, makeStateKey } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, DOCUMENT, TransferState, makeStateKey, OnDestroy } from '@angular/core';
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
-import { BusinessModel, BusinessThemeTypographyModel, BusinessThemeUIModel } from '@models/business.model';
+import { BusinessModel, BusinessThemeTypographyModel, BusinessThemeUIModel, BusinessThemeColorsModel } from '@models/business.model';
 import { BusinessService } from '@services/business.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -18,7 +18,7 @@ const DEFAULT_UI: Required<BusinessThemeUIModel> = {
 };
 
 @Injectable({ providedIn: 'root' })
-export class TenantService {
+export class TenantService implements OnDestroy {
 
   private readonly ENVIRONMENT = environment.production;
   private currentBusiness: BusinessModel | undefined = undefined;
@@ -28,12 +28,19 @@ export class TenantService {
   private businessSubject = new BehaviorSubject<BusinessModel | null>(null);
   public business$: Observable<BusinessModel | null> = this.businessSubject.asObservable();
 
+  // Referencia al listener de postMessage para evitar duplicados y permitir limpieza
+  private messageListener: ((event: MessageEvent) => void) | null = null;
+
   constructor(
     private businessApi: BusinessService,
     private transferState: TransferState,
     @Inject(PLATFORM_ID) private platformId: any,
     @Inject(DOCUMENT) private document: Document,
   ) {}
+
+  ngOnDestroy(): void {
+    this.stopThemePreviewListener();
+  }
 
   async initialize(): Promise<void> {
 
@@ -45,6 +52,7 @@ export class TenantService {
       this.currentBusiness = cached;
       this.businessSubject.next(cached);
       await this.loadBusinessStyles();
+      this.setupThemePreviewListener();
       return;
     }
 
@@ -56,6 +64,7 @@ export class TenantService {
         TenantService.domainCache.set(domain, transferBusiness);
         this.businessSubject.next(transferBusiness);
         await this.loadBusinessStyles();
+        this.setupThemePreviewListener();
         return;
       }
 
@@ -66,6 +75,7 @@ export class TenantService {
         TenantService.domainCache.set(domain, storedBusiness);
         this.businessSubject.next(storedBusiness);
         await this.loadBusinessStyles();
+        this.setupThemePreviewListener();
         return;
       }
     }
@@ -87,6 +97,10 @@ export class TenantService {
       this.businessSubject.next(this.currentBusiness);
       await this.loadBusinessStyles();
       
+      if (isPlatformBrowser(this.platformId)) {
+        this.setupThemePreviewListener();
+      }
+
     } catch (error) {
       console.error('❌ Error inicializando tenant:', error);
       throw error;
@@ -107,14 +121,74 @@ export class TenantService {
     return this.currentBusiness;
   }
 
-  private async loadBusinessStyles(): Promise<void> {
-    if (!this.currentBusiness) return;
+  // Configura el listener de postMessage únicamente en entorno de navegador
+  public setupThemePreviewListener(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
 
-    const theme = this.currentBusiness.settings?.theme_config?.theme || this.currentBusiness.settings?.theme;
-    const colors = theme?.colors || {};
-    const typography = { ...DEFAULT_TYPOGRAPHY, ...theme?.typography };
-    const ui = { ...DEFAULT_UI, ...theme?.ui };
+    this.stopThemePreviewListener();
 
+    this.messageListener = (event: MessageEvent) => {
+      this.handleThemePreviewMessage(event);
+    };
+
+    window.addEventListener('message', this.messageListener);
+  }
+
+  // Remueve el listener de postMessage si existe
+  public stopThemePreviewListener(): void {
+    if (isPlatformBrowser(this.platformId) && this.messageListener) {
+      window.removeEventListener('message', this.messageListener);
+      this.messageListener = null;
+    }
+  }
+
+  private handleThemePreviewMessage(event: MessageEvent): void {
+    // 1. Validar origen strictly
+    if (!this.isValidOrigin(event.origin)) {
+      return;
+    }
+
+    // 2. Validar estructura básica del mensaje
+    if (!event.data || typeof event.data !== 'object' || event.data.type !== 'THEME_UPDATE') {
+      return;
+    }
+
+    const payload = event.data.payload;
+    if (!payload || typeof payload !== 'object') {
+      return;
+    }
+
+    // 3. Aplicar tema de previsualización temporal sin alterar el tenant ni la caché
+    this.applyPreviewTheme(payload);
+  }
+
+  private isValidOrigin(origin: string): boolean {
+    const rawAdminUrl = (environment as any).admin_url;
+    if (!rawAdminUrl || typeof rawAdminUrl !== 'string') {
+      return false;
+    }
+
+    try {
+      const expectedUrl = new URL(rawAdminUrl);
+      const expectedOrigin = expectedUrl.origin; // e.g. "http://localhost:4200"
+
+      return origin === expectedOrigin;
+    } catch {
+      return false;
+    }
+  }
+
+  public applyPreviewTheme(previewPayload: any): void {
+    const theme = previewPayload.theme_config?.theme || previewPayload.theme || previewPayload;
+    const rawColors = theme?.colors || {};
+    const rawTypography = theme?.typography || {};
+    const rawUi = theme?.ui || {};
+
+    const colors = this.sanitizeColors(rawColors);
+    const typography = this.sanitizeTypography(rawTypography);
+    const ui = this.sanitizeUi(rawUi);
+
+    // Mapeo con los fallbacks existentes del servicio
     const primaryColor = colors.primary || '#917f6e';
     const primaryV1Color = colors.primary_v1 || colors.primary_dark || '#6d5742';
     const secondaryColor = colors.secondary || '#efbc98';
@@ -164,6 +238,93 @@ export class TenantService {
       }
     `.replace(/\s+/g, ' ').trim();
 
+    this.updateStyleElement(cssContent);
+  }
+
+  private sanitizeColors(rawColors: any): BusinessThemeColorsModel {
+    const sanitized: BusinessThemeColorsModel = {};
+    if (!rawColors || typeof rawColors !== 'object') return sanitized;
+
+    for (const [key, value] of Object.entries(rawColors)) {
+      if (typeof value === 'string' && this.isValidColorValue(value.trim())) {
+        (sanitized as any)[key] = value.trim();
+      }
+    }
+    return sanitized;
+  }
+
+  private isValidColorValue(val: string): boolean {
+    if (!val) return false;
+    // Prevenir inyección de CSS (no permitir ;, {, }, <, >, url, javascript)
+    if (/[;{}<>]|url\s*\(|javascript\s*:/i.test(val)) {
+      return false;
+    }
+
+    // Hex (#RGB, #RRGGBB, #RGBA, #RRGGBBAA)
+    const hexRegex = /^#(?:[0-9a-fA-F]{3,4}){1,2}$/;
+    if (hexRegex.test(val)) return true;
+
+    // RGB / RGBA
+    const rgbRegex = /^rgba?\(\s*(\d{1,3}%?\s*,\s*){2}\d{1,3}%?\s*(,\s*(0|1|0?\.\d+|\d{1,3}%)\s*)?\)$/i;
+    if (rgbRegex.test(val)) return true;
+
+    // HSL / HSLA
+    const hslRegex = /^hsla?\(\s*\d{1,3}(deg)?\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\s*(,\s*(0|1|0?\.\d+|\d{1,3}%)\s*)?\)$/i;
+    if (hslRegex.test(val)) return true;
+
+    return false;
+  }
+
+  private sanitizeTypography(rawTypo: any): { font_family_main: string } {
+    if (!rawTypo || typeof rawTypo !== 'object') {
+      return { ...DEFAULT_TYPOGRAPHY };
+    }
+
+    const val = rawTypo.font_family_main || rawTypo.fontFamily;
+    if (typeof val === 'string' && this.isValidFontFamily(val.trim())) {
+      return { font_family_main: val.trim() };
+    }
+
+    return { ...DEFAULT_TYPOGRAPHY };
+  }
+
+  private isValidFontFamily(val: string): boolean {
+    if (!val) return false;
+    if (/[;{}<>]|url\s*\(|javascript\s*:/i.test(val)) return false;
+    // Permite letras, números, espacios, guiones, comas, comillas simples y dobles
+    return /^[a-zA-Z0-9\s,\-"']+$/.test(val);
+  }
+
+  private sanitizeUi(rawUi: any): Required<BusinessThemeUIModel> {
+    const result = { ...DEFAULT_UI };
+    if (!rawUi || typeof rawUi !== 'object') return result;
+
+    const radius = rawUi.card_radius || rawUi.borderRadius;
+    if (typeof radius === 'string' && this.isValidDimension(radius.trim())) {
+      result.card_radius = radius.trim();
+    }
+
+    const shadow = rawUi.card_shadow || rawUi.boxShadow;
+    if (typeof shadow === 'string' && this.isValidShadow(shadow.trim())) {
+      result.card_shadow = shadow.trim();
+    }
+
+    return result;
+  }
+
+  private isValidDimension(val: string): boolean {
+    if (!val) return false;
+    if (/[;{}<>]|url\s*\(|javascript\s*:/i.test(val)) return false;
+    return /^\d+(px|rem|em|%)?$/.test(val);
+  }
+
+  private isValidShadow(val: string): boolean {
+    if (!val) return false;
+    if (/[;{}<>]|url\s*\(|javascript\s*:/i.test(val)) return false;
+    return /^(none|0|(\d+(px|rem|em)\s*){2,4}(rgba?\([^)]+\)|#[0-9a-fA-F]{3,8}|[a-zA-Z]+)?)$/i.test(val);
+  }
+
+  private updateStyleElement(cssContent: string): void {
     let styleElement = this.document.getElementById('site-tenant-tokens') as HTMLStyleElement | null;
     if (!styleElement) {
       styleElement = this.document.createElement('style');
@@ -171,6 +332,13 @@ export class TenantService {
       this.document.head.appendChild(styleElement);
     }
     styleElement.textContent = cssContent;
+  }
+
+  private async loadBusinessStyles(): Promise<void> {
+    if (!this.currentBusiness) return;
+
+    const theme = this.currentBusiness.settings?.theme_config?.theme || this.currentBusiness.settings?.theme;
+    this.applyPreviewTheme(theme || {});
 
     if (isPlatformBrowser(this.platformId)) {
       this.businessApi.setBusiness(this.currentBusiness);

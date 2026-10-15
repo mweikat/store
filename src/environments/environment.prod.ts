@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
+  admin_url: 'https://adminstore.lil.cl',
   api_store:'https://backstore.lil.cl/api/v1/catalog',
   apiAuth:'https://backstore.lil.cl/api/v1/auth',
   api_business:'https://backstore.lil.cl/api/v1/business',

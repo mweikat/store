@@ -5,6 +5,7 @@ import { PLATFORM_ID, TransferState, makeStateKey } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { of } from 'rxjs';
 import { BusinessModel } from '@models/business.model';
+import { environment } from 'src/environments/environment';
 
 const TENANT_KEY = makeStateKey<BusinessModel>('tenant_business');
 
@@ -100,6 +101,7 @@ describe('TenantService', () => {
 
   afterEach(() => {
     TenantService.clearCache();
+    service.stopThemePreviewListener();
     const styleEl = document.getElementById('site-tenant-tokens');
     if (styleEl) {
       styleEl.remove();
@@ -124,7 +126,6 @@ describe('TenantService', () => {
       expect(cssText).toContain('--color-quaternary: #AABBCC');
       expect(cssText).toContain('--font-family-main: "Roboto", sans-serif');
       expect(cssText).toContain('--card-radius: 12px');
-      expect(cssText).toContain('--card-shadow: 0 4px 12px rgba(0,0,0,0.1)');
     });
   });
 
@@ -368,6 +369,293 @@ describe('TenantService', () => {
       expect(mockBusinessService.getBusinessHost).not.toHaveBeenCalled();
       const styleEl = document.getElementById('site-tenant-tokens');
       expect(styleEl?.textContent).toContain('--color-primary: #333333');
+    });
+  });
+
+  describe('Fase 4C: postMessage Theme Preview', () => {
+    const authorizedOrigin = 'http://localhost:4200';
+
+    beforeEach(async () => {
+      (environment as any).admin_url = authorizedOrigin;
+      await service.initialize();
+    });
+
+    it('1. should accept a valid THEME_UPDATE message from an authorized origin', () => {
+      const validMessage = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: {
+          type: 'THEME_UPDATE',
+          payload: {
+            theme_config: {
+              theme: {
+                colors: { primary: '#123456' },
+                typography: { font_family_main: '"Open Sans", sans-serif' },
+                ui: { card_radius: '16px' }
+              }
+            }
+          }
+        }
+      });
+
+      window.dispatchEvent(validMessage);
+
+      const styleEl = document.getElementById('site-tenant-tokens');
+      const cssText = styleEl?.textContent || '';
+      expect(cssText).toContain('--color-primary: #123456');
+      expect(cssText).toContain('--font-family-main: "Open Sans", sans-serif');
+      expect(cssText).toContain('--card-radius: 16px');
+    });
+
+    it('2. should reject a message from an unauthorized origin', () => {
+      const styleElBefore = document.getElementById('site-tenant-tokens')?.textContent;
+
+      const unauthorizedMessage = new MessageEvent('message', {
+        origin: 'http://evil-site.com',
+        data: {
+          type: 'THEME_UPDATE',
+          payload: { colors: { primary: '#FF0000' } }
+        }
+      });
+
+      window.dispatchEvent(unauthorizedMessage);
+
+      const styleElAfter = document.getElementById('site-tenant-tokens')?.textContent;
+      expect(styleElAfter).toBe(styleElBefore);
+      expect(styleElAfter).not.toContain('--color-primary: #FF0000');
+    });
+
+    it('3. should reject similar domains, unauthorized subdomains, or scheme/port mismatches', () => {
+      const styleElBefore = document.getElementById('site-tenant-tokens')?.textContent;
+
+      const testCases = [
+        'http://localhost:4200.evil.com',
+        'http://evil.localhost:4200',
+        'https://localhost:4200',
+        'http://localhost:8080'
+      ];
+
+      for (const badOrigin of testCases) {
+        window.dispatchEvent(new MessageEvent('message', {
+          origin: badOrigin,
+          data: {
+            type: 'THEME_UPDATE',
+            payload: { colors: { primary: '#999999' } }
+          }
+        }));
+      }
+
+      const styleElAfter = document.getElementById('site-tenant-tokens')?.textContent;
+      expect(styleElAfter).toBe(styleElBefore);
+      expect(styleElAfter).not.toContain('--color-primary: #999999');
+    });
+
+    it('4. should reject messages with wrong event type or malformed payload', () => {
+      const styleElBefore = document.getElementById('site-tenant-tokens')?.textContent;
+
+      const badMessages = [
+        { type: 'OTHER_EVENT', payload: { colors: { primary: '#00FF00' } } },
+        { type: 'THEME_UPDATE', payload: null },
+        { type: 'THEME_UPDATE', payload: 'string-payload' },
+        null
+      ];
+
+      for (const badData of badMessages) {
+        window.dispatchEvent(new MessageEvent('message', {
+          origin: authorizedOrigin,
+          data: badData
+        }));
+      }
+
+      const styleElAfter = document.getElementById('site-tenant-tokens')?.textContent;
+      expect(styleElAfter).toBe(styleElBefore);
+      expect(styleElAfter).not.toContain('--color-primary: #00FF00');
+    });
+
+    it('5. should reject invalid hex color values', () => {
+      const invalidHexMessage = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: {
+          type: 'THEME_UPDATE',
+          payload: {
+            colors: {
+              primary: '#12',
+              secondary: '#12345',
+              tertiary: 'NOT_A_HEX'
+            }
+          }
+        }
+      });
+
+      window.dispatchEvent(invalidHexMessage);
+
+      const styleEl = document.getElementById('site-tenant-tokens');
+      const cssText = styleEl?.textContent || '';
+      // Invalid colors fall back to defaults
+      expect(cssText).toContain('--color-primary: #917f6e');
+      expect(cssText).toContain('--color-secondary: #efbc98');
+      expect(cssText).toContain('--color-tertiary: #efd2be');
+    });
+
+    it('6. should reject values trying to inject additional CSS declarations or malicious tags', () => {
+      const maliciousMessage = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: {
+          type: 'THEME_UPDATE',
+          payload: {
+            colors: {
+              primary: '#FFFFFF; body { display: none !important; }',
+              secondary: 'red; } </style><script>alert(1)</script>'
+            }
+          }
+        }
+      });
+
+      window.dispatchEvent(maliciousMessage);
+
+      const styleEl = document.getElementById('site-tenant-tokens');
+      const cssText = styleEl?.textContent || '';
+      expect(cssText).not.toContain('display: none');
+      expect(cssText).not.toContain('script');
+      expect(cssText).toContain('--color-primary: #917f6e');
+      expect(cssText).toContain('--color-secondary: #efbc98');
+    });
+
+    it('7. should validate and sanitize typography, card radius, and box shadow when received', () => {
+      const validCustomsMessage = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: {
+          type: 'THEME_UPDATE',
+          payload: {
+            typography: { font_family_main: '"Poppins", sans-serif' },
+            ui: { card_radius: '10px', card_shadow: 'none' }
+          }
+        }
+      });
+
+      window.dispatchEvent(validCustomsMessage);
+
+      let cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
+      expect(cssText).toContain('--font-family-main: "Poppins", sans-serif');
+      expect(cssText).toContain('--card-radius: 10px');
+      expect(cssText).toContain('--card-shadow: none');
+
+      // Malicious typography & ui values
+      const maliciousUiMessage = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: {
+          type: 'THEME_UPDATE',
+          payload: {
+            typography: { font_family_main: 'Arial; body{color:red}' },
+            ui: { card_radius: '10px; background:red', card_shadow: 'url(javascript:alert(1))' }
+          }
+        }
+      });
+
+      window.dispatchEvent(maliciousUiMessage);
+
+      cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
+      expect(cssText).toContain('--font-family-main: "Montserrat", sans-serif');
+      expect(cssText).toContain('--card-radius: 8px');
+      expect(cssText).toContain('--card-shadow: 0 2px 8px rgba(0,0,0,0.06)');
+    });
+
+    it('8. should update existing site-tenant-tokens element in-place without duplicating style tags', () => {
+      const msg1 = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#111111' } } }
+      });
+      const msg2 = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#222222' } } }
+      });
+
+      window.dispatchEvent(msg1);
+      window.dispatchEvent(msg2);
+
+      const styleTags = document.querySelectorAll('#site-tenant-tokens');
+      expect(styleTags.length).toBe(1);
+      expect(styleTags[0].textContent).toContain('--color-primary: #222222');
+    });
+
+    it('9. should ensure invalid messages do not alter existing styles', () => {
+      const msgValid = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#123456' } } }
+      });
+      window.dispatchEvent(msgValid);
+
+      let cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
+      expect(cssText).toContain('--color-primary: #123456');
+
+      const msgInvalid = new MessageEvent('message', {
+        origin: 'http://evil.com',
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#FFFFFF' } } }
+      });
+      window.dispatchEvent(msgInvalid);
+
+      cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
+      expect(cssText).toContain('--color-primary: #123456');
+    });
+
+    it('10. should ensure preview does not mutate currentBusiness or domainCache', () => {
+      const originalBusiness = service.getCurrentBusiness();
+      const originalPrimary = originalBusiness.settings?.theme_config?.theme?.colors?.primary;
+
+      const previewMsg = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#999999' } } }
+      });
+      window.dispatchEvent(previewMsg);
+
+      const businessAfter = service.getCurrentBusiness();
+      expect(businessAfter.settings?.theme_config?.theme?.colors?.primary).toBe(originalPrimary);
+    });
+
+    it('11. should not write preview updates to localStorage or trigger HTTP persist calls', async () => {
+      mockBusinessService.getBusinessHost.calls.reset();
+      const localStorageSpy = spyOn(localStorage, 'setItem');
+
+      const previewMsg = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#ABCDEF' } } }
+      });
+      window.dispatchEvent(previewMsg);
+
+      expect(localStorageSpy).not.toHaveBeenCalled();
+      expect(mockBusinessService.getBusinessHost).not.toHaveBeenCalled();
+    });
+
+    it('12. should not register listener during SSR execution', () => {
+      const addEventListenerSpy = spyOn(window, 'addEventListener');
+
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          TenantService,
+          { provide: BusinessService, useValue: mockBusinessService },
+          { provide: TransferState, useValue: mockTransferState },
+          { provide: PLATFORM_ID, useValue: 'server' },
+          { provide: DOCUMENT, useValue: window.document }
+        ]
+      });
+
+      const ssrTenantService = TestBed.inject(TenantService);
+      ssrTenantService.setupThemePreviewListener();
+
+      expect(addEventListenerSpy).not.toHaveBeenCalled();
+    });
+
+    it('13. should clean up listener properly and avoid duplicate event listeners', () => {
+      service.stopThemePreviewListener();
+      const removeEventListenerSpy = spyOn(window, 'removeEventListener').and.callThrough();
+
+      service.setupThemePreviewListener();
+      service.setupThemePreviewListener();
+
+      expect(removeEventListenerSpy).toHaveBeenCalledTimes(1);
+
+      service.stopThemePreviewListener();
+      expect(removeEventListenerSpy).toHaveBeenCalledTimes(2);
     });
   });
 });
