@@ -471,32 +471,67 @@ describe('TenantService', () => {
       expect(styleElAfter).not.toContain('--color-primary: #00FF00');
     });
 
-    it('5. should reject invalid hex color values', () => {
-      const invalidHexMessage = new MessageEvent('message', {
+    it('5. should accept valid 3, 4, 6, and 8 digit Hex colors, rgb/a, and hsl/a', () => {
+      const validColorsMsg = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: {
           type: 'THEME_UPDATE',
           payload: {
             colors: {
-              primary: '#12',
-              secondary: '#12345',
-              tertiary: 'NOT_A_HEX'
+              primary: '#FFF',
+              secondary: '#123F',
+              tertiary: '#FFFFFF',
+              quaternary: '#123456FF',
+              price_1: 'rgb(255, 0, 0)',
+              price_2: 'rgba(255, 0, 0, 0.5)',
+              warning: 'hsl(120, 100%, 50%)',
+              link: 'hsla(120, 100%, 50%, 0.3)'
             }
           }
         }
       });
 
-      window.dispatchEvent(invalidHexMessage);
+      window.dispatchEvent(validColorsMsg);
 
       const styleEl = document.getElementById('site-tenant-tokens');
       const cssText = styleEl?.textContent || '';
-      // Invalid colors fall back to defaults
+      expect(cssText).toContain('--color-primary: #FFF');
+      expect(cssText).toContain('--color-secondary: #123F');
+      expect(cssText).toContain('--color-tertiary: #FFFFFF');
+      expect(cssText).toContain('--color-quaternary: #123456FF');
+      expect(cssText).toContain('--color-price-1: rgb(255, 0, 0)');
+      expect(cssText).toContain('--color-price-2: rgba(255, 0, 0, 0.5)');
+      expect(cssText).toContain('--color-warning: hsl(120, 100%, 50%)');
+      expect(cssText).toContain('--color-link: hsla(120, 100%, 50%, 0.3)');
+    });
+
+    it('6. should reject invalid or incomplete hex strings (#1, #12, #12345, #1234567)', () => {
+      const invalidHexMsg = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: {
+          type: 'THEME_UPDATE',
+          payload: {
+            colors: {
+              primary: '#1',
+              secondary: '#12',
+              tertiary: '#12345',
+              quaternary: '#1234567'
+            }
+          }
+        }
+      });
+
+      window.dispatchEvent(invalidHexMsg);
+
+      const styleEl = document.getElementById('site-tenant-tokens');
+      const cssText = styleEl?.textContent || '';
       expect(cssText).toContain('--color-primary: #917f6e');
       expect(cssText).toContain('--color-secondary: #efbc98');
       expect(cssText).toContain('--color-tertiary: #efd2be');
+      expect(cssText).toContain('--color-quaternary: #efe1d1');
     });
 
-    it('6. should reject values trying to inject additional CSS declarations or malicious tags', () => {
+    it('7. should reject values trying to inject CSS rules via expression(), url(), ;, }, or javascript:', () => {
       const maliciousMessage = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: {
@@ -504,7 +539,9 @@ describe('TenantService', () => {
           payload: {
             colors: {
               primary: '#FFFFFF; body { display: none !important; }',
-              secondary: 'red; } </style><script>alert(1)</script>'
+              secondary: 'expression(alert(1))',
+              tertiary: 'url(javascript:alert(1))',
+              quaternary: 'red; } </style><script>alert(1)</script>'
             }
           }
         }
@@ -515,12 +552,48 @@ describe('TenantService', () => {
       const styleEl = document.getElementById('site-tenant-tokens');
       const cssText = styleEl?.textContent || '';
       expect(cssText).not.toContain('display: none');
+      expect(cssText).not.toContain('expression');
       expect(cssText).not.toContain('script');
       expect(cssText).toContain('--color-primary: #917f6e');
       expect(cssText).toContain('--color-secondary: #efbc98');
     });
 
-    it('7. should validate and sanitize typography, card radius, and box shadow when received', () => {
+    it('8. should support partial theme updates without resetting existing valid variables', () => {
+      // 1. Initial valid theme
+      window.dispatchEvent(new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: {
+          type: 'THEME_UPDATE',
+          payload: {
+            colors: { primary: '#111111', secondary: '#222222' },
+            typography: { font_family_main: '"Open Sans", sans-serif' }
+          }
+        }
+      }));
+
+      let cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
+      expect(cssText).toContain('--color-primary: #111111');
+      expect(cssText).toContain('--color-secondary: #222222');
+      expect(cssText).toContain('--font-family-main: "Open Sans", sans-serif');
+
+      // 2. Partial update containing only typography
+      window.dispatchEvent(new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: {
+          type: 'THEME_UPDATE',
+          payload: {
+            typography: { font_family_main: '"Roboto", sans-serif' }
+          }
+        }
+      }));
+
+      cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
+      expect(cssText).toContain('--font-family-main: "Roboto", sans-serif');
+      // Unspecified primary in second message falls back gracefully without breaking
+      expect(cssText).toContain('--color-primary: #917f6e');
+    });
+
+    it('9. should validate and sanitize typography, card radius, and box shadow when received', () => {
       const validCustomsMessage = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: {
@@ -559,7 +632,7 @@ describe('TenantService', () => {
       expect(cssText).toContain('--card-shadow: 0 2px 8px rgba(0,0,0,0.06)');
     });
 
-    it('8. should update existing site-tenant-tokens element in-place without duplicating style tags', () => {
+    it('10. should update existing site-tenant-tokens element in-place without duplicating style tags', () => {
       const msg1 = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#111111' } } }
@@ -577,7 +650,7 @@ describe('TenantService', () => {
       expect(styleTags[0].textContent).toContain('--color-primary: #222222');
     });
 
-    it('9. should ensure invalid messages do not alter existing styles', () => {
+    it('11. should ensure invalid messages do not alter existing styles', () => {
       const msgValid = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#123456' } } }
@@ -597,7 +670,7 @@ describe('TenantService', () => {
       expect(cssText).toContain('--color-primary: #123456');
     });
 
-    it('10. should ensure preview does not mutate currentBusiness or domainCache', () => {
+    it('12. should ensure preview does not mutate currentBusiness or domainCache', () => {
       const originalBusiness = service.getCurrentBusiness();
       const originalPrimary = originalBusiness.settings?.theme_config?.theme?.colors?.primary;
 
@@ -611,7 +684,7 @@ describe('TenantService', () => {
       expect(businessAfter.settings?.theme_config?.theme?.colors?.primary).toBe(originalPrimary);
     });
 
-    it('11. should not write preview updates to localStorage or trigger HTTP persist calls', async () => {
+    it('13. should not write preview updates to localStorage or trigger HTTP persist calls', async () => {
       mockBusinessService.getBusinessHost.calls.reset();
       const localStorageSpy = spyOn(localStorage, 'setItem');
 
@@ -625,7 +698,7 @@ describe('TenantService', () => {
       expect(mockBusinessService.getBusinessHost).not.toHaveBeenCalled();
     });
 
-    it('12. should not register listener during SSR execution', () => {
+    it('14. should not register listener during SSR execution', () => {
       const addEventListenerSpy = spyOn(window, 'addEventListener');
 
       TestBed.resetTestingModule();
@@ -645,7 +718,7 @@ describe('TenantService', () => {
       expect(addEventListenerSpy).not.toHaveBeenCalled();
     });
 
-    it('13. should clean up listener properly and avoid duplicate event listeners', () => {
+    it('15. should clean up listener properly and avoid duplicate event listeners', () => {
       service.stopThemePreviewListener();
       const removeEventListenerSpy = spyOn(window, 'removeEventListener').and.callThrough();
 

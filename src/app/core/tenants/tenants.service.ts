@@ -260,8 +260,8 @@ export class TenantService implements OnDestroy {
       return false;
     }
 
-    // Hex (#RGB, #RRGGBB, #RGBA, #RRGGBBAA)
-    const hexRegex = /^#(?:[0-9a-fA-F]{3,4}){1,2}$/;
+    // Hex (#RGB, #RGBA, #RRGGBB, #RRGGBBAA)
+    const hexRegex = /^#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
     if (hexRegex.test(val)) return true;
 
     // RGB / RGBA
