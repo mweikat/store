@@ -20,9 +20,7 @@ const DEFAULT_UI: Required<BusinessThemeUIModel> = {
 @Injectable({ providedIn: 'root' })
 export class TenantService implements OnDestroy {
 
-  private readonly ENVIRONMENT = environment.production;
   private currentBusiness: BusinessModel | undefined = undefined;
-  private static readonly domainCache = new Map<string, BusinessModel>();
 
   // BehaviorSubject para compartir globalmente
   private businessSubject = new BehaviorSubject<BusinessModel | null>(null);
@@ -42,119 +40,46 @@ export class TenantService implements OnDestroy {
     this.stopThemePreviewListener();
   }
 
-  private hasValidThemeConfig(business: BusinessModel | null | undefined): boolean {
-    if (!business || !business.settings) return false;
-    const theme = business.settings.theme_config?.theme || business.settings.theme;
-    return !!(theme && theme.colors && Object.keys(theme.colors).length > 0);
-  }
-
-  private extractTheme(business: BusinessModel | null | undefined): any {
-    if (!business || !business.settings) return null;
-    return business.settings.theme_config?.theme || business.settings.theme || null;
-  }
-
-  private areThemesEqual(businessA: BusinessModel | null | undefined, businessB: BusinessModel | null | undefined): boolean {
-    const themeA = this.extractTheme(businessA);
-    const themeB = this.extractTheme(businessB);
-
-    if (!themeA && !themeB) return true;
-    if (!themeA || !themeB) return false;
-
-    // Comparar objeto de colores serializado
-    const colorsA = JSON.stringify(themeA.colors || {});
-    const colorsB = JSON.stringify(themeB.colors || {});
-    if (colorsA !== colorsB) return false;
-
-    // Comparar objeto de tipografía serializado
-    const typoA = JSON.stringify(themeA.typography || {});
-    const typoB = JSON.stringify(themeB.typography || {});
-    if (typoA !== typoB) return false;
-
-    // Comparar objeto de ui serializado
-    const uiA = JSON.stringify(themeA.ui || {});
-    const uiB = JSON.stringify(themeB.ui || {});
-    return uiA === uiB;
-  }
-
   async initialize(): Promise<void> {
 
     const domain = await this.businessApi.getNameHost();
 
-    // 1. Verificar cache en memoria primero
-    const cached = TenantService.domainCache.get(domain);
-    if (cached && this.hasValidThemeConfig(cached)) {
-      this.currentBusiness = cached;
-      this.businessSubject.next(cached);
-      await this.loadBusinessStyles();
-      this.setupThemePreviewListener();
-      return;
-    }
+    if(isPlatformServer(this.platformId)) {
 
-    // 2. Verificar TransferState (cuando el cliente hidrata desde SSR con datos frescos del servidor)
-    if (isPlatformBrowser(this.platformId)) {
-      const transferBusiness = this.transferState.get(TENANT_KEY, null);
-      if (transferBusiness && transferBusiness.id && this.hasValidThemeConfig(transferBusiness)) {
+          try {
+            // Llamar al API para obtener datos del business si no estaba en cache/TransferState o si la caché carecía de tema
+            this.currentBusiness = await this.businessApi.getBusinessHost(domain).toPromise();
+            
+            if (!this.currentBusiness) {
+              throw new Error(`No se encontró business para el dominio: ${domain}`);
+            }
 
-        // Verificar si localStorage tiene un tema desactualizado en relación a TransferState
-        const storedBusiness = this.businessApi.getBusinessStorage();
-        if (!this.areThemesEqual(transferBusiness, storedBusiness)) {
-          // Limpiar caché antigua de localStorage y refrescarla con los datos frescos de TransferState
+            //set transferState
+            this.transferState.set(TENANT_KEY, this.currentBusiness);         
+
+            // Cachear el resultado
+            this.businessSubject.next(this.currentBusiness);
+            await this.loadBusinessStyles();        
+            
+
+          } catch (error) {
+            console.error('❌ Error inicializando tenant:', error);
+            throw error;
+          }
+    }else{
+
+        // 1. Verificar TransferState (cuando el cliente hidrata desde SSR con datos frescos del servidor)
+        const transferBusiness = this.transferState.get(TENANT_KEY, null);
+        if(transferBusiness && transferBusiness.id){
+          this.businessSubject.next(transferBusiness);
+          this.currentBusiness = transferBusiness;
+          this.transferState.remove(TENANT_KEY);
           this.businessApi.setBusiness(transferBusiness);
+          this.setupThemePreviewListener();
         }
-
-        this.currentBusiness = transferBusiness;
-        TenantService.domainCache.set(domain, transferBusiness);
-        this.businessSubject.next(transferBusiness);
-        await this.loadBusinessStyles();
-        this.setupThemePreviewListener();
-        return;
-      }
-
-      // 3. Verificar localStorage si existe y coincide
-      const storedBusiness = this.businessApi.getBusinessStorage();
-      if (storedBusiness && storedBusiness.id && this.hasValidThemeConfig(storedBusiness)) {
-        this.currentBusiness = storedBusiness;
-        TenantService.domainCache.set(domain, storedBusiness);
-        this.businessSubject.next(storedBusiness);
-        await this.loadBusinessStyles();
-        this.setupThemePreviewListener();
-        return;
-      }
     }
 
-    try {
-      // Llamar al API para obtener datos del business si no estaba en cache/TransferState o si la caché carecía de tema
-      this.currentBusiness = await this.businessApi.getBusinessHost(domain).toPromise();
-      
-      if (!this.currentBusiness) {
-        throw new Error(`No se encontró business para el dominio: ${domain}`);
-      }
 
-      if (isPlatformServer(this.platformId)) {
-        this.transferState.set(TENANT_KEY, this.currentBusiness);
-      }
-
-      // Revalidar y actualizar localStorage con la respuesta fresca de la API
-      if (isPlatformBrowser(this.platformId)) {
-        const storedBusiness = this.businessApi.getBusinessStorage();
-        if (!this.areThemesEqual(this.currentBusiness, storedBusiness)) {
-          this.businessApi.setBusiness(this.currentBusiness);
-        }
-      }
-
-      // Cachear el resultado
-      TenantService.domainCache.set(domain, this.currentBusiness);
-      this.businessSubject.next(this.currentBusiness);
-      await this.loadBusinessStyles();
-      
-      if (isPlatformBrowser(this.platformId)) {
-        this.setupThemePreviewListener();
-      }
-
-    } catch (error) {
-      console.error('❌ Error inicializando tenant:', error);
-      throw error;
-    }
   }
 
   getBusinessId(): string {
@@ -390,13 +315,6 @@ export class TenantService implements OnDestroy {
     const theme = this.currentBusiness.settings?.theme_config?.theme || this.currentBusiness.settings?.theme;
     this.applyPreviewTheme(theme || {});
 
-    if (isPlatformBrowser(this.platformId)) {
-      this.businessApi.setBusiness(this.currentBusiness);
-    }
   }
 
-  // Para limpiar cache (útil en desarrollo)
-  static clearCache(): void {
-    this.domainCache.clear();
-  }
 }
