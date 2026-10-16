@@ -48,6 +48,34 @@ export class TenantService implements OnDestroy {
     return !!(theme && theme.colors && Object.keys(theme.colors).length > 0);
   }
 
+  private extractTheme(business: BusinessModel | null | undefined): any {
+    if (!business || !business.settings) return null;
+    return business.settings.theme_config?.theme || business.settings.theme || null;
+  }
+
+  private areThemesEqual(businessA: BusinessModel | null | undefined, businessB: BusinessModel | null | undefined): boolean {
+    const themeA = this.extractTheme(businessA);
+    const themeB = this.extractTheme(businessB);
+
+    if (!themeA && !themeB) return true;
+    if (!themeA || !themeB) return false;
+
+    // Comparar objeto de colores serializado
+    const colorsA = JSON.stringify(themeA.colors || {});
+    const colorsB = JSON.stringify(themeB.colors || {});
+    if (colorsA !== colorsB) return false;
+
+    // Comparar objeto de tipografía serializado
+    const typoA = JSON.stringify(themeA.typography || {});
+    const typoB = JSON.stringify(themeB.typography || {});
+    if (typoA !== typoB) return false;
+
+    // Comparar objeto de ui serializado
+    const uiA = JSON.stringify(themeA.ui || {});
+    const uiB = JSON.stringify(themeB.ui || {});
+    return uiA === uiB;
+  }
+
   async initialize(): Promise<void> {
 
     const domain = await this.businessApi.getNameHost();
@@ -62,10 +90,18 @@ export class TenantService implements OnDestroy {
       return;
     }
 
-    // 2. Verificar TransferState (cuando el cliente hidrata desde SSR)
+    // 2. Verificar TransferState (cuando el cliente hidrata desde SSR con datos frescos del servidor)
     if (isPlatformBrowser(this.platformId)) {
       const transferBusiness = this.transferState.get(TENANT_KEY, null);
       if (transferBusiness && transferBusiness.id && this.hasValidThemeConfig(transferBusiness)) {
+
+        // Verificar si localStorage tiene un tema desactualizado en relación a TransferState
+        const storedBusiness = this.businessApi.getBusinessStorage();
+        if (!this.areThemesEqual(transferBusiness, storedBusiness)) {
+          // Limpiar caché antigua de localStorage y refrescarla con los datos frescos de TransferState
+          this.businessApi.setBusiness(transferBusiness);
+        }
+
         this.currentBusiness = transferBusiness;
         TenantService.domainCache.set(domain, transferBusiness);
         this.businessSubject.next(transferBusiness);
@@ -74,7 +110,7 @@ export class TenantService implements OnDestroy {
         return;
       }
 
-      // 3. Verificar localStorage si existe y tiene un tema válido
+      // 3. Verificar localStorage si existe y coincide
       const storedBusiness = this.businessApi.getBusinessStorage();
       if (storedBusiness && storedBusiness.id && this.hasValidThemeConfig(storedBusiness)) {
         this.currentBusiness = storedBusiness;
@@ -96,6 +132,14 @@ export class TenantService implements OnDestroy {
 
       if (isPlatformServer(this.platformId)) {
         this.transferState.set(TENANT_KEY, this.currentBusiness);
+      }
+
+      // Revalidar y actualizar localStorage con la respuesta fresca de la API
+      if (isPlatformBrowser(this.platformId)) {
+        const storedBusiness = this.businessApi.getBusinessStorage();
+        if (!this.areThemesEqual(this.currentBusiness, storedBusiness)) {
+          this.businessApi.setBusiness(this.currentBusiness);
+        }
       }
 
       // Cachear el resultado

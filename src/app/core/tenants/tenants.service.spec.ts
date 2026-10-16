@@ -190,6 +190,63 @@ describe('TenantService', () => {
       const cssText = styleEl?.textContent || '';
       expect(cssText).toContain('--color-primary: #112233');
     });
+
+    it('should detect when localStorage has an outdated theme compared to TransferState and overwrite localStorage with the fresh theme', async () => {
+      const staleStoredBusiness: BusinessModel = {
+        ...mockBusinessCanonical,
+        settings: {
+          theme_config: {
+            theme: {
+              colors: { primary: '#000000' }
+            }
+          }
+        }
+      };
+
+      const freshTransferBusiness: BusinessModel = {
+        ...mockBusinessCanonical,
+        settings: {
+          theme_config: {
+            theme: {
+              colors: { primary: '#11EE22' }
+            }
+          }
+        }
+      };
+
+      mockTransferState.get.and.returnValue(freshTransferBusiness);
+      mockBusinessService.getBusinessStorage.and.returnValue(staleStoredBusiness);
+
+      await service.initialize();
+
+      expect(mockBusinessService.setBusiness).toHaveBeenCalledWith(freshTransferBusiness);
+      const styleEl = document.getElementById('site-tenant-tokens');
+      const cssText = styleEl?.textContent || '';
+      expect(cssText).toContain('--color-primary: #11EE22');
+    });
+
+    it('should fetch fresh theme from getBusinessHost when localStorage lacks theme and update localStorage', async () => {
+      const freshApiBusiness: BusinessModel = {
+        ...mockBusinessCanonical,
+        settings: {
+          theme_config: {
+            theme: {
+              colors: { primary: '#123456' }
+            }
+          }
+        }
+      };
+
+      mockBusinessService.getBusinessStorage.and.returnValue({} as BusinessModel);
+      mockBusinessService.getBusinessHost.and.returnValue(of(freshApiBusiness));
+
+      await service.initialize();
+
+      expect(mockBusinessService.setBusiness).toHaveBeenCalledWith(freshApiBusiness);
+      const styleEl = document.getElementById('site-tenant-tokens');
+      const cssText = styleEl?.textContent || '';
+      expect(cssText).toContain('--color-primary: #123456');
+    });
   });
 
   describe('D. Configuración parcial', () => {
