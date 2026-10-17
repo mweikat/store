@@ -1,19 +1,27 @@
 .user-menu {
-
     position: relative;
+
+    i {
+      color: var(--user-menu-icon, var(--color-action-primary, #917f6e));
+    }
   
     .btn-go-cart {
-        
         font-weight: bold;
         text-align: center;
         padding: 0.5rem;
         transition: background-color 0.3s ease;
+        background-color: var(--user-menu-btn-bg, var(--color-action-secondary, #efbc98));
+        color: var(--user-menu-btn-text, var(--neutral-100, #ffffff));
+
+        &:hover {
+          background-color: var(--color-action-secondary, #efbc98);
+        }
     }
 
     .dropdown-toggle {
-      
       padding: 0.5rem;
       position: relative;
+      color: var(--user-menu-icon, var(--color-action-primary, #917f6e));
     }
   
     .dropdown-menu {
@@ -21,11 +29,18 @@
       padding: 0.5rem;
       border-radius: 0.25rem;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background-color: var(--user-menu-dropdown-bg, var(--color-surface-base, #ffffff));
+      border: 1px solid var(--user-menu-dropdown-border, var(--color-border-default, #efd2be));
   
       .dropdown-item {
-        
         padding: 0.5rem 1rem;
         transition: background-color 0.3s ease, color 0.3s ease;
+        color: var(--user-menu-dropdown-text, var(--color-text-dark, #000000));
+
+        &:hover {
+          background-color: var(--color-border-default, #efd2be);
+          color: var(--color-action-primary, #917f6e);
+        }
       }
     }
 

@@ -100,6 +100,36 @@
   --checkout-steps-active-bg: var(--color-action-primary);
   --checkout-steps-active-text: var(--neutral-100);
 
+  /* User Menu & User Admin Tokens */
+  --user-menu-icon: var(--color-action-primary);
+  --user-menu-btn-bg: var(--color-action-secondary);
+  --user-menu-btn-text: var(--neutral-100);
+  --user-menu-dropdown-bg: var(--color-surface-base);
+  --user-menu-dropdown-border: var(--color-border-default);
+  --user-menu-dropdown-text: var(--color-text-dark);
+  --user-admin-menu-text: var(--color-action-primary);
+  --user-admin-menu-border: var(--color-surface-base);
+  --user-admin-menu-hover-bg: var(--color-action-secondary);
+  --user-admin-menu-hover-text: var(--neutral-100);
+  --user-admin-menu-active-bg: var(--color-action-primary);
+  --user-admin-menu-active-text: var(--neutral-100);
+  --user-orders-title: var(--color-action-primary);
+  --user-orders-badge-success-bg: var(--color-action-secondary);
+  --user-orders-badge-success-text: var(--neutral-100);
+  --user-orders-badge-warning-bg: var(--color-state-warning);
+  --user-orders-badge-warning-text: var(--color-action-primary-hover);
+  --user-orders-badge-danger-bg: var(--color-price-1, #e74c3c);
+  --user-orders-badge-danger-text: var(--neutral-100);
+
+  /* Pagination Component Tokens */
+  --pagination-bg: var(--color-surface-base);
+  --pagination-text: var(--color-action-primary);
+  --pagination-border: var(--color-surface-variant);
+  --pagination-active-bg: var(--color-action-primary);
+  --pagination-active-text: var(--neutral-100);
+  --pagination-hover-bg: var(--color-state-warning-soft);
+  --pagination-hover-text: var(--color-action-primary-hover);
+
   /* Remapeo Bootstrap 5 */
   --bs-primary: var(--color-action-primary);
   --bs-body-bg: var(--color-surface-base);
@@ -952,37 +982,37 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 .user-menu{
     i {
         font-size: 1.5rem;
-        color: vars.$header-user-menu-icon;
+        color: var(--user-menu-icon, var(--color-action-primary, #917f6e));
     }
 
     .btn-go-cart {
-        background-color: vars.$header-user-menu-btn-background;
-        color: vars.$header-user-menu-btn-text !important;
+        background-color: var(--user-menu-btn-bg, var(--color-action-secondary, #efbc98));
+        color: var(--user-menu-btn-text, var(--neutral-100, #ffffff)) !important;
 
         &:hover {
-          background-color: color-mix(in srgb, vars.$header-user-menu-btn-background 90%, white);
-          color: vars.$header-user-menu-btn-text;
+          background-color: color-mix(in srgb, var(--user-menu-btn-bg, var(--color-action-secondary, #efbc98)) 90%, white);
+          color: var(--user-menu-btn-text, var(--neutral-100, #ffffff));
         }   
     }
 
     .dropdown-toggle {
-        color: vars.$header-user-menu-dropdown-toggle;
+        color: var(--user-menu-icon, var(--color-action-primary, #917f6e));
 
         &:hover {
-            color: vars.$header-user-menu-dropdown-toggle-hover;
+            color: var(--color-action-primary-hover, #6d5742);
         }
   
     }
     .dropdown-menu {
-        border: 1px solid vars.$header-user-menu-dropdown-border;
-        background-color: vars.$header-user-menu-dropdown-background;
+        border: 1px solid var(--user-menu-dropdown-border, var(--color-border-default, #efd2be));
+        background-color: var(--user-menu-dropdown-bg, var(--color-surface-base, #ffffff));
 
         .dropdown-item {
-            color: vars.$header-user-menu-dropdown-text;
+            color: var(--user-menu-dropdown-text, var(--color-text-dark, #000000));
 
             &:hover {
-                background-color: vars.$header-user-menu-dropdown-background-hover !important;
-                color: vars.$header-user-menu-dropdown-color-hover !important;
+                background-color: var(--color-border-default, #efd2be) !important;
+                color: var(--color-action-primary, #917f6e) !important;
             }
         }
     }
@@ -991,41 +1021,41 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 .user-submenu {
 
     .nav-link {
-        color: vars.$user-admin-menu-text !important;
-        border-bottom: 1px solid vars.$user-admin-menu-border !important; ;
+        color: var(--user-admin-menu-text, var(--color-action-primary, #917f6e)) !important;
+        border-bottom: 1px solid var(--user-admin-menu-border, var(--color-surface-base, #ffffff)) !important;
         &:hover {
-            background-color: vars.$user-admin-menu-hover-background !important; /* Color secundario */
-            color: vars.$user-admin-menu-hover-text !important; /* Color de texto */
+            background-color: var(--user-admin-menu-hover-bg, var(--color-action-secondary, #efbc98)) !important;
+            color: var(--user-admin-menu-hover-text, var(--neutral-100, #ffffff)) !important;
         }
         &.active {
-            background-color: vars.$user-admin-menu-active-background !important; /* Color primario */
-            color: vars.$user-admin-menu-active-text !important;
+            background-color: var(--user-admin-menu-active-bg, var(--color-action-primary, #917f6e)) !important;
+            color: var(--user-admin-menu-active-text, var(--neutral-100, #ffffff)) !important;
         }
         i {
             font-size: 1.2rem;
-            color: vars.$user-admin-menu-icon !important;
+            color: var(--user-admin-menu-text, var(--color-action-primary, #917f6e)) !important;
         }
     }
 }
 .orders-section {
     
     h5.card-title {
-       color: vars.$user-orders-title;
+       color: var(--user-orders-title, var(--color-action-primary, #917f6e));
     }
     .badge {
         &.badge-success {
-            background-color: vars.$user-orders-badge-success-background;
-            color: vars.$user-orders-badge-success-text;
+            background-color: var(--user-orders-badge-success-bg, var(--color-action-secondary, #efbc98));
+            color: var(--user-orders-badge-success-text, var(--neutral-100, #ffffff));
         }
 
         &.badge-warning {
-            background-color: vars.$user-orders-badge-warning-background;
-            color: vars.$user-orders-badge-warning-text;
+            background-color: var(--user-orders-badge-warning-bg, var(--color-state-warning, #ffbd59));
+            color: var(--user-orders-badge-warning-text, var(--color-action-primary-hover, #6d5742));
         }
 
         &.badge-danger {
-            background-color: vars.$user-orders-badge-danger-background;
-            color: vars.$user-orders-badge-danger-text;
+            background-color: var(--user-orders-badge-danger-bg, var(--color-price-1, #e74c3c));
+            color: var(--user-orders-badge-danger-text, var(--neutral-100, #ffffff));
         }
     }
 }

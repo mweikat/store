@@ -9,6 +9,7 @@
   h5.card-title {
     font-weight: bold;
     font-size: 1.8rem;
+    color: var(--user-orders-title, var(--color-action-primary, #917f6e));
   }
 
   .orders-controls-bar {
@@ -62,6 +63,21 @@
     border-radius: 8px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+
+    &.badge-success {
+      background-color: var(--user-orders-badge-success-bg, var(--color-action-secondary, #efbc98));
+      color: var(--user-orders-badge-success-text, var(--neutral-100, #ffffff));
+    }
+
+    &.badge-warning {
+      background-color: var(--user-orders-badge-warning-bg, var(--color-state-warning, #ffbd59));
+      color: var(--user-orders-badge-warning-text, var(--color-action-primary-hover, #6d5742));
+    }
+
+    &.badge-danger {
+      background-color: var(--user-orders-badge-danger-bg, var(--color-price-1, #e74c3c));
+      color: var(--user-orders-badge-danger-text, var(--neutral-100, #ffffff));
+    }
   }
 
   .order-click {

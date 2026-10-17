@@ -3,6 +3,23 @@
       padding: 1rem;
       font-weight: 500;
       transition: all 0.3s ease;
+      color: var(--user-admin-menu-text, var(--color-action-primary, #917f6e));
+      border-bottom: 1px solid var(--user-admin-menu-border, var(--color-surface-base, #ffffff));
+
+      &:hover {
+        background-color: var(--user-admin-menu-hover-bg, var(--color-action-secondary, #efbc98));
+        color: var(--user-admin-menu-hover-text, var(--neutral-100, #ffffff));
+      }
+
+      &.active {
+        background-color: var(--user-admin-menu-active-bg, var(--color-action-primary, #917f6e));
+        color: var(--user-admin-menu-active-text, var(--neutral-100, #ffffff));
+      }
+
+      i {
+        font-size: 1.2rem;
+        color: var(--user-admin-menu-text, var(--color-action-primary, #917f6e));
+      }
     }
   }
   

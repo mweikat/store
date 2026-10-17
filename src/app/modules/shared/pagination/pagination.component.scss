@@ -3,26 +3,26 @@
 .pagination-component {
   .page-link {
     cursor: pointer;
-    color: vars.$primary-color;
-    background-color: vars.$light-bg;
-    border-color: vars.$quaternary-color2;
+    color: var(--pagination-text, var(--color-action-primary, #917f6e));
+    background-color: var(--pagination-bg, var(--color-surface-base, #ffffff));
+    border-color: var(--pagination-border, var(--color-surface-variant, #ffedd9));
     transition: all 0.2s ease-in-out;
 
     &:hover {
-      background-color: vars.$warning-color-v1;
-      color: vars.$primary-color-v1;
-      border-color: vars.$warning-color;
+      background-color: var(--pagination-hover-bg, var(--color-state-warning-soft, rgba(253, 201, 13, 0.25)));
+      color: var(--pagination-hover-text, var(--color-action-primary-hover, #6d5742));
+      border-color: var(--color-state-warning, #ffbd59);
     }
 
     &:focus {
-      box-shadow: 0 0 0 0.2rem vars.$warning-color-v1;
+      box-shadow: 0 0 0 0.2rem var(--color-state-warning-soft, rgba(253, 201, 13, 0.25));
     }
   }
 
   .page-item.active .page-link {
-    background-color: vars.$primary-color;
-    border-color: vars.$primary-color;
-    color: vars.$light-bg;
+    background-color: var(--pagination-active-bg, var(--color-action-primary, #917f6e));
+    border-color: var(--pagination-active-bg, var(--color-action-primary, #917f6e));
+    color: var(--pagination-active-text, var(--neutral-100, #ffffff));
   }
 
   .page-item.disabled .page-link {

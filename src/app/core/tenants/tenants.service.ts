@@ -350,6 +350,36 @@ export class TenantService implements OnDestroy {
         --checkout-steps-active-bg: var(--color-action-primary);
         --checkout-steps-active-text: var(--neutral-100);
 
+        /* User Menu & User Admin Tokens */
+        --user-menu-icon: var(--color-action-primary);
+        --user-menu-btn-bg: var(--color-action-secondary);
+        --user-menu-btn-text: var(--neutral-100);
+        --user-menu-dropdown-bg: var(--color-surface-base);
+        --user-menu-dropdown-border: var(--color-border-default);
+        --user-menu-dropdown-text: var(--color-text-dark);
+        --user-admin-menu-text: var(--color-action-primary);
+        --user-admin-menu-border: var(--color-surface-base);
+        --user-admin-menu-hover-bg: var(--color-action-secondary);
+        --user-admin-menu-hover-text: var(--neutral-100);
+        --user-admin-menu-active-bg: var(--color-action-primary);
+        --user-admin-menu-active-text: var(--neutral-100);
+        --user-orders-title: var(--color-action-primary);
+        --user-orders-badge-success-bg: var(--color-action-secondary);
+        --user-orders-badge-success-text: var(--neutral-100);
+        --user-orders-badge-warning-bg: ${warningColor};
+        --user-orders-badge-warning-text: var(--color-action-primary-hover);
+        --user-orders-badge-danger-bg: ${price1Color};
+        --user-orders-badge-danger-text: var(--neutral-100);
+
+        /* Pagination Component Tokens */
+        --pagination-bg: var(--color-surface-base);
+        --pagination-text: var(--color-action-primary);
+        --pagination-border: ${quaternaryV2Color};
+        --pagination-active-bg: var(--color-action-primary);
+        --pagination-active-text: var(--neutral-100);
+        --pagination-hover-bg: var(--color-state-warning-soft);
+        --pagination-hover-text: var(--color-action-primary-hover);
+
         /* Remapeo Bootstrap 5 */
         --bs-primary: var(--color-action-primary);
         --bs-body-bg: var(--color-surface-base);
