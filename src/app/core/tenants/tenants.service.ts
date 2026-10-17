@@ -319,6 +319,24 @@ export class TenantService implements OnDestroy {
         --footer-link: var(--color-action-primary);
         --footer-link-hover: var(--color-action-primary-hover);
 
+        /* Cart Component Tokens */
+        --cart-title: var(--color-action-primary);
+        --cart-item-bg: ${rgba2};
+        --cart-item-title: var(--color-action-primary);
+        --cart-item-price: var(--color-action-secondary);
+        --cart-quantity-btn: var(--color-action-primary);
+        --cart-quantity-btn-hover-bg: var(--color-action-secondary);
+        --cart-summary-bg: ${cardListTotalColor};
+        --cart-summary-title: var(--color-action-primary);
+        --cart-summary-btn-bg: var(--color-action-primary);
+        --cart-menu-toggle: var(--color-action-primary);
+        --cart-menu-badge-bg: ${warningColor};
+        --cart-menu-badge-text: var(--neutral-100);
+        --cart-menu-dropdown-bg: var(--color-surface-base);
+        --cart-menu-dropdown-border: var(--color-border-default);
+        --cart-menu-btn-bg: var(--color-action-secondary);
+        --cart-menu-btn-text: var(--neutral-100);
+
         /* Remapeo Bootstrap 5 */
         --bs-primary: var(--color-action-primary);
         --bs-body-bg: var(--color-surface-base);

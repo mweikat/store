@@ -5,35 +5,47 @@
     .dropdown-toggle {
       padding: 0.5rem;
       position: relative;
+      color: var(--cart-menu-toggle, var(--color-action-primary, #917f6e));
   
       .cart-badge {
         font-size: 0.8rem;
         margin-left: -10px;
         padding: 0.25rem 0.5rem;
-
+        background-color: var(--cart-menu-badge-bg, var(--color-state-warning, #ffbd59));
+        color: var(--cart-menu-badge-text, var(--neutral-100, #ffffff));
       }
     }
   
     .dropdown-menu {
       min-width: 200px;
       padding: 0.5rem;
-      
       border-radius: 0.25rem;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background-color: var(--cart-menu-dropdown-bg, var(--color-surface-base, #ffffff));
+      border: 1px solid var(--cart-menu-dropdown-border, var(--color-border-default, #efd2be));
   
       .dropdown-item {
         padding: 0.5rem 1rem;
         transition: background-color 0.3s ease, color 0.3s ease;
+        color: var(--color-action-primary, #917f6e);
+
+        &:hover {
+          background-color: var(--color-border-default, #efd2be);
+          color: var(--color-action-primary, #917f6e);
+        }
       }
   
       .btn-go-cart {
-        
         font-weight: bold;
         text-align: center;
         padding: 0.5rem;
         transition: background-color 0.3s ease;
-  
-        
+        background-color: var(--cart-menu-btn-bg, var(--color-action-secondary, #efbc98));
+        color: var(--cart-menu-btn-text, var(--neutral-100, #ffffff));
+
+        &:hover {
+          background-color: var(--color-action-secondary, #efbc98);
+        }
       }
     }
 

@@ -126,8 +126,15 @@ describe('TenantService', () => {
       // Tokens Semánticos
       expect(cssText).toContain('--color-action-primary: var(--brand-primary)');
       expect(cssText).toContain('--color-surface-base: var(--neutral-100)');
-      // Tokens de Componentes
+      // Tokens de Componentes (Fase 3A)
       expect(cssText).toContain('--btn-primary-bg: var(--color-action-primary)');
+      expect(cssText).toContain('--product-card-bg: var(--color-surface-base)');
+      expect(cssText).toContain('--product-card-border: var(--color-border-default)');
+      expect(cssText).toContain('--product-card-title: var(--color-text-brand)');
+      expect(cssText).toContain('--header-bg: var(--color-surface-base)');
+      expect(cssText).toContain('--header-link: var(--color-action-primary)');
+      expect(cssText).toContain('--footer-bg: var(--neutral-900)');
+      expect(cssText).toContain('--footer-text: var(--neutral-100)');
       // Remapeo Bootstrap 5
       expect(cssText).toContain('--bs-primary: var(--color-action-primary)');
       // Tokens Heredados
