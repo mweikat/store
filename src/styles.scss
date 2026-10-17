@@ -87,6 +87,19 @@
   --cart-menu-btn-bg: var(--color-action-secondary);
   --cart-menu-btn-text: var(--neutral-100);
 
+  /* Checkout Component Tokens */
+  --checkout-title: var(--color-action-primary);
+  --checkout-section-border: var(--color-surface-subtle);
+  --checkout-confirm-card-bg: var(--color-surface-base);
+  --checkout-confirm-title: var(--color-action-primary);
+  --checkout-confirm-order-bg: var(--color-border-default);
+  --checkout-fail-card-bg: var(--color-surface-base);
+  --checkout-fail-title: var(--color-state-danger-text);
+  --checkout-fail-order-bg: var(--color-border-default);
+  --checkout-steps-bg: var(--color-surface-subtle);
+  --checkout-steps-active-bg: var(--color-action-primary);
+  --checkout-steps-active-text: var(--neutral-100);
+
   /* Remapeo Bootstrap 5 */
   --bs-primary: var(--color-action-primary);
   --bs-body-bg: var(--color-surface-base);
@@ -496,23 +509,23 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 /*****************check out******************/
 .check-out{
     h2 {
-        color: vars.$check-title !important;
+        color: var(--checkout-title, var(--color-action-primary, #917f6e)) !important;
     }
     .payment-section, .shipping-method, .address-section {
-        border: 1px solid vars.$check-payment-section !important;
+        border: 1px solid var(--checkout-section-border, var(--color-surface-subtle, #efe1d1)) !important;
         
         .input-tel:focus {
-            border-color: vars.$checkout-delivery-data-border-select-1 !important;
-            box-shadow: 0 0 0 0.25rem vars.$checkout-delivery-data-border-select !important;
+            border-color: var(--color-surface-base, #ffffff) !important;
+            box-shadow: 0 0 0 0.25rem var(--color-state-warning-soft, rgba(253, 201, 13, 0.25)) !important;
         }
         i{
             font-size: 22px !important;
-            color: vars.$check-payment-section !important;
+            color: var(--checkout-section-border, var(--color-surface-subtle, #efe1d1)) !important;
         }
     }
     .payment-section {
         .accordion-collapse {
-            color: vars.$check-payment-section-accordion-collapse !important;
+            color: var(--color-text-dark, #000000) !important;
         }
     } 
 
@@ -520,45 +533,45 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 }
 .checkout-success {
     .card{
-        background-color: vars.$check-confirm-card;
+        background-color: var(--checkout-confirm-card-bg, var(--color-surface-base, #ffffff));
 
         .title {
-            color: vars.$check-confirm-h1;
+            color: var(--checkout-confirm-title, var(--color-action-primary, #917f6e));
         }
         .text-secondary {
-            color: vars.$check-confirm-text;
+            color: var(--color-text-dark, #000000);
         }
         .order-summary {
                 ul {
-                background-color: vars.$check-confirm-order;
+                background-color: var(--checkout-confirm-order-bg, var(--color-border-default, #efd2be));
                 .list-group-item {
-                    color: vars.$check-confirm-order-item;
+                    color: var(--color-text-dark, #000000);
                 }
                 }
         }
     }
 }
 .order-summary-detail {
-    color: vars.$check-confirm-order-item-detail !important;
+    color: var(--color-action-primary, #917f6e) !important;
 }
 .checkout-failure{
     .card {
-        background-color: vars.$check-fail-card-back;
+        background-color: var(--checkout-fail-card-bg, var(--color-surface-base, #ffffff));
 
         .text-secondary {
-            color: vars.$check-fail-card-text;
+            color: var(--color-text-dark, #000000);
             font-size: 1rem;
         }
 
         h1{
-            color: vars.$check-fail-card-h1; // Rojo para indicar error
+            color: var(--checkout-fail-title, var(--color-state-danger-text, #d9534f));
         }
 
         .error-options {
             ul {
-                background-color: vars.$check-fail-card-error-back;
+                background-color: var(--checkout-fail-order-bg, var(--color-border-default, #efd2be));
                 .list-group-item {
-                    color: vars.$check-fail-card-item;
+                    color: var(--color-text-dark, #000000);
                 }
             }
         }

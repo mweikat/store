@@ -337,6 +337,19 @@ export class TenantService implements OnDestroy {
         --cart-menu-btn-bg: var(--color-action-secondary);
         --cart-menu-btn-text: var(--neutral-100);
 
+        /* Checkout Component Tokens */
+        --checkout-title: var(--color-action-primary);
+        --checkout-section-border: ${quaternaryColor};
+        --checkout-confirm-card-bg: var(--color-surface-base);
+        --checkout-confirm-title: var(--color-action-primary);
+        --checkout-confirm-order-bg: ${tertiaryColor};
+        --checkout-fail-card-bg: var(--color-surface-base);
+        --checkout-fail-title: ${checkFailColor};
+        --checkout-fail-order-bg: ${tertiaryColor};
+        --checkout-steps-bg: ${quaternaryColor};
+        --checkout-steps-active-bg: var(--color-action-primary);
+        --checkout-steps-active-text: var(--neutral-100);
+
         /* Remapeo Bootstrap 5 */
         --bs-primary: var(--color-action-primary);
         --bs-body-bg: var(--color-surface-base);

@@ -1,8 +1,11 @@
 .check-out{ 
+  h2 {
+    color: var(--checkout-title, var(--color-action-primary, #917f6e)) !important;
+  }
   .payment-section, .shipping-method, .address-section {
-  
     padding: 1rem;
     border-radius: 8px;
     margin-bottom: 1.5rem;
+    border: 1px solid var(--checkout-section-border, var(--color-surface-subtle, #efe1d1)) !important;
   }
 }

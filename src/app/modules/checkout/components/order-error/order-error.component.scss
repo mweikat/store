@@ -4,6 +4,7 @@
     .card {
       border: none;
       border-radius: 12px;
+      background-color: var(--checkout-fail-card-bg, var(--color-surface-base, #ffffff));
   
       .error-icon {
         width: 100px;
@@ -13,19 +14,23 @@
       h1 {
         font-size: 2rem;
         font-weight: 600;
-        
+        color: var(--checkout-fail-title, var(--color-state-danger-text, #d9534f));
+      }
+
+      .text-secondary {
+        color: var(--color-text-dark, #000000);
       }
   
       .error-options {
         ul {
-          
           border-radius: 8px;
+          background-color: var(--checkout-fail-order-bg, var(--color-border-default, #efd2be));
   
           .list-group-item {
             background-color: transparent;
             border: none;
             font-size: 1rem;
-            
+            color: var(--color-text-dark, #000000);
           }
         }
       }

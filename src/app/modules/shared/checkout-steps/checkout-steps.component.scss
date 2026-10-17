@@ -5,7 +5,7 @@
     position: relative;
   
     .bg-steps {
-
+      background-color: var(--checkout-steps-bg, var(--color-surface-subtle, #efe1d1));
       height: 4px;
       position: relative;
       margin-bottom: 20px;
@@ -14,7 +14,7 @@
       em {
         display: block;
         height: 100%;
-        
+        background-color: var(--checkout-steps-active-bg, var(--color-action-primary, #917f6e));
         transition: width 0.3s ease-in-out;
         border-radius: 2px;
       }
@@ -29,8 +29,18 @@
       .step-item {
         position: relative;
         text-align: center;
-        width: 25%; // Ajustar según el número de pasos
-        
+        width: 25%;
+
+        &.active {
+          .step-circle {
+            background-color: var(--checkout-steps-active-bg, var(--color-action-primary, #917f6e)) !important;
+            color: var(--checkout-steps-active-text, var(--neutral-100, #ffffff)) !important;
+          }
+          .step-label {
+            font-weight: bold;
+            color: var(--checkout-steps-active-bg, var(--color-action-primary, #917f6e));
+          }
+        }
   
         .step-circle {
           width: 40px;
@@ -40,13 +50,16 @@
           justify-content: center;
           align-items: center;
           border-radius: 50%;
-          
+          background-color: var(--checkout-steps-bg, var(--color-surface-subtle, #efe1d1));
+          color: var(--color-text-dark, #000000);
+          font-weight: bold;
+          transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
         }
   
         .step-label {
           margin-top: 10px;
           font-size: 14px;
-          
+          color: var(--color-text-dark, #000000);
         }
       }
     }
