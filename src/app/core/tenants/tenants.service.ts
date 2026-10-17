@@ -291,6 +291,34 @@ export class TenantService implements OnDestroy {
         --input-focus-ring: var(--color-state-warning-soft);
         --product-price-sale: ${price2Color};
 
+        /* Product Card Component Tokens */
+        --product-card-bg: var(--color-surface-base);
+        --product-card-border: var(--color-border-default);
+        --product-card-img-bg: var(--color-surface-subtle);
+        --product-card-img-border: var(--color-border-default);
+        --product-card-title: var(--color-text-brand);
+        --product-card-price: var(--color-action-primary-hover);
+        --product-card-price-sale: ${price2Color};
+
+        /* Header Component Tokens */
+        --header-bg: var(--color-surface-base);
+        --header-border: var(--color-border-default);
+        --header-link: var(--color-action-primary);
+        --header-link-hover: var(--color-action-primary-hover);
+        --header-dropdown-bg: var(--color-surface-base);
+        --header-dropdown-text: var(--color-action-primary);
+        --header-dropdown-hover-bg: var(--color-state-warning-soft);
+        --header-sidebar-bg: var(--color-surface-base);
+        --header-sidebar-header-bg: var(--color-border-default);
+        --header-sidebar-title: var(--color-action-primary);
+        --header-sidebar-overlay: ${rgba4};
+
+        /* Footer Component Tokens */
+        --footer-bg: var(--neutral-900);
+        --footer-text: var(--neutral-100);
+        --footer-link: var(--color-action-primary);
+        --footer-link-hover: var(--color-action-primary-hover);
+
         /* Remapeo Bootstrap 5 */
         --bs-primary: var(--color-action-primary);
         --bs-body-bg: var(--color-surface-base);

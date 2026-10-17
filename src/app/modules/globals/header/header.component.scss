@@ -1,4 +1,6 @@
 .header {
+  background-color: var(--header-bg, var(--color-surface-base, #ffffff));
+  border-bottom: 1px solid var(--header-border, var(--color-border-default, #efd2be));
   
   .container-fluid {
     width: 98%;
@@ -10,18 +12,29 @@
   }
 
   .nav-link {
+    color: var(--header-link, var(--color-action-primary, #917f6e));
     transition: color 0.3s ease, border-bottom 0.3s ease;
     padding: 0.75rem 1rem;
+
+    &:hover, &.active {
+      color: var(--header-link-hover, var(--color-action-primary-hover, #6d5742));
+    }
   }
 
   .dropdown-menu {
-    
+    background-color: var(--header-dropdown-bg, var(--color-surface-base, #ffffff));
     border-radius: 0.25rem;
     padding: 0.5rem;
 
     .dropdown-item {
+      color: var(--header-dropdown-text, var(--color-action-primary, #917f6e));
       padding: 0.5rem 1rem;
       transition: background-color 0.3s ease, color 0.3s ease;
+
+      &:hover {
+        background-color: var(--header-dropdown-hover-bg, var(--color-state-warning-soft, rgba(253, 201, 13, 0.25)));
+        color: var(--header-link-hover, var(--color-action-primary-hover, #6d5742));
+      }
     }
   }
 
@@ -46,6 +59,7 @@
   z-index: 1050;
   transition: left 0.3s ease;
   padding: 20px;
+  background-color: var(--header-sidebar-bg, var(--color-surface-base, #ffffff));
 
   &.active {
     left: 0;
@@ -57,10 +71,12 @@
     align-items: center;
     margin-bottom: 1rem;
     padding-bottom: 10px;
+    border-bottom: 1px solid var(--header-sidebar-header-bg, var(--color-border-default, #efd2be));
 
     .sidebar-title {
       font-size: 1.25rem;
       font-weight: bold;
+      color: var(--header-sidebar-title, var(--color-action-primary, #917f6e));
     }
 
     .btn-close {
@@ -68,6 +84,7 @@
       border: none;
       background: none;
       cursor: pointer;
+      color: var(--color-text-dark, #000000);
     }
   }
 
@@ -82,6 +99,11 @@
       .nav-link {
         font-size: 1rem;
         text-decoration: none;
+        color: var(--header-link, var(--color-action-primary, #917f6e));
+
+        &:hover {
+          color: var(--header-link-hover, var(--color-action-primary-hover, #6d5742));
+        }
       }
     }
   }
@@ -97,6 +119,7 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease;
+  background-color: var(--header-sidebar-overlay, rgba(0, 0, 0, 0.5));
 
   &.active {
     opacity: 1;
