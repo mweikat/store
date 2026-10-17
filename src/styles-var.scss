@@ -13,7 +13,7 @@
   --color-surface-base: var(--neutral-100);
   --color-surface-variant: var(--brand-quaternary-light);
   --color-surface-subtle: var(--brand-quaternary);
-  --color-text-base: var(--brand-primary);
+  --color-text-base: var(--neutral-900);
   --color-text-dark: var(--neutral-900);
   --color-text-sale: #dc3545;
   --color-action-primary: var(--brand-primary);
@@ -46,8 +46,7 @@
 
   /* CSS Custom Properties Heredadas */
   --color-invalid-form: red;
-  --color-check-fail: #d9534f; 
-  --color-link: #efbc98;
+  --color-check-fail: #d9534f;
   --color-primary: #917f6e;
   --color-primary-v1: #6d5742;
   --color-secondary: #efbc98;
