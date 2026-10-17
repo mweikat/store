@@ -82,7 +82,7 @@ describe('TenantService', () => {
     mockBusinessService.getBusinessHost.and.returnValue(of(mockBusinessCanonical));
     mockBusinessService.getBusinessStorage.and.returnValue({} as BusinessModel);
 
-    mockTransferState = jasmine.createSpyObj('TransferState', ['get', 'set']);
+    mockTransferState = jasmine.createSpyObj('TransferState', ['get', 'set', 'remove']);
     mockTransferState.get.and.returnValue(null);
 
     TestBed.configureTestingModule({
@@ -113,13 +113,24 @@ describe('TenantService', () => {
   });
 
   describe('A. Tema canónico', () => {
-    it('should load canonical theme colors, typography, and ui settings', async () => {
+    it('should load canonical theme colors, typography, and ui settings along with 3-tier tokens', async () => {
       await service.initialize();
 
       const styleEl = document.getElementById('site-tenant-tokens');
       expect(styleEl).toBeTruthy();
       const cssText = styleEl?.textContent || '';
 
+      // Primitivos / Marca
+      expect(cssText).toContain('--brand-primary: #112233');
+      expect(cssText).toContain('--brand-secondary: #445566');
+      // Tokens Semánticos
+      expect(cssText).toContain('--color-action-primary: var(--brand-primary)');
+      expect(cssText).toContain('--color-surface-base: var(--neutral-100)');
+      // Tokens de Componentes
+      expect(cssText).toContain('--btn-primary-bg: var(--color-action-primary)');
+      // Remapeo Bootstrap 5
+      expect(cssText).toContain('--bs-primary: var(--color-action-primary)');
+      // Tokens Heredados
       expect(cssText).toContain('--color-primary: #112233');
       expect(cssText).toContain('--color-secondary: #445566');
       expect(cssText).toContain('--color-tertiary: #778899');
@@ -382,7 +393,7 @@ describe('TenantService', () => {
   });
 
   describe('G. Aislamiento entre tenants', () => {
-    it('should isolate theme data per domain in domainCache', async () => {
+    it('should isolate theme data per domain across calls', async () => {
       mockBusinessService.getNameHost.and.returnValue('tenant-a');
       const tenantA: BusinessModel = {
         ...mockBusinessCanonical,
@@ -399,6 +410,8 @@ describe('TenantService', () => {
 
       await service.initialize();
       expect(service.getBusinessId()).toBe('tenant-a-id');
+      let styleEl = document.getElementById('site-tenant-tokens');
+      expect(styleEl?.textContent).toContain('--color-primary: #111111');
 
       mockBusinessService.getNameHost.and.returnValue('tenant-b');
       const tenantB: BusinessModel = {
@@ -416,13 +429,8 @@ describe('TenantService', () => {
 
       await service.initialize();
       expect(service.getBusinessId()).toBe('tenant-b-id');
-
-      // Re-initialization of tenant-a should hit domainCache
-      mockBusinessService.getNameHost.and.returnValue('tenant-a');
-      await service.initialize();
-      expect(service.getBusinessId()).toBe('tenant-a-id');
-      const styleEl = document.getElementById('site-tenant-tokens');
-      expect(styleEl?.textContent).toContain('--color-primary: #111111');
+      styleEl = document.getElementById('site-tenant-tokens');
+      expect(styleEl?.textContent).toContain('--color-primary: #222222');
     });
   });
 
