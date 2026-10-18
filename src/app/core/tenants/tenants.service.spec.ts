@@ -132,17 +132,19 @@ describe('TenantService', () => {
       expect(cssText).toContain('--product-card-border: var(--color-border-default)');
       expect(cssText).toContain('--product-card-title: var(--color-text-brand)');
       expect(cssText).toContain('--header-bg: var(--color-surface-base)');
-      expect(cssText).toContain('--header-link: var(--color-action-primary)');
+      expect(cssText).toContain('--header-link: var(--color-action-primary-hover)');
       expect(cssText).toContain('--footer-bg: var(--neutral-900)');
       expect(cssText).toContain('--footer-text: var(--neutral-100)');
-      // Tokens de Carrito, Checkout, User Admin y Paginación (Fases 3B.1, 3B.2, 3B.3)
+      // Tokens de Carrito, Checkout, User Admin y Paginación (Fases 3B.1, 3B.2, 3B.3, 4.4)
       expect(cssText).toContain('--cart-title: var(--color-action-primary)');
       expect(cssText).toContain('--cart-item-title: var(--color-action-primary)');
+      expect(cssText).toContain('--cart-item-price: var(--color-action-primary-hover)');
       expect(cssText).toContain('--checkout-title: var(--color-action-primary)');
       expect(cssText).toContain('--checkout-steps-active-bg: var(--color-action-primary)');
       expect(cssText).toContain('--user-menu-icon: var(--color-action-primary)');
       expect(cssText).toContain('--user-orders-title: var(--color-action-primary)');
-      expect(cssText).toContain('--pagination-active-bg: var(--color-action-primary)');
+      expect(cssText).toContain('--user-orders-badge-success-text: var(--neutral-900)');
+      expect(cssText).toContain('--pagination-active-bg: var(--color-action-primary-hover)');
       // Remapeo Bootstrap 5
       expect(cssText).toContain('--bs-primary: var(--color-action-primary)');
       // Tokens Heredados

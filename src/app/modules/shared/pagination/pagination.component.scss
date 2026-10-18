@@ -20,8 +20,8 @@
   }
 
   .page-item.active .page-link {
-    background-color: var(--pagination-active-bg, var(--color-action-primary, #917f6e));
-    border-color: var(--pagination-active-bg, var(--color-action-primary, #917f6e));
+    background-color: var(--pagination-active-bg, var(--color-action-primary-hover, #6d5742));
+    border-color: var(--pagination-active-bg, var(--color-action-primary-hover, #6d5742));
     color: var(--pagination-active-text, var(--neutral-100, #ffffff));
   }
 

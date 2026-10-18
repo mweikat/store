@@ -29,6 +29,10 @@
         font-size: 1.1rem;
         color: var(--cart-item-title, var(--color-action-primary, #917f6e));
       }
+
+      .product-price {
+        color: var(--cart-item-price, var(--color-action-primary-hover, #6d5742));
+      }
     }
 }
 

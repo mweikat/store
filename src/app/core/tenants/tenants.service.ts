@@ -303,10 +303,10 @@ export class TenantService implements OnDestroy {
         /* Header Component Tokens */
         --header-bg: var(--color-surface-base);
         --header-border: var(--color-border-default);
-        --header-link: var(--color-action-primary);
+        --header-link: var(--color-action-primary-hover);
         --header-link-hover: var(--color-action-primary-hover);
         --header-dropdown-bg: var(--color-surface-base);
-        --header-dropdown-text: var(--color-action-primary);
+        --header-dropdown-text: var(--color-text-dark);
         --header-dropdown-hover-bg: var(--color-state-warning-soft);
         --header-sidebar-bg: var(--color-surface-base);
         --header-sidebar-header-bg: var(--color-border-default);
@@ -323,7 +323,7 @@ export class TenantService implements OnDestroy {
         --cart-title: var(--color-action-primary);
         --cart-item-bg: ${rgba2};
         --cart-item-title: var(--color-action-primary);
-        --cart-item-price: var(--color-action-secondary);
+        --cart-item-price: var(--color-action-primary-hover);
         --cart-quantity-btn: var(--color-action-primary);
         --cart-quantity-btn-hover-bg: var(--color-action-secondary);
         --cart-summary-bg: ${cardListTotalColor};
@@ -365,7 +365,7 @@ export class TenantService implements OnDestroy {
         --user-admin-menu-active-text: var(--neutral-100);
         --user-orders-title: var(--color-action-primary);
         --user-orders-badge-success-bg: var(--color-action-secondary);
-        --user-orders-badge-success-text: var(--neutral-100);
+        --user-orders-badge-success-text: var(--neutral-900);
         --user-orders-badge-warning-bg: ${warningColor};
         --user-orders-badge-warning-text: var(--color-action-primary-hover);
         --user-orders-badge-danger-bg: ${price1Color};
@@ -375,7 +375,7 @@ export class TenantService implements OnDestroy {
         --pagination-bg: var(--color-surface-base);
         --pagination-text: var(--color-action-primary);
         --pagination-border: ${quaternaryV2Color};
-        --pagination-active-bg: var(--color-action-primary);
+        --pagination-active-bg: var(--color-action-primary-hover);
         --pagination-active-text: var(--neutral-100);
         --pagination-hover-bg: var(--color-state-warning-soft);
         --pagination-hover-text: var(--color-action-primary-hover);
