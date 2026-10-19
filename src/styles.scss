@@ -32,10 +32,10 @@
   --color-card-list-total: #fff3cd;
 
   /* Capa 3: Tokens de Componentes */
-  --btn-primary-bg: var(--color-action-primary);
-  --btn-primary-border: var(--color-action-primary);
-  --btn-primary-text: var(--neutral-100);
-  --btn-primary-hover-bg: var(--color-action-primary-hover);
+  --btn-primary-bg: var(--color-action-primary-hover, #6d5742);
+  --btn-primary-border: var(--color-action-primary-hover, #6d5742);
+  --btn-primary-text: var(--neutral-100, #ffffff);
+  --btn-primary-hover-bg: var(--color-action-primary-hover, #6d5742);
   --card-border-color: var(--color-border-default);
   --card-bg: var(--color-surface-base);
   --input-focus-ring: var(--color-state-warning-soft);
@@ -46,7 +46,7 @@
   --product-card-border: var(--color-border-default);
   --product-card-img-bg: var(--color-surface-subtle);
   --product-card-img-border: var(--color-border-default);
-  --product-card-title: var(--color-action-primary);
+  --product-card-title: var(--color-action-primary-hover, #6d5742);
   --product-card-price: var(--color-action-primary-hover);
   --product-card-price-sale: var(--color-text-sale);
 
@@ -119,7 +119,7 @@
   --user-orders-badge-warning-bg: var(--color-state-warning);
   --user-orders-badge-warning-text: var(--color-action-primary-hover);
   --user-orders-badge-danger-bg: var(--color-price-1, #e74c3c);
-  --user-orders-badge-danger-text: var(--neutral-100);
+  --user-orders-badge-danger-text: var(--neutral-900, #000000);
 
   /* Pagination Component Tokens */
   --pagination-bg: var(--color-surface-base);
@@ -1055,7 +1055,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 
         &.badge-danger {
             background-color: var(--user-orders-badge-danger-bg, var(--color-price-1, #e74c3c));
-            color: var(--user-orders-badge-danger-text, var(--neutral-100, #ffffff));
+            color: var(--user-orders-badge-danger-text, var(--neutral-900, #000000));
         }
     }
 }

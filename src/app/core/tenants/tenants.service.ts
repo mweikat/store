@@ -282,8 +282,8 @@ export class TenantService implements OnDestroy {
         --color-card-list-total: ${cardListTotalColor};
 
         /* Capa 3: Tokens de Componentes con Fallback Semántico */
-        --btn-primary-bg: var(--color-action-primary);
-        --btn-primary-border: var(--color-action-primary);
+        --btn-primary-bg: var(--color-action-primary-hover);
+        --btn-primary-border: var(--color-action-primary-hover);
         --btn-primary-text: var(--neutral-100);
         --btn-primary-hover-bg: var(--color-action-primary-hover);
         --card-border-color: var(--color-border-default);
@@ -296,7 +296,7 @@ export class TenantService implements OnDestroy {
         --product-card-border: var(--color-border-default);
         --product-card-img-bg: var(--color-surface-subtle);
         --product-card-img-border: var(--color-border-default);
-        --product-card-title: var(--color-text-brand);
+        --product-card-title: var(--color-action-primary-hover);
         --product-card-price: var(--color-action-primary-hover);
         --product-card-price-sale: ${price2Color};
 
@@ -369,7 +369,7 @@ export class TenantService implements OnDestroy {
         --user-orders-badge-warning-bg: ${warningColor};
         --user-orders-badge-warning-text: var(--color-action-primary-hover);
         --user-orders-badge-danger-bg: ${price1Color};
-        --user-orders-badge-danger-text: var(--neutral-100);
+        --user-orders-badge-danger-text: var(--neutral-900);
 
         /* Pagination Component Tokens */
         --pagination-bg: var(--color-surface-base);
