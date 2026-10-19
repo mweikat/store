@@ -181,16 +181,24 @@ a:hover{
 }
 /**********************buttonss***************/
 .btn-primary-c1 {
-    background-color: vars.$primary-color !important;
-    border-color: vars.$primary-color !important;
-    color: vars.$light-bg !important;
+    background-color: var(--btn-primary-bg, var(--color-action-primary-hover, #6d5742)) !important;
+    border-color: var(--btn-primary-border, var(--color-action-primary-hover, #6d5742)) !important;
+    color: var(--btn-primary-text, var(--neutral-100, #ffffff)) !important;
     &:hover {
-      background-color: color-mix(in srgb, vars.$primary-color 90%, white) !important;
+      background-color: color-mix(in srgb, var(--btn-primary-hover-bg, var(--color-action-primary-hover, #6d5742)) 85%, black) !important;
+      border-color: var(--btn-primary-hover-bg, var(--color-action-primary-hover, #6d5742)) !important;
+      color: var(--btn-primary-text, var(--neutral-100, #ffffff)) !important;
     }
-}
-.btn-primary-c1:hover {
-    color: vars.$light-bg !important;
-    border-color: vars.$quaternary-color !important;
+    &:focus, &:focus-visible {
+      outline: 2px solid var(--color-action-primary-hover, #6d5742);
+      outline-offset: 2px;
+      box-shadow: 0 0 0 0.25rem var(--color-state-warning-soft, rgba(253, 201, 13, 0.25)) !important;
+    }
+    &:disabled, &.disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
 }
 .btn-primary-c2 {
     background-color: vars.$warning-color !important;
