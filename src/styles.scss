@@ -1045,7 +1045,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
     .badge {
         &.badge-success {
             background-color: var(--user-orders-badge-success-bg, var(--color-action-secondary, #efbc98));
-            color: var(--user-orders-badge-success-text, var(--neutral-100, #ffffff));
+            color: var(--user-orders-badge-success-text, var(--neutral-900, #000000));
         }
 
         &.badge-warning {
