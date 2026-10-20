@@ -209,17 +209,18 @@ export class TenantService implements OnDestroy {
     this.pendingPreviewPayload = payload;
 
     if (isPlatformBrowser(this.platformId) && typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
-      if (this.previewAnimationFrameId !== null) {
-        window.cancelAnimationFrame(this.previewAnimationFrameId);
+      // Si ya existe una actualización programada para el siguiente fotograma,
+      // la actualización de this.pendingPreviewPayload es suficiente.
+      if (this.previewAnimationFrameId === null) {
+        this.previewAnimationFrameId = window.requestAnimationFrame(() => {
+          this.previewAnimationFrameId = null;
+          if (this.pendingPreviewPayload) {
+            const latestPayload = this.pendingPreviewPayload;
+            this.pendingPreviewPayload = null;
+            this.applyPreviewTheme(latestPayload);
+          }
+        });
       }
-      this.previewAnimationFrameId = window.requestAnimationFrame(() => {
-        this.previewAnimationFrameId = null;
-        if (this.pendingPreviewPayload) {
-          const latestPayload = this.pendingPreviewPayload;
-          this.pendingPreviewPayload = null;
-          this.applyPreviewTheme(latestPayload);
-        }
-      });
     } else {
       this.applyPreviewTheme(payload);
     }

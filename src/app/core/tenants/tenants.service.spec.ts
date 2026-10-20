@@ -1088,7 +1088,9 @@ describe('TenantService', () => {
       });
     });
 
-    it('2. should coalesce rapid consecutive messages A, B, C into a single frame execution applying C', (done) => {
+    it('2. should coalesce rapid consecutive messages A, B, C scheduling exactly ONE animation frame applying C', (done) => {
+      const rafSpy = spyOn(window, 'requestAnimationFrame').and.callThrough();
+
       const msgA = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#AAAAAA' } } }
@@ -1107,6 +1109,9 @@ describe('TenantService', () => {
       window.dispatchEvent(msgA);
       window.dispatchEvent(msgB);
       window.dispatchEvent(msgC);
+
+      // Verify that requestAnimationFrame was called exactly ONCE across the burst
+      expect(rafSpy).toHaveBeenCalledTimes(1);
 
       requestAnimationFrame(() => {
         expect(applySpy).toHaveBeenCalledTimes(1);
@@ -1179,6 +1184,27 @@ describe('TenantService', () => {
       requestAnimationFrame(() => {
         const el = document.getElementById('site-tenant-tokens');
         expect(el?.textContent).not.toContain('--brand-primary: #777777');
+        done();
+      });
+    });
+
+    it('6. should ensure invalid or unauthorized message does NOT overwrite valid pending preview payload', (done) => {
+      const validMsg = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#118833' } } }
+      });
+      const invalidMsg = new MessageEvent('message', {
+        origin: 'http://malicious.com',
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#999999' } } }
+      });
+
+      window.dispatchEvent(validMsg);
+      window.dispatchEvent(invalidMsg);
+
+      requestAnimationFrame(() => {
+        const el = document.getElementById('site-tenant-tokens');
+        expect(el?.textContent).toContain('--brand-primary: #118833');
+        expect(el?.textContent).not.toContain('--brand-primary: #999999');
         done();
       });
     });
