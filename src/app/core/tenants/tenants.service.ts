@@ -506,8 +506,15 @@ export class TenantService implements OnDestroy {
     if (!styleElement) {
       styleElement = this.document.createElement('style');
       styleElement.id = 'site-tenant-tokens';
+      styleElement.textContent = cssContent;
       this.document.head.appendChild(styleElement);
+      return;
     }
+
+    if (styleElement.textContent === cssContent) {
+      return;
+    }
+
     styleElement.textContent = cssContent;
   }
 

@@ -837,4 +837,103 @@ describe('TenantService', () => {
       expect(removeEventListenerSpy).toHaveBeenCalledTimes(2);
     });
   });
+
+  describe('Fase 1: Optimización del Inyector CSS', () => {
+    it('1. should create style#site-tenant-tokens when element does not exist', () => {
+      const existing = document.getElementById('site-tenant-tokens');
+      if (existing) existing.remove();
+
+      service.applyPreviewTheme({ colors: { primary: '#111111' } });
+
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el).toBeTruthy();
+      expect(el?.textContent).toContain('--brand-primary: #111111');
+    });
+
+    it('2. should NOT rewrite textContent if CSS content is identical on subsequent calls', () => {
+      service.applyPreviewTheme({ colors: { primary: '#222222' } });
+
+      const el = document.getElementById('site-tenant-tokens') as HTMLStyleElement;
+      expect(el).toBeTruthy();
+
+      const textContentSetterSpy = spyOnProperty(el, 'textContent', 'set').and.callThrough();
+
+      service.applyPreviewTheme({ colors: { primary: '#222222' } });
+
+      expect(textContentSetterSpy).not.toHaveBeenCalled();
+    });
+
+    it('3. should update textContent if CSS content is different', () => {
+      service.applyPreviewTheme({ colors: { primary: '#333333' } });
+
+      const el = document.getElementById('site-tenant-tokens') as HTMLStyleElement;
+      expect(el.textContent).toContain('--brand-primary: #333333');
+
+      service.applyPreviewTheme({ colors: { primary: '#444444' } });
+
+      expect(el.textContent).toContain('--brand-primary: #444444');
+    });
+
+    it('4. should avoid rewriting when style element with expected CSS pre-exists before initialization (SSR hydration)', async () => {
+      const existing = document.getElementById('site-tenant-tokens');
+      if (existing) existing.remove();
+
+      // Simulate pre-existing SSR rendered style tag
+      service.applyPreviewTheme(mockBusinessCanonical.settings?.theme_config?.theme || {});
+      const el = document.getElementById('site-tenant-tokens') as HTMLStyleElement;
+      expect(el).toBeTruthy();
+
+      const textContentSetterSpy = spyOnProperty(el, 'textContent', 'set').and.callThrough();
+
+      // Initialize service simulating client hydration
+      await service.initialize();
+
+      expect(textContentSetterSpy).not.toHaveBeenCalled();
+    });
+
+    it('5. should recover and recreate style element if element is removed from DOM externally', () => {
+      service.applyPreviewTheme({ colors: { primary: '#555555' } });
+
+      let el = document.getElementById('site-tenant-tokens');
+      expect(el).toBeTruthy();
+      el?.remove();
+
+      expect(document.getElementById('site-tenant-tokens')).toBeNull();
+
+      service.applyPreviewTheme({ colors: { primary: '#555555' } });
+
+      el = document.getElementById('site-tenant-tokens');
+      expect(el).toBeTruthy();
+      expect(el?.textContent).toContain('--brand-primary: #555555');
+    });
+
+    it('6. should restore expected CSS if element content is modified externally', () => {
+      service.applyPreviewTheme({ colors: { primary: '#666666' } });
+
+      const el = document.getElementById('site-tenant-tokens') as HTMLStyleElement;
+      el.textContent = '/* corrupted styles */';
+
+      service.applyPreviewTheme({ colors: { primary: '#666666' } });
+
+      expect(el.textContent).toContain('--brand-primary: #666666');
+    });
+
+    it('7. should correctly update between two different valid theme configurations', () => {
+      service.applyPreviewTheme(mockBusinessCanonical.settings?.theme_config?.theme || {});
+      let el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #112233');
+
+      service.applyPreviewTheme(mockBusinessAliasTheme.settings?.theme || {});
+      el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #990000');
+    });
+
+    it('8. should preserve default fallbacks and token mappings without changes', () => {
+      service.applyPreviewTheme({});
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #917f6e');
+      expect(el?.textContent).toContain('--font-family-main: "Montserrat", sans-serif');
+      expect(el?.textContent).toContain('--card-radius: 8px');
+    });
+  });
 });
