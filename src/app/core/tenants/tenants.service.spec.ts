@@ -936,4 +936,95 @@ describe('TenantService', () => {
       expect(el?.textContent).toContain('--card-radius: 8px');
     });
   });
+
+  describe('Fase 2: Normalización del Payload de Temas', () => {
+    it('1. should extract theme from theme_config.theme structure', () => {
+      const payload = {
+        settings: {
+          theme_config: {
+            theme: { colors: { primary: '#A1B2C3' } }
+          }
+        }
+      };
+      service.applyPreviewTheme(payload);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #A1B2C3');
+    });
+
+    it('2. should extract theme from direct theme structure (alias)', () => {
+      const payload = {
+        settings: {
+          theme: { colors: { primary: '#C3B2A1' } }
+        }
+      };
+      service.applyPreviewTheme(payload);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #C3B2A1');
+    });
+
+    it('3. should verify canonical theme_config.theme precedence when both structures are present with non-empty colors', () => {
+      const payload = {
+        settings: {
+          theme_config: {
+            theme: { colors: { primary: '#111111' } }
+          },
+          theme: { colors: { primary: '#222222' } }
+        }
+      };
+      service.applyPreviewTheme(payload);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #111111');
+    });
+
+    it('4. should fallback to direct theme when theme_config.theme is an empty object', () => {
+      const payload = {
+        settings: {
+          theme_config: { theme: {} },
+          theme: { colors: { primary: '#333333' } }
+        }
+      };
+      service.applyPreviewTheme(payload);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #333333');
+    });
+
+    it('5. should safely handle payload without theme or null/undefined settings', () => {
+      service.applyPreviewTheme({ settings: null });
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #917f6e');
+
+      service.applyPreviewTheme(null);
+      expect(el?.textContent).toContain('--brand-primary: #917f6e');
+    });
+
+    it('6. should handle incomplete theme objects cleanly with default fallbacks', () => {
+      const payload = {
+        theme: {
+          colors: { primary: '#777777' },
+          typography: null,
+          ui: undefined
+        }
+      };
+      service.applyPreviewTheme(payload);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #777777');
+      expect(el?.textContent).toContain('--font-family-main: "Montserrat", sans-serif');
+      expect(el?.textContent).toContain('--card-radius: 8px');
+    });
+
+    it('7. should apply preview theme without altering existing behavior or Phase 1 DOM write optimizations', () => {
+      const previewPayload = {
+        theme_config: {
+          theme: { colors: { primary: '#888888' } }
+        }
+      };
+      service.applyPreviewTheme(previewPayload);
+      const el = document.getElementById('site-tenant-tokens') as HTMLStyleElement;
+      expect(el?.textContent).toContain('--brand-primary: #888888');
+
+      const textContentSetterSpy = spyOnProperty(el, 'textContent', 'set').and.callThrough();
+      service.applyPreviewTheme(previewPayload);
+      expect(textContentSetterSpy).not.toHaveBeenCalled();
+    });
+  });
 });

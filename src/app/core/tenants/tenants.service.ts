@@ -90,7 +90,8 @@ export class TenantService implements OnDestroy {
 
         // 2. Fallback local/API en navegador si no hay TransferState
         const storedBusiness = this.businessApi.getBusinessStorage();
-        const hasStoredTheme = !!(storedBusiness?.settings?.theme_config?.theme || storedBusiness?.settings?.theme);
+        const storedTheme = this.extractTheme(storedBusiness);
+        const hasStoredTheme = Object.keys(storedTheme).length > 0;
 
         if (storedBusiness && storedBusiness.id && hasStoredTheme) {
           this.currentBusiness = storedBusiness;
@@ -218,7 +219,7 @@ export class TenantService implements OnDestroy {
   }
 
   public applyPreviewTheme(previewPayload: any): void {
-    const theme = previewPayload.theme_config?.theme || previewPayload.theme || previewPayload;
+    const theme = this.extractTheme(previewPayload);
     const rawColors = theme?.colors || {};
     const rawTypography = theme?.typography || {};
     const rawUi = theme?.ui || {};
@@ -518,12 +519,47 @@ export class TenantService implements OnDestroy {
     styleElement.textContent = cssContent;
   }
 
+  private extractTheme(input: any): BusinessThemeModel {
+    if (!input || typeof input !== 'object') {
+      return {};
+    }
+
+    const settings = input.settings || input;
+    const themeConfigTheme = settings.theme_config?.theme;
+    const directTheme = settings.theme || (input !== settings ? input.theme : undefined);
+
+    const hasThemeContent = (t: any): boolean => {
+      if (!t || typeof t !== 'object') return false;
+      const hasColors = t.colors && typeof t.colors === 'object' && Object.keys(t.colors).length > 0;
+      const hasTypo = t.typography && typeof t.typography === 'object' && Object.keys(t.typography).length > 0;
+      const hasUi = t.ui && typeof t.ui === 'object' && Object.keys(t.ui).length > 0;
+      return hasColors || hasTypo || hasUi;
+    };
+
+    if (hasThemeContent(themeConfigTheme)) {
+      return themeConfigTheme;
+    }
+    if (hasThemeContent(directTheme)) {
+      return directTheme;
+    }
+    if (themeConfigTheme && typeof themeConfigTheme === 'object') {
+      return themeConfigTheme;
+    }
+    if (directTheme && typeof directTheme === 'object') {
+      return directTheme;
+    }
+    if (hasThemeContent(input)) {
+      return input;
+    }
+
+    return {};
+  }
+
   private async loadBusinessStyles(): Promise<void> {
     if (!this.currentBusiness) return;
 
-    const theme = this.currentBusiness.settings?.theme_config?.theme || this.currentBusiness.settings?.theme;
-    this.applyPreviewTheme(theme || {});
-
+    const theme = this.extractTheme(this.currentBusiness);
+    this.applyPreviewTheme(theme);
   }
 
 }
