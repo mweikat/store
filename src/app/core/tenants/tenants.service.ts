@@ -519,14 +519,15 @@ export class TenantService implements OnDestroy {
     styleElement.textContent = cssContent;
   }
 
-  private extractTheme(input: any): BusinessThemeModel {
+  private extractTheme(input: BusinessModel | BusinessSettingsModel | BusinessThemeModel | Record<string, any> | null | undefined): BusinessThemeModel {
     if (!input || typeof input !== 'object') {
       return {};
     }
 
-    const settings = input.settings || input;
+    const rawInput = input as Record<string, any>;
+    const settings = (rawInput['settings'] && typeof rawInput['settings'] === 'object') ? rawInput['settings'] : rawInput;
     const themeConfigTheme = settings.theme_config?.theme;
-    const directTheme = settings.theme || (input !== settings ? input.theme : undefined);
+    const directTheme = settings.theme || (rawInput !== settings ? rawInput['theme'] : undefined);
 
     const hasThemeContent = (t: any): boolean => {
       if (!t || typeof t !== 'object') return false;
@@ -548,8 +549,8 @@ export class TenantService implements OnDestroy {
     if (directTheme && typeof directTheme === 'object') {
       return directTheme;
     }
-    if (hasThemeContent(input)) {
-      return input;
+    if (hasThemeContent(rawInput) && !rawInput['settings'] && !rawInput['id'] && !rawInput['template_key']) {
+      return rawInput as BusinessThemeModel;
     }
 
     return {};

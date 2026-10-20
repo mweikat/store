@@ -1026,5 +1026,42 @@ describe('TenantService', () => {
       service.applyPreviewTheme(previewPayload);
       expect(textContentSetterSpy).not.toHaveBeenCalled();
     });
+
+    it('8. should verify canonical theme takes precedence without deep merging when canonical has colors but lacks typography/ui while alias has them', () => {
+      const payload = {
+        settings: {
+          theme_config: {
+            theme: { colors: { primary: '#112233' } }
+          },
+          theme: {
+            colors: { primary: '#998877' },
+            typography: { font_family_main: '"CustomFont", sans-serif' },
+            ui: { card_radius: '20px' }
+          }
+        }
+      };
+      service.applyPreviewTheme(payload);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #112233');
+      // No deep merge: canonical theme is selected, typography/ui fall back to system defaults
+      expect(el?.textContent).toContain('--font-family-main: "Montserrat", sans-serif');
+      expect(el?.textContent).toContain('--card-radius: 8px');
+    });
+
+    it('9. should NOT interpret a BusinessModel object without a valid theme as a theme object', () => {
+      const businessObjectWithoutTheme: BusinessModel = {
+        id: 'bus-300',
+        name: 'No Theme Pet Shop',
+        url: 'notheme.cl',
+        desc: 'No Theme Description',
+        info: {} as any,
+        settings: {}
+      };
+
+      service.applyPreviewTheme(businessObjectWithoutTheme);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #917f6e');
+      expect(el?.textContent).toContain('--font-family-main: "Montserrat", sans-serif');
+    });
   });
 });
