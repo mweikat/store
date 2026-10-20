@@ -29,6 +29,7 @@ export interface BusinessThemeColorsModel {
     rgba_2?: string;
     rgba_3?: string;
     rgba_4?: string;
+    components?: Record<string, Record<string, string>>;
 }
 
 export interface BusinessThemeTypographyModel {
@@ -41,9 +42,11 @@ export interface BusinessThemeUIModel {
 }
 
 export interface BusinessThemeModel {
+    mode?: 'light' | 'dark';
     colors?: BusinessThemeColorsModel;
     typography?: BusinessThemeTypographyModel;
     ui?: BusinessThemeUIModel;
+    components?: Record<string, Record<string, string>>;
 }
 
 export interface BusinessThemeConfigWrapperModel {

@@ -1,45 +1,21 @@
-:root {
-  --color-invalid-form: red;
-  --color-check-fail: #d9534f; 
-  --color-link: #efbc98;
+/* Variables base y mapeos Sass */
 
-  --color-primary: #917f6e;
-  --color-primary-v1: #6d5742;
-  --color-secondary: #efbc98;
-  --color-tertiary: #efd2be;
-  --color-quaternary: #efe1d1;
-  --color-quaternary-v2: #ffedd9;
-  --color-light-bg: white;
-  --color-dark-text: black;
-  --color-warning: #ffbd59;
-  --color-warning-v1: rgba(253, 201, 13, .25);
-  --color-price-1: #e74c3c;
-  --color-price-2: #dc3545;
-  --color-card-list-total: #fff3cd;
-
-  --color-rgba-1: rgba(253, 201, 13, 0.5);
-  --color-rgba-2: rgba(253, 249, 235, 0.5);
-  --color-rgba-3: rgb(255 189 89 / 11%);
-  --color-rgba-4: rgba(0, 0, 0, 0.5);
-  --font-family-main: "Montserrat", sans-serif;
-}
-
-$invalid-form-color: var(--color-invalid-form, red);
-$check-fail: var(--color-check-fail, #d9534f);
+$invalid-form-color: var(--color-state-danger, var(--color-invalid-form, red));
+$check-fail: var(--color-state-danger-text, var(--color-check-fail, #d9534f));
 $link-color: var(--color-link, #efbc98);
 
-$primary-color: var(--color-primary, #917f6e);
-$primary-color-v1: var(--color-primary-v1, #6d5742);
-$secondary-color: var(--color-secondary, #efbc98);
-$tertiary-color: var(--color-tertiary, #efd2be);
-$quaternary-color: var(--color-quaternary, #efe1d1);
-$quaternary-color2: var(--color-quaternary-v2, #ffedd9);
-$light-bg: var(--color-light-bg, white);
-$dark-text: var(--color-dark-text, black);
-$warning-color: var(--color-warning, #ffbd59);
-$warning-color-v1: var(--color-warning-v1, rgba(253, 201, 13, .25));
+$primary-color: var(--color-action-primary, var(--color-primary, #917f6e));
+$primary-color-v1: var(--color-action-primary-hover, var(--color-primary-v1, #6d5742));
+$secondary-color: var(--color-action-secondary, var(--color-secondary, #efbc98));
+$tertiary-color: var(--color-border-default, var(--color-tertiary, #efd2be));
+$quaternary-color: var(--color-surface-subtle, var(--color-quaternary, #efe1d1));
+$quaternary-color2: var(--color-surface-variant, var(--color-quaternary-v2, #ffedd9));
+$light-bg: var(--color-surface-base, var(--color-light-bg, white));
+$dark-text: var(--color-text-dark, var(--color-dark-text, black));
+$warning-color: var(--color-state-warning, var(--color-warning, #ffbd59));
+$warning-color-v1: var(--color-state-warning-soft, var(--color-warning-v1, rgba(253, 201, 13, .25)));
 $price-color-1: var(--color-price-1, #e74c3c);
-$color-price-sale: var(--color-price-2, #dc3545);
+$color-price-sale: var(--product-price-sale, var(--color-price-2, #dc3545));
 $color-card-list-total: var(--color-card-list-total, #fff3cd);
 $rgba-1: var(--color-rgba-1, rgba(253, 201, 13, 0.5));
 $rgba-2: var(--color-rgba-2, rgba(253, 249, 235, 0.5));
@@ -61,7 +37,7 @@ $header-nav-link-color-active: $primary-color-v1;
 $header-dropdown-menu: $light-bg;
 $header-dropdown-menu-text: $primary-color;
 $header-dropdown-menu-hover: $primary-color-v1;
-$header-dropdown-menu-hover-background: $warning-color-v1;
+//$header-dropdown-menu-hover-background: $warning-color-v1;
 $header-dropdown-active-link: $primary-color;
 $header-dropdown-active-border: $primary-color;
 $header-sidebar-background:  $light-bg;

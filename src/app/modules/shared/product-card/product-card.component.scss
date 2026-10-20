@@ -1,11 +1,13 @@
 .product-card {
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  border-radius: 0.75rem;
+  border-radius: var(--card-radius, 0.75rem);
   overflow: hidden;
+  border: 1px solid var(--product-card-border, var(--color-border-default, #efd2be));
+  background-color: var(--product-card-bg, var(--color-surface-base, #ffffff));
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+    box-shadow: var(--card-shadow, 0 0.5rem 1rem rgba(0, 0, 0, 0.08));
   }
 
   .product-image-wrapper {
@@ -15,6 +17,8 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    background-color: var(--product-card-img-bg, var(--color-surface-subtle, #efe1d1));
+    border-bottom: 2px solid var(--product-card-img-border, var(--color-border-default, #efd2be));
 
     .product-image {
       object-fit: contain;
@@ -49,6 +53,7 @@
       overflow: hidden;
       min-height: 2.3rem;
       word-break: break-word;
+      color: var(--product-card-title, var(--color-text-brand, #917f6e));
     }
 
     .product-price {
@@ -58,6 +63,18 @@
       flex-wrap: wrap;
       gap: 0.25rem;
       min-height: 1.5rem;
+
+      .normal-price {
+        color: var(--product-card-price, var(--color-action-primary-hover, #6d5742));
+
+        &.text-decoration-line-through {
+          color: var(--product-card-price, var(--color-action-primary-hover, #6d5742));
+        }
+      }
+
+      .sale-price {
+        color: var(--product-card-price-sale, var(--color-text-sale, #dc3545));
+      }
     }
 
     .action-btn {

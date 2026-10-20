@@ -3,6 +3,7 @@
     .card {
       border: none;
       border-radius: 12px;
+      background-color: var(--checkout-confirm-card-bg, var(--color-surface-base, #ffffff));
         
       .success-icon {
         width: 100px;
@@ -12,11 +13,12 @@
       .title {
         font-size: 2rem;
         font-weight: 600;
-        
+        color: var(--checkout-confirm-title, var(--color-action-primary, #917f6e));
       }
   
       .text-secondary {
         font-size: 1rem;
+        color: var(--color-text-dark, #000000);
       }
 
       .message-placeholder {
@@ -34,8 +36,8 @@
   
       .order-summary {
         ul {
-          
           border-radius: 8px;
+          background-color: var(--checkout-confirm-order-bg, var(--color-border-default, #efd2be));
   
           .list-group-item {
             min-height: 48px;
@@ -45,6 +47,7 @@
             background-color: transparent;
             border: none;
             font-size: 1rem;
+            color: var(--color-text-dark, #000000);
             
             strong {
               font-weight: 600;

@@ -1,5 +1,164 @@
 @use 'src/styles-var.scss' as vars ;
 
+:root {
+  /* Capa 1: Primitivos y Marca (Valores Base) */
+  --brand-primary: #917f6e;
+  --brand-primary-dark: #6d5742;
+  --brand-secondary: #efbc98;
+  --brand-tertiary: #efd2be;
+  --brand-quaternary: #efe1d1;
+  --brand-quaternary-light: #ffedd9;
+  --neutral-100: white;
+  --neutral-900: black;
+
+  /* Capa 2: Tokens Semánticos */
+  --color-surface-base: var(--neutral-100);
+  --color-surface-variant: var(--brand-quaternary-light);
+  --color-surface-subtle: var(--brand-quaternary);
+  --color-text-base: var(--neutral-900);
+  --color-text-dark: var(--neutral-900);
+  --color-text-brand: var(--brand-primary);
+  --color-text-sale: #dc3545;
+  --color-action-primary: var(--brand-primary);
+  --color-action-primary-hover: var(--brand-primary-dark);
+  --color-action-secondary: var(--brand-secondary);
+  --color-border-default: var(--brand-tertiary);
+  --color-border-subtle: var(--brand-quaternary);
+  --color-state-warning: #ffbd59;
+  --color-state-warning-soft: rgba(253, 201, 13, 0.25);
+  --color-state-danger: red;
+  --color-state-danger-text: #d9534f;
+  --color-link: #efbc98;
+  --color-card-list-total: #fff3cd;
+
+  /* Capa 3: Tokens de Componentes */
+  --btn-primary-bg: var(--color-action-primary-hover, #6d5742);
+  --btn-primary-border: var(--color-action-primary-hover, #6d5742);
+  --btn-primary-text: var(--neutral-100, #ffffff);
+  --btn-primary-hover-bg: var(--color-action-primary-hover, #6d5742);
+  --card-border-color: var(--color-border-default);
+  --card-bg: var(--color-surface-base);
+  --input-focus-ring: var(--color-state-warning-soft);
+  --product-price-sale: var(--color-text-sale);
+
+  /* Product Card Tokens */
+  --product-card-bg: var(--color-surface-base);
+  --product-card-border: var(--color-border-default);
+  --product-card-img-bg: var(--color-surface-subtle);
+  --product-card-img-border: var(--color-border-default);
+  --product-card-title: var(--color-action-primary-hover, #6d5742);
+  --product-card-price: var(--color-action-primary-hover);
+  --product-card-price-sale: var(--color-text-sale);
+
+  /* Header Tokens */
+  --header-bg: var(--color-surface-base);
+  --header-border: var(--color-border-default);
+  --header-link: var(--color-action-primary-hover);
+  --header-link-hover: var(--color-action-primary-hover);
+  --header-dropdown-bg: var(--color-surface-base);
+  --header-dropdown-text: var(--color-text-dark);
+  --header-dropdown-hover-bg: var(--color-state-warning-soft);
+  --header-sidebar-bg: var(--color-surface-base);
+  --header-sidebar-header-bg: var(--color-border-default);
+  --header-sidebar-title: var(--color-action-primary);
+  --header-sidebar-overlay: rgba(0, 0, 0, 0.5);
+
+  /* Footer Tokens */
+  --footer-bg: var(--neutral-900);
+  --footer-text: var(--neutral-100);
+  --footer-link: var(--color-action-primary);
+  --footer-link-hover: var(--color-action-primary-hover);
+
+  /* Cart Component Tokens */
+  --cart-title: var(--color-action-primary);
+  --cart-item-bg: var(--color-rgba-2, rgba(253, 249, 235, 0.5));
+  --cart-item-title: var(--color-action-primary);
+  --cart-item-price: var(--color-action-primary-hover);
+  --cart-quantity-btn: var(--color-action-primary);
+  --cart-quantity-btn-hover-bg: var(--color-action-secondary);
+  --cart-summary-bg: var(--color-card-list-total);
+  --cart-summary-title: var(--color-action-primary);
+  --cart-summary-btn-bg: var(--color-action-primary);
+  --cart-menu-toggle: var(--color-action-primary);
+  --cart-menu-badge-bg: var(--color-state-warning);
+  --cart-menu-badge-text: var(--neutral-100);
+  --cart-menu-dropdown-bg: var(--color-surface-base);
+  --cart-menu-dropdown-border: var(--color-border-default);
+  --cart-menu-btn-bg: var(--color-action-secondary);
+  --cart-menu-btn-text: var(--neutral-100);
+
+  /* Checkout Component Tokens */
+  --checkout-title: var(--color-action-primary);
+  --checkout-section-border: var(--color-surface-subtle);
+  --checkout-confirm-card-bg: var(--color-surface-base);
+  --checkout-confirm-title: var(--color-action-primary);
+  --checkout-confirm-order-bg: var(--color-border-default);
+  --checkout-fail-card-bg: var(--color-surface-base);
+  --checkout-fail-title: var(--color-state-danger-text);
+  --checkout-fail-order-bg: var(--color-border-default);
+  --checkout-steps-bg: var(--color-surface-subtle);
+  --checkout-steps-active-bg: var(--color-action-primary);
+  --checkout-steps-active-text: var(--neutral-100);
+
+  /* User Menu & User Admin Tokens */
+  --user-menu-icon: var(--color-action-primary);
+  --user-menu-btn-bg: var(--color-action-secondary);
+  --user-menu-btn-text: var(--neutral-100);
+  --user-menu-dropdown-bg: var(--color-surface-base);
+  --user-menu-dropdown-border: var(--color-border-default);
+  --user-menu-dropdown-text: var(--color-text-dark);
+  --user-admin-menu-text: var(--color-action-primary);
+  --user-admin-menu-border: var(--color-surface-base);
+  --user-admin-menu-hover-bg: var(--color-action-secondary);
+  --user-admin-menu-hover-text: var(--neutral-100);
+  --user-admin-menu-active-bg: var(--color-action-primary);
+  --user-admin-menu-active-text: var(--neutral-100);
+  --user-orders-title: var(--color-action-primary);
+  --user-orders-badge-success-bg: var(--color-action-secondary);
+  --user-orders-badge-success-text: var(--neutral-900);
+  --user-orders-badge-warning-bg: var(--color-state-warning);
+  --user-orders-badge-warning-text: var(--color-action-primary-hover);
+  --user-orders-badge-danger-bg: var(--color-price-1, #e74c3c);
+  --user-orders-badge-danger-text: var(--neutral-900, #000000);
+
+  /* Pagination Component Tokens */
+  --pagination-bg: var(--color-surface-base);
+  --pagination-text: var(--color-action-primary);
+  --pagination-border: var(--color-surface-variant);
+  --pagination-active-bg: var(--color-action-primary-hover);
+  --pagination-active-text: var(--neutral-100);
+  --pagination-hover-bg: var(--color-state-warning-soft);
+  --pagination-hover-text: var(--color-action-primary-hover);
+
+  /* Remapeo Bootstrap 5 */
+  --bs-primary: var(--color-action-primary);
+  --bs-body-bg: var(--color-surface-base);
+  --bs-body-color: var(--color-text-base);
+  --bs-link-color: var(--color-link);
+
+  /* CSS Custom Properties Heredadas */
+  --color-invalid-form: red;
+  --color-check-fail: #d9534f;
+  --color-primary: #917f6e;
+  --color-primary-v1: #6d5742;
+  --color-secondary: #efbc98;
+  --color-tertiary: #efd2be;
+  --color-quaternary: #efe1d1;
+  --color-quaternary-v2: #ffedd9;
+  --color-light-bg: white;
+  --color-dark-text: black;
+  --color-warning: #ffbd59;
+  --color-price-1: #e74c3c;
+  --color-price-2: #dc3545;
+  --color-card-list-total: #fff3cd;
+
+  --color-rgba-1: rgba(253, 201, 13, 0.5);
+  --color-rgba-2: rgba(253, 249, 235, 0.5);
+  --color-rgba-3: rgb(255 189 89 / 11%);
+  --color-rgba-4: rgba(0, 0, 0, 0.5);
+  --font-family-main: "Montserrat", sans-serif;
+}
+
 body {
     font-family: vars.$font-family-main !important;
     font-weight: vars.$font-weight-main !important;
@@ -21,16 +180,24 @@ a:hover{
 }
 /**********************buttonss***************/
 .btn-primary-c1 {
-    background-color: vars.$primary-color !important;
-    border-color: vars.$primary-color !important;
-    color: vars.$light-bg !important;
+    background-color: var(--btn-primary-bg, var(--color-action-primary-hover, #6d5742)) !important;
+    border-color: var(--btn-primary-border, var(--color-action-primary-hover, #6d5742)) !important;
+    color: var(--btn-primary-text, var(--neutral-100, #ffffff)) !important;
     &:hover {
-      background-color: color-mix(in srgb, vars.$primary-color 90%, white) !important;
+      background-color: color-mix(in srgb, var(--btn-primary-hover-bg, var(--color-action-primary-hover, #6d5742)) 85%, black) !important;
+      border-color: var(--btn-primary-hover-bg, var(--color-action-primary-hover, #6d5742)) !important;
+      color: var(--btn-primary-text, var(--neutral-100, #ffffff)) !important;
     }
-}
-.btn-primary-c1:hover {
-    color: vars.$light-bg !important;
-    border-color: vars.$quaternary-color !important;
+    &:focus, &:focus-visible {
+      outline: 2px solid var(--color-action-primary-hover, #6d5742);
+      outline-offset: 2px;
+      box-shadow: 0 0 0 0.25rem var(--color-state-warning-soft, rgba(253, 201, 13, 0.25)) !important;
+    }
+    &:disabled, &.disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
 }
 .btn-primary-c2 {
     background-color: vars.$warning-color !important;
@@ -69,7 +236,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 
 .form-control:focus {
     border-color: vars.$warning-color;
-    box-shadow: 0 0 0 .25rem vars.$warning-color-v1;
+    /*box-shadow: 0 0 0 .25rem vars.$warning-color-v1;*/
 }
 .product-price{
     color: vars.$primary-color-v1;
@@ -79,10 +246,10 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 }
 .dropdown-item:focus, .dropdown-item:hover {
     
-    background-color: vars.$warning-color-v1;
+    /*background-color: vars.$warning-color-v1;*/
 }
 .dropdown-item.active, .dropdown-item:active {
-    background-color: vars.$warning-color-v1;
+    /*background-color: vars.$warning-color-v1;*/
 }
 .form-select {
     color: vars.$primary-color;
@@ -180,7 +347,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
             color: vars.$header-dropdown-menu-text !important;
             &:hover {
                 color: vars.$header-dropdown-menu-hover !important;
-                background-color: vars.$header-dropdown-menu-hover-background !important;
+                /*background-color: vars.$header-dropdown-menu-hover-background !important;*/
             }
         }
     }
@@ -289,56 +456,56 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 .cart-container {
 
     .cart-title {
-      color: vars.$cart-list-title;
+      color: var(--cart-title, var(--color-action-primary, #917f6e));
     }
 
     .cart-item {
-        background-color: vars.$cart-list-item-background !important;
+        background-color: var(--cart-item-bg, var(--color-rgba-2, rgba(253, 249, 235, 0.5))) !important;
         
         .product-name {
-            color: vars.$cart-list-product-name;
+            color: var(--cart-item-title, var(--color-action-primary, #917f6e));
         }
 
         .product-price {
-            color: vars.$cart-list-product-price;
+            color: var(--cart-item-price, var(--color-action-secondary, #efbc98));
         }
   
         .quantity-controls {
             button {
-                color: vars.$cart-list-quantity-btn;
-                border-color: vars.$cart-list-quantity-border;
+                color: var(--cart-quantity-btn, var(--color-action-primary, #917f6e));
+                border-color: var(--color-action-secondary, #efbc98);
             
                 &:hover {
-                    background-color: vars.$cart-list-quantity-hover-background;
-                    color: vars.$cart-list-quantity-hover-color;
+                    background-color: var(--cart-quantity-btn-hover-bg, var(--color-action-secondary, #efbc98));
+                    color: var(--neutral-100, #ffffff);
                 }
             }
         }
   
         .btn-danger {
-            background-color: vars.$cart-list-btn-danger;
-            border-color: vars.$cart-list-btn-danger-border;
+            background-color: var(--color-state-warning, #ffbd59);
+            border-color: var(--color-state-warning, #ffbd59);
     
             &:hover {
-                background-color: color-mix(in srgb, vars.$cart-list-btn-danger-hover-background 80%, white);
+                background-color: color-mix(in srgb, var(--color-state-warning, #ffbd59) 80%, white);
             }
         }
     }
 
     .cart-total {
-      background-color: vars.$cart-list-total; // Amarillo claro Bootstrap
+      background-color: var(--cart-summary-bg, var(--color-card-list-total, #fff3cd));
       border-radius: 0.5rem;
   
       h5 {
-        color: vars.$cart-list-total-h5;
+        color: var(--cart-summary-title, var(--color-action-primary, #917f6e));
       }
   
       .btn-primary {
-        background-color: vars.$cart-list-total-btn-back;
-        border-color: vars.$cart-list-total-btn-border;
+        background-color: var(--cart-summary-btn-bg, var(--color-action-primary, #917f6e));
+        border-color: var(--cart-summary-btn-bg, var(--color-action-primary, #917f6e));
   
         &:hover {
-          background-color: color-mix(in srgb, vars.$cart-list-total-btn-hover 80%, white);
+          background-color: color-mix(in srgb, var(--cart-summary-btn-bg, var(--color-action-primary, #917f6e)) 80%, white);
         }
       }
     }
@@ -379,23 +546,23 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 /*****************check out******************/
 .check-out{
     h2 {
-        color: vars.$check-title !important;
+        color: var(--checkout-title, var(--color-action-primary, #917f6e)) !important;
     }
     .payment-section, .shipping-method, .address-section {
-        border: 1px solid vars.$check-payment-section !important;
+        border: 1px solid var(--checkout-section-border, var(--color-surface-subtle, #efe1d1)) !important;
         
         .input-tel:focus {
-            border-color: vars.$checkout-delivery-data-border-select-1 !important;
-            box-shadow: 0 0 0 0.25rem vars.$checkout-delivery-data-border-select !important;
+            border-color: var(--color-surface-base, #ffffff) !important;
+            box-shadow: 0 0 0 0.25rem var(--color-state-warning-soft, rgba(253, 201, 13, 0.25)) !important;
         }
         i{
             font-size: 22px !important;
-            color: vars.$check-payment-section !important;
+            color: var(--checkout-section-border, var(--color-surface-subtle, #efe1d1)) !important;
         }
     }
     .payment-section {
         .accordion-collapse {
-            color: vars.$check-payment-section-accordion-collapse !important;
+            color: var(--color-text-dark, #000000) !important;
         }
     } 
 
@@ -403,45 +570,45 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 }
 .checkout-success {
     .card{
-        background-color: vars.$check-confirm-card;
+        background-color: var(--checkout-confirm-card-bg, var(--color-surface-base, #ffffff));
 
         .title {
-            color: vars.$check-confirm-h1;
+            color: var(--checkout-confirm-title, var(--color-action-primary, #917f6e));
         }
         .text-secondary {
-            color: vars.$check-confirm-text;
+            color: var(--color-text-dark, #000000);
         }
         .order-summary {
                 ul {
-                background-color: vars.$check-confirm-order;
+                background-color: var(--checkout-confirm-order-bg, var(--color-border-default, #efd2be));
                 .list-group-item {
-                    color: vars.$check-confirm-order-item;
+                    color: var(--color-text-dark, #000000);
                 }
                 }
         }
     }
 }
 .order-summary-detail {
-    color: vars.$check-confirm-order-item-detail !important;
+    color: var(--color-action-primary, #917f6e) !important;
 }
 .checkout-failure{
     .card {
-        background-color: vars.$check-fail-card-back;
+        background-color: var(--checkout-fail-card-bg, var(--color-surface-base, #ffffff));
 
         .text-secondary {
-            color: vars.$check-fail-card-text;
+            color: var(--color-text-dark, #000000);
             font-size: 1rem;
         }
 
         h1{
-            color: vars.$check-fail-card-h1; // Rojo para indicar error
+            color: var(--checkout-fail-title, var(--color-state-danger-text, #d9534f));
         }
 
         .error-options {
             ul {
-                background-color: vars.$check-fail-card-error-back;
+                background-color: var(--checkout-fail-order-bg, var(--color-border-default, #efd2be));
                 .list-group-item {
-                    color: vars.$check-fail-card-item;
+                    color: var(--color-text-dark, #000000);
                 }
             }
         }
@@ -822,37 +989,37 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 .user-menu{
     i {
         font-size: 1.5rem;
-        color: vars.$header-user-menu-icon;
+        color: var(--user-menu-icon, var(--color-action-primary, #917f6e));
     }
 
     .btn-go-cart {
-        background-color: vars.$header-user-menu-btn-background;
-        color: vars.$header-user-menu-btn-text !important;
+        background-color: var(--user-menu-btn-bg, var(--color-action-secondary, #efbc98));
+        color: var(--user-menu-btn-text, var(--neutral-100, #ffffff)) !important;
 
         &:hover {
-          background-color: color-mix(in srgb, vars.$header-user-menu-btn-background 90%, white);
-          color: vars.$header-user-menu-btn-text;
+          background-color: color-mix(in srgb, var(--user-menu-btn-bg, var(--color-action-secondary, #efbc98)) 90%, white);
+          color: var(--user-menu-btn-text, var(--neutral-100, #ffffff));
         }   
     }
 
     .dropdown-toggle {
-        color: vars.$header-user-menu-dropdown-toggle;
+        color: var(--user-menu-icon, var(--color-action-primary, #917f6e));
 
         &:hover {
-            color: vars.$header-user-menu-dropdown-toggle-hover;
+            color: var(--color-action-primary-hover, #6d5742);
         }
   
     }
     .dropdown-menu {
-        border: 1px solid vars.$header-user-menu-dropdown-border;
-        background-color: vars.$header-user-menu-dropdown-background;
+        border: 1px solid var(--user-menu-dropdown-border, var(--color-border-default, #efd2be));
+        background-color: var(--user-menu-dropdown-bg, var(--color-surface-base, #ffffff));
 
         .dropdown-item {
-            color: vars.$header-user-menu-dropdown-text;
+            color: var(--user-menu-dropdown-text, var(--color-text-dark, #000000));
 
             &:hover {
-                background-color: vars.$header-user-menu-dropdown-background-hover !important;
-                color: vars.$header-user-menu-dropdown-color-hover !important;
+                background-color: var(--color-border-default, #efd2be) !important;
+                color: var(--color-action-primary, #917f6e) !important;
             }
         }
     }
@@ -861,41 +1028,41 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 .user-submenu {
 
     .nav-link {
-        color: vars.$user-admin-menu-text !important;
-        border-bottom: 1px solid vars.$user-admin-menu-border !important; ;
+        color: var(--user-admin-menu-text, var(--color-action-primary, #917f6e)) !important;
+        border-bottom: 1px solid var(--user-admin-menu-border, var(--color-surface-base, #ffffff)) !important;
         &:hover {
-            background-color: vars.$user-admin-menu-hover-background !important; /* Color secundario */
-            color: vars.$user-admin-menu-hover-text !important; /* Color de texto */
+            background-color: var(--user-admin-menu-hover-bg, var(--color-action-secondary, #efbc98)) !important;
+            color: var(--user-admin-menu-hover-text, var(--neutral-100, #ffffff)) !important;
         }
         &.active {
-            background-color: vars.$user-admin-menu-active-background !important; /* Color primario */
-            color: vars.$user-admin-menu-active-text !important;
+            background-color: var(--user-admin-menu-active-bg, var(--color-action-primary, #917f6e)) !important;
+            color: var(--user-admin-menu-active-text, var(--neutral-100, #ffffff)) !important;
         }
         i {
             font-size: 1.2rem;
-            color: vars.$user-admin-menu-icon !important;
+            color: var(--user-admin-menu-text, var(--color-action-primary, #917f6e)) !important;
         }
     }
 }
 .orders-section {
     
     h5.card-title {
-       color: vars.$user-orders-title;
+       color: var(--user-orders-title, var(--color-action-primary, #917f6e));
     }
     .badge {
         &.badge-success {
-            background-color: vars.$user-orders-badge-success-background;
-            color: vars.$user-orders-badge-success-text;
+            background-color: var(--user-orders-badge-success-bg, var(--color-action-secondary, #efbc98));
+            color: var(--user-orders-badge-success-text, var(--neutral-900, #000000));
         }
 
         &.badge-warning {
-            background-color: vars.$user-orders-badge-warning-background;
-            color: vars.$user-orders-badge-warning-text;
+            background-color: var(--user-orders-badge-warning-bg, var(--color-state-warning, #ffbd59));
+            color: var(--user-orders-badge-warning-text, var(--color-action-primary-hover, #6d5742));
         }
 
         &.badge-danger {
-            background-color: vars.$user-orders-badge-danger-background;
-            color: vars.$user-orders-badge-danger-text;
+            background-color: var(--user-orders-badge-danger-bg, var(--color-price-1, #e74c3c));
+            color: var(--user-orders-badge-danger-text, var(--neutral-900, #000000));
         }
     }
 }
