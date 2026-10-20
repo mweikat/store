@@ -237,7 +237,7 @@ export class TenantService implements OnDestroy {
     const lightBgColor = colors.light_bg || colors.bg_light || '#ffffff';
     const darkTextColor = colors.dark_text || colors.text_dark || '#000000';
     const warningColor = colors.warning || '#ffbd59';
-    const warningV1Color = colors.warning_v1 || 'rgba(253, 201, 13, 0.25)';
+    const warningV1Color = colors.tertiary || 'rgba(253, 201, 13, 0.25)';
     const price1Color = colors.price_1 || colors.price_color_1 || colors.price_sale || '#e74c3c';
     const price2Color = colors.price_2 || '#dc3545';
     const linkColor = colors.link || colors.link_color || '#efbc98';

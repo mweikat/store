@@ -148,7 +148,6 @@
   --color-light-bg: white;
   --color-dark-text: black;
   --color-warning: #ffbd59;
-  --color-warning-v1: rgba(253, 201, 13, .25);
   --color-price-1: #e74c3c;
   --color-price-2: #dc3545;
   --color-card-list-total: #fff3cd;
@@ -237,7 +236,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 
 .form-control:focus {
     border-color: vars.$warning-color;
-    box-shadow: 0 0 0 .25rem vars.$warning-color-v1;
+    /*box-shadow: 0 0 0 .25rem vars.$warning-color-v1;*/
 }
 .product-price{
     color: vars.$primary-color-v1;
@@ -247,10 +246,10 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
 }
 .dropdown-item:focus, .dropdown-item:hover {
     
-    background-color: vars.$warning-color-v1;
+    /*background-color: vars.$warning-color-v1;*/
 }
 .dropdown-item.active, .dropdown-item:active {
-    background-color: vars.$warning-color-v1;
+    /*background-color: vars.$warning-color-v1;*/
 }
 .form-select {
     color: vars.$primary-color;
@@ -348,7 +347,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
             color: vars.$header-dropdown-menu-text !important;
             &:hover {
                 color: vars.$header-dropdown-menu-hover !important;
-                background-color: vars.$header-dropdown-menu-hover-background !important;
+                /*background-color: vars.$header-dropdown-menu-hover-background !important;*/
             }
         }
     }
