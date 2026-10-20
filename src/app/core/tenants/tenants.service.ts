@@ -32,6 +32,8 @@ export class TenantService implements OnDestroy {
 
   // Referencia al listener de postMessage para evitar duplicados y permitir limpieza
   private messageListener: ((event: MessageEvent) => void) | null = null;
+  private pendingPreviewPayload: any = null;
+  private previewAnimationFrameId: number | null = null;
 
   constructor(
     private businessApi: BusinessService,
@@ -180,6 +182,11 @@ export class TenantService implements OnDestroy {
       window.removeEventListener('message', this.messageListener);
       this.messageListener = null;
     }
+    if (this.previewAnimationFrameId !== null && typeof window !== 'undefined' && typeof window.cancelAnimationFrame === 'function') {
+      window.cancelAnimationFrame(this.previewAnimationFrameId);
+      this.previewAnimationFrameId = null;
+    }
+    this.pendingPreviewPayload = null;
   }
 
   private handleThemePreviewMessage(event: MessageEvent): void {
@@ -198,8 +205,24 @@ export class TenantService implements OnDestroy {
       return;
     }
 
-    // 3. Aplicar tema de previsualización temporal sin alterar el tenant ni la caché
-    this.applyPreviewTheme(payload);
+    // 3. Aplicar tema de previsualización con agrupación por frame en el navegador
+    this.pendingPreviewPayload = payload;
+
+    if (isPlatformBrowser(this.platformId) && typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+      if (this.previewAnimationFrameId !== null) {
+        window.cancelAnimationFrame(this.previewAnimationFrameId);
+      }
+      this.previewAnimationFrameId = window.requestAnimationFrame(() => {
+        this.previewAnimationFrameId = null;
+        if (this.pendingPreviewPayload) {
+          const latestPayload = this.pendingPreviewPayload;
+          this.pendingPreviewPayload = null;
+          this.applyPreviewTheme(latestPayload);
+        }
+      });
+    } else {
+      this.applyPreviewTheme(payload);
+    }
   }
 
   private isValidOrigin(origin: string): boolean {

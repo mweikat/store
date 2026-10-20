@@ -1064,4 +1064,123 @@ describe('TenantService', () => {
       expect(el?.textContent).toContain('--font-family-main: "Montserrat", sans-serif');
     });
   });
+
+  describe('Fase 3: Optimización Controlada de la Vista Previa de Temas', () => {
+    let authorizedOrigin: string;
+
+    beforeEach(() => {
+      authorizedOrigin = new URL((environment as any).admin_url).origin;
+      service.setupThemePreviewListener();
+    });
+
+    it('1. should process a valid message and apply preview theme', (done) => {
+      const msg = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#112233' } } }
+      });
+
+      window.dispatchEvent(msg);
+
+      requestAnimationFrame(() => {
+        const el = document.getElementById('site-tenant-tokens');
+        expect(el?.textContent).toContain('--brand-primary: #112233');
+        done();
+      });
+    });
+
+    it('2. should coalesce rapid consecutive messages A, B, C into a single frame execution applying C', (done) => {
+      const msgA = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#AAAAAA' } } }
+      });
+      const msgB = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#BBBBBB' } } }
+      });
+      const msgC = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#CCCCCC' } } }
+      });
+
+      const applySpy = spyOn(service, 'applyPreviewTheme').and.callThrough();
+
+      window.dispatchEvent(msgA);
+      window.dispatchEvent(msgB);
+      window.dispatchEvent(msgC);
+
+      requestAnimationFrame(() => {
+        expect(applySpy).toHaveBeenCalledTimes(1);
+        expect(applySpy).toHaveBeenCalledWith({ colors: { primary: '#CCCCCC' } });
+
+        const el = document.getElementById('site-tenant-tokens');
+        expect(el?.textContent).toContain('--brand-primary: #CCCCCC');
+        done();
+      });
+    });
+
+    it('3. should ignore messages with unauthorized origin or invalid format', () => {
+      const invalidOriginMsg = new MessageEvent('message', {
+        origin: 'http://unauthorized.com',
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#999999' } } }
+      });
+      const invalidDataMsg = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'OTHER_TYPE', payload: { colors: { primary: '#999999' } } }
+      });
+
+      window.dispatchEvent(invalidOriginMsg);
+      window.dispatchEvent(invalidDataMsg);
+
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).not.toContain('--brand-primary: #999999');
+    });
+
+    it('4. should not generate redundant DOM writes when consecutive preview themes are identical', (done) => {
+      const msg1 = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#444444' } } }
+      });
+      const msg2 = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#444444' } } }
+      });
+
+      window.dispatchEvent(msg1);
+
+      requestAnimationFrame(() => {
+        const el = document.getElementById('site-tenant-tokens') as HTMLStyleElement;
+        expect(el?.textContent).toContain('--brand-primary: #444444');
+
+        const textContentSetterSpy = spyOnProperty(el, 'textContent', 'set').and.callThrough();
+
+        window.dispatchEvent(msg2);
+
+        requestAnimationFrame(() => {
+          expect(textContentSetterSpy).not.toHaveBeenCalled();
+          done();
+        });
+      });
+    });
+
+    it('5. should cancel pending animation frame callbacks on stopThemePreviewListener or service destruction', (done) => {
+      const cancelSpy = spyOn(window, 'cancelAnimationFrame').and.callThrough();
+
+      const msg = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#777777' } } }
+      });
+
+      window.dispatchEvent(msg);
+
+      service.stopThemePreviewListener();
+
+      expect(cancelSpy).toHaveBeenCalled();
+
+      requestAnimationFrame(() => {
+        const el = document.getElementById('site-tenant-tokens');
+        expect(el?.textContent).not.toContain('--brand-primary: #777777');
+        done();
+      });
+    });
+  });
 });
