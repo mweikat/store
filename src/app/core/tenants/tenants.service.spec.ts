@@ -837,4 +837,376 @@ describe('TenantService', () => {
       expect(removeEventListenerSpy).toHaveBeenCalledTimes(2);
     });
   });
+
+  describe('Fase 1: Optimización del Inyector CSS', () => {
+    it('1. should create style#site-tenant-tokens when element does not exist', () => {
+      const existing = document.getElementById('site-tenant-tokens');
+      if (existing) existing.remove();
+
+      service.applyPreviewTheme({ colors: { primary: '#111111' } });
+
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el).toBeTruthy();
+      expect(el?.textContent).toContain('--brand-primary: #111111');
+    });
+
+    it('2. should NOT rewrite textContent if CSS content is identical on subsequent calls', () => {
+      service.applyPreviewTheme({ colors: { primary: '#222222' } });
+
+      const el = document.getElementById('site-tenant-tokens') as HTMLStyleElement;
+      expect(el).toBeTruthy();
+
+      const textContentSetterSpy = spyOnProperty(el, 'textContent', 'set').and.callThrough();
+
+      service.applyPreviewTheme({ colors: { primary: '#222222' } });
+
+      expect(textContentSetterSpy).not.toHaveBeenCalled();
+    });
+
+    it('3. should update textContent if CSS content is different', () => {
+      service.applyPreviewTheme({ colors: { primary: '#333333' } });
+
+      const el = document.getElementById('site-tenant-tokens') as HTMLStyleElement;
+      expect(el.textContent).toContain('--brand-primary: #333333');
+
+      service.applyPreviewTheme({ colors: { primary: '#444444' } });
+
+      expect(el.textContent).toContain('--brand-primary: #444444');
+    });
+
+    it('4. should avoid rewriting when style element with expected CSS pre-exists before initialization (SSR hydration)', async () => {
+      const existing = document.getElementById('site-tenant-tokens');
+      if (existing) existing.remove();
+
+      // Simulate pre-existing SSR rendered style tag
+      service.applyPreviewTheme(mockBusinessCanonical.settings?.theme_config?.theme || {});
+      const el = document.getElementById('site-tenant-tokens') as HTMLStyleElement;
+      expect(el).toBeTruthy();
+
+      const textContentSetterSpy = spyOnProperty(el, 'textContent', 'set').and.callThrough();
+
+      // Initialize service simulating client hydration
+      await service.initialize();
+
+      expect(textContentSetterSpy).not.toHaveBeenCalled();
+    });
+
+    it('5. should recover and recreate style element if element is removed from DOM externally', () => {
+      service.applyPreviewTheme({ colors: { primary: '#555555' } });
+
+      let el = document.getElementById('site-tenant-tokens');
+      expect(el).toBeTruthy();
+      el?.remove();
+
+      expect(document.getElementById('site-tenant-tokens')).toBeNull();
+
+      service.applyPreviewTheme({ colors: { primary: '#555555' } });
+
+      el = document.getElementById('site-tenant-tokens');
+      expect(el).toBeTruthy();
+      expect(el?.textContent).toContain('--brand-primary: #555555');
+    });
+
+    it('6. should restore expected CSS if element content is modified externally', () => {
+      service.applyPreviewTheme({ colors: { primary: '#666666' } });
+
+      const el = document.getElementById('site-tenant-tokens') as HTMLStyleElement;
+      el.textContent = '/* corrupted styles */';
+
+      service.applyPreviewTheme({ colors: { primary: '#666666' } });
+
+      expect(el.textContent).toContain('--brand-primary: #666666');
+    });
+
+    it('7. should correctly update between two different valid theme configurations', () => {
+      service.applyPreviewTheme(mockBusinessCanonical.settings?.theme_config?.theme || {});
+      let el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #112233');
+
+      service.applyPreviewTheme(mockBusinessAliasTheme.settings?.theme || {});
+      el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #990000');
+    });
+
+    it('8. should preserve default fallbacks and token mappings without changes', () => {
+      service.applyPreviewTheme({});
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #917f6e');
+      expect(el?.textContent).toContain('--font-family-main: "Montserrat", sans-serif');
+      expect(el?.textContent).toContain('--card-radius: 8px');
+    });
+  });
+
+  describe('Fase 2: Normalización del Payload de Temas', () => {
+    it('1. should extract theme from theme_config.theme structure', () => {
+      const payload = {
+        settings: {
+          theme_config: {
+            theme: { colors: { primary: '#A1B2C3' } }
+          }
+        }
+      };
+      service.applyPreviewTheme(payload);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #A1B2C3');
+    });
+
+    it('2. should extract theme from direct theme structure (alias)', () => {
+      const payload = {
+        settings: {
+          theme: { colors: { primary: '#C3B2A1' } }
+        }
+      };
+      service.applyPreviewTheme(payload);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #C3B2A1');
+    });
+
+    it('3. should verify canonical theme_config.theme precedence when both structures are present with non-empty colors', () => {
+      const payload = {
+        settings: {
+          theme_config: {
+            theme: { colors: { primary: '#111111' } }
+          },
+          theme: { colors: { primary: '#222222' } }
+        }
+      };
+      service.applyPreviewTheme(payload);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #111111');
+    });
+
+    it('4. should fallback to direct theme when theme_config.theme is an empty object', () => {
+      const payload = {
+        settings: {
+          theme_config: { theme: {} },
+          theme: { colors: { primary: '#333333' } }
+        }
+      };
+      service.applyPreviewTheme(payload);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #333333');
+    });
+
+    it('5. should safely handle payload without theme or null/undefined settings', () => {
+      service.applyPreviewTheme({ settings: null });
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #917f6e');
+
+      service.applyPreviewTheme(null);
+      expect(el?.textContent).toContain('--brand-primary: #917f6e');
+    });
+
+    it('6. should handle incomplete theme objects cleanly with default fallbacks', () => {
+      const payload = {
+        theme: {
+          colors: { primary: '#777777' },
+          typography: null,
+          ui: undefined
+        }
+      };
+      service.applyPreviewTheme(payload);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #777777');
+      expect(el?.textContent).toContain('--font-family-main: "Montserrat", sans-serif');
+      expect(el?.textContent).toContain('--card-radius: 8px');
+    });
+
+    it('7. should apply preview theme without altering existing behavior or Phase 1 DOM write optimizations', () => {
+      const previewPayload = {
+        theme_config: {
+          theme: { colors: { primary: '#888888' } }
+        }
+      };
+      service.applyPreviewTheme(previewPayload);
+      const el = document.getElementById('site-tenant-tokens') as HTMLStyleElement;
+      expect(el?.textContent).toContain('--brand-primary: #888888');
+
+      const textContentSetterSpy = spyOnProperty(el, 'textContent', 'set').and.callThrough();
+      service.applyPreviewTheme(previewPayload);
+      expect(textContentSetterSpy).not.toHaveBeenCalled();
+    });
+
+    it('8. should verify canonical theme takes precedence without deep merging when canonical has colors but lacks typography/ui while alias has them', () => {
+      const payload = {
+        settings: {
+          theme_config: {
+            theme: { colors: { primary: '#112233' } }
+          },
+          theme: {
+            colors: { primary: '#998877' },
+            typography: { font_family_main: '"CustomFont", sans-serif' },
+            ui: { card_radius: '20px' }
+          }
+        }
+      };
+      service.applyPreviewTheme(payload);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #112233');
+      // No deep merge: canonical theme is selected, typography/ui fall back to system defaults
+      expect(el?.textContent).toContain('--font-family-main: "Montserrat", sans-serif');
+      expect(el?.textContent).toContain('--card-radius: 8px');
+    });
+
+    it('9. should NOT interpret a BusinessModel object without a valid theme as a theme object', () => {
+      const businessObjectWithoutTheme: BusinessModel = {
+        id: 'bus-300',
+        name: 'No Theme Pet Shop',
+        url: 'notheme.cl',
+        desc: 'No Theme Description',
+        info: {} as any,
+        settings: {}
+      };
+
+      service.applyPreviewTheme(businessObjectWithoutTheme);
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).toContain('--brand-primary: #917f6e');
+      expect(el?.textContent).toContain('--font-family-main: "Montserrat", sans-serif');
+    });
+  });
+
+  describe('Fase 3: Optimización Controlada de la Vista Previa de Temas', () => {
+    let authorizedOrigin: string;
+
+    beforeEach(() => {
+      authorizedOrigin = new URL((environment as any).admin_url).origin;
+      service.setupThemePreviewListener();
+    });
+
+    it('1. should process a valid message and apply preview theme', (done) => {
+      const msg = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#112233' } } }
+      });
+
+      window.dispatchEvent(msg);
+
+      requestAnimationFrame(() => {
+        const el = document.getElementById('site-tenant-tokens');
+        expect(el?.textContent).toContain('--brand-primary: #112233');
+        done();
+      });
+    });
+
+    it('2. should coalesce rapid consecutive messages A, B, C scheduling exactly ONE animation frame applying C', (done) => {
+      const rafSpy = spyOn(window, 'requestAnimationFrame').and.callThrough();
+
+      const msgA = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#AAAAAA' } } }
+      });
+      const msgB = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#BBBBBB' } } }
+      });
+      const msgC = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#CCCCCC' } } }
+      });
+
+      const applySpy = spyOn(service, 'applyPreviewTheme').and.callThrough();
+
+      window.dispatchEvent(msgA);
+      window.dispatchEvent(msgB);
+      window.dispatchEvent(msgC);
+
+      // Verify that requestAnimationFrame was called exactly ONCE across the burst
+      expect(rafSpy).toHaveBeenCalledTimes(1);
+
+      requestAnimationFrame(() => {
+        expect(applySpy).toHaveBeenCalledTimes(1);
+        expect(applySpy).toHaveBeenCalledWith({ colors: { primary: '#CCCCCC' } });
+
+        const el = document.getElementById('site-tenant-tokens');
+        expect(el?.textContent).toContain('--brand-primary: #CCCCCC');
+        done();
+      });
+    });
+
+    it('3. should ignore messages with unauthorized origin or invalid format', () => {
+      const invalidOriginMsg = new MessageEvent('message', {
+        origin: 'http://unauthorized.com',
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#999999' } } }
+      });
+      const invalidDataMsg = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'OTHER_TYPE', payload: { colors: { primary: '#999999' } } }
+      });
+
+      window.dispatchEvent(invalidOriginMsg);
+      window.dispatchEvent(invalidDataMsg);
+
+      const el = document.getElementById('site-tenant-tokens');
+      expect(el?.textContent).not.toContain('--brand-primary: #999999');
+    });
+
+    it('4. should not generate redundant DOM writes when consecutive preview themes are identical', (done) => {
+      const msg1 = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#444444' } } }
+      });
+      const msg2 = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#444444' } } }
+      });
+
+      window.dispatchEvent(msg1);
+
+      requestAnimationFrame(() => {
+        const el = document.getElementById('site-tenant-tokens') as HTMLStyleElement;
+        expect(el?.textContent).toContain('--brand-primary: #444444');
+
+        const textContentSetterSpy = spyOnProperty(el, 'textContent', 'set').and.callThrough();
+
+        window.dispatchEvent(msg2);
+
+        requestAnimationFrame(() => {
+          expect(textContentSetterSpy).not.toHaveBeenCalled();
+          done();
+        });
+      });
+    });
+
+    it('5. should cancel pending animation frame callbacks on stopThemePreviewListener or service destruction', (done) => {
+      const cancelSpy = spyOn(window, 'cancelAnimationFrame').and.callThrough();
+
+      const msg = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#777777' } } }
+      });
+
+      window.dispatchEvent(msg);
+
+      service.stopThemePreviewListener();
+
+      expect(cancelSpy).toHaveBeenCalled();
+
+      requestAnimationFrame(() => {
+        const el = document.getElementById('site-tenant-tokens');
+        expect(el?.textContent).not.toContain('--brand-primary: #777777');
+        done();
+      });
+    });
+
+    it('6. should ensure invalid or unauthorized message does NOT overwrite valid pending preview payload', (done) => {
+      const validMsg = new MessageEvent('message', {
+        origin: authorizedOrigin,
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#118833' } } }
+      });
+      const invalidMsg = new MessageEvent('message', {
+        origin: 'http://malicious.com',
+        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#999999' } } }
+      });
+
+      window.dispatchEvent(validMsg);
+      window.dispatchEvent(invalidMsg);
+
+      requestAnimationFrame(() => {
+        const el = document.getElementById('site-tenant-tokens');
+        expect(el?.textContent).toContain('--brand-primary: #118833');
+        expect(el?.textContent).not.toContain('--brand-primary: #999999');
+        done();
+      });
+    });
+  });
 });

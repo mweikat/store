@@ -32,6 +32,8 @@ export class TenantService implements OnDestroy {
 
   // Referencia al listener de postMessage para evitar duplicados y permitir limpieza
   private messageListener: ((event: MessageEvent) => void) | null = null;
+  private pendingPreviewPayload: any = null;
+  private previewAnimationFrameId: number | null = null;
 
   constructor(
     private businessApi: BusinessService,
@@ -90,7 +92,8 @@ export class TenantService implements OnDestroy {
 
         // 2. Fallback local/API en navegador si no hay TransferState
         const storedBusiness = this.businessApi.getBusinessStorage();
-        const hasStoredTheme = !!(storedBusiness?.settings?.theme_config?.theme || storedBusiness?.settings?.theme);
+        const storedTheme = this.extractTheme(storedBusiness);
+        const hasStoredTheme = Object.keys(storedTheme).length > 0;
 
         if (storedBusiness && storedBusiness.id && hasStoredTheme) {
           this.currentBusiness = storedBusiness;
@@ -179,6 +182,11 @@ export class TenantService implements OnDestroy {
       window.removeEventListener('message', this.messageListener);
       this.messageListener = null;
     }
+    if (this.previewAnimationFrameId !== null && typeof window !== 'undefined' && typeof window.cancelAnimationFrame === 'function') {
+      window.cancelAnimationFrame(this.previewAnimationFrameId);
+      this.previewAnimationFrameId = null;
+    }
+    this.pendingPreviewPayload = null;
   }
 
   private handleThemePreviewMessage(event: MessageEvent): void {
@@ -197,8 +205,25 @@ export class TenantService implements OnDestroy {
       return;
     }
 
-    // 3. Aplicar tema de previsualización temporal sin alterar el tenant ni la caché
-    this.applyPreviewTheme(payload);
+    // 3. Aplicar tema de previsualización con agrupación por frame en el navegador
+    this.pendingPreviewPayload = payload;
+
+    if (isPlatformBrowser(this.platformId) && typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+      // Si ya existe una actualización programada para el siguiente fotograma,
+      // la actualización de this.pendingPreviewPayload es suficiente.
+      if (this.previewAnimationFrameId === null) {
+        this.previewAnimationFrameId = window.requestAnimationFrame(() => {
+          this.previewAnimationFrameId = null;
+          if (this.pendingPreviewPayload) {
+            const latestPayload = this.pendingPreviewPayload;
+            this.pendingPreviewPayload = null;
+            this.applyPreviewTheme(latestPayload);
+          }
+        });
+      }
+    } else {
+      this.applyPreviewTheme(payload);
+    }
   }
 
   private isValidOrigin(origin: string): boolean {
@@ -218,7 +243,7 @@ export class TenantService implements OnDestroy {
   }
 
   public applyPreviewTheme(previewPayload: any): void {
-    const theme = previewPayload.theme_config?.theme || previewPayload.theme || previewPayload;
+    const theme = this.extractTheme(previewPayload);
     const rawColors = theme?.colors || {};
     const rawTypography = theme?.typography || {};
     const rawUi = theme?.ui || {};
@@ -506,17 +531,60 @@ export class TenantService implements OnDestroy {
     if (!styleElement) {
       styleElement = this.document.createElement('style');
       styleElement.id = 'site-tenant-tokens';
+      styleElement.textContent = cssContent;
       this.document.head.appendChild(styleElement);
+      return;
     }
+
+    if (styleElement.textContent === cssContent) {
+      return;
+    }
+
     styleElement.textContent = cssContent;
+  }
+
+  private extractTheme(input: BusinessModel | BusinessSettingsModel | BusinessThemeModel | Record<string, any> | null | undefined): BusinessThemeModel {
+    if (!input || typeof input !== 'object') {
+      return {};
+    }
+
+    const rawInput = input as Record<string, any>;
+    const settings = (rawInput['settings'] && typeof rawInput['settings'] === 'object') ? rawInput['settings'] : rawInput;
+    const themeConfigTheme = settings.theme_config?.theme;
+    const directTheme = settings.theme || (rawInput !== settings ? rawInput['theme'] : undefined);
+
+    const hasThemeContent = (t: any): boolean => {
+      if (!t || typeof t !== 'object') return false;
+      const hasColors = t.colors && typeof t.colors === 'object' && Object.keys(t.colors).length > 0;
+      const hasTypo = t.typography && typeof t.typography === 'object' && Object.keys(t.typography).length > 0;
+      const hasUi = t.ui && typeof t.ui === 'object' && Object.keys(t.ui).length > 0;
+      return hasColors || hasTypo || hasUi;
+    };
+
+    if (hasThemeContent(themeConfigTheme)) {
+      return themeConfigTheme;
+    }
+    if (hasThemeContent(directTheme)) {
+      return directTheme;
+    }
+    if (themeConfigTheme && typeof themeConfigTheme === 'object') {
+      return themeConfigTheme;
+    }
+    if (directTheme && typeof directTheme === 'object') {
+      return directTheme;
+    }
+    if (hasThemeContent(rawInput) && !rawInput['settings'] && !rawInput['id'] && !rawInput['template_key']) {
+      return rawInput as BusinessThemeModel;
+    }
+
+    return {};
   }
 
   private async loadBusinessStyles(): Promise<void> {
     if (!this.currentBusiness) return;
 
-    const theme = this.currentBusiness.settings?.theme_config?.theme || this.currentBusiness.settings?.theme;
-    this.applyPreviewTheme(theme || {});
-
+    const theme = this.extractTheme(this.currentBusiness);
+    this.applyPreviewTheme(theme);
   }
 
 }

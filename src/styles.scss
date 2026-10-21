@@ -214,7 +214,7 @@ a:hover{
     color: vars.$light-bg !important;
     border-color: vars.$quaternary-color !important;
 }
-btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus, .btn-primary-c1.active:focus, .btn-primary-c1:active:focus, .show>.btn-primary-c1.dropdown-toggle:focus {
+.btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus, .btn-primary-c1.active:focus, .btn-primary-c1:active:focus, .show>.btn-primary-c1.dropdown-toggle:focus {
     box-shadow: 0 0 0 .25rem vars.$secondary-color;
 }
 .btn-check:active+.btn-primary-c1, .btn-check:checked+.btn-primary-c1, .btn-primary-c1.active, .btn-primary-c1:active, .show>.btn-primary-c1.dropdown-toggle {
@@ -291,7 +291,7 @@ btn-check:active+.btn-primary-c1:focus, .btn-check:checked+.btn-primary-c1:focus
     //background-color: vars.$quaternary-color2; /* Fondo personalizado */
     //color: vars.$primary-color; /* Color del texto */
     //border-color: vars.$light-bg; /* Borde del select */
-    border: opx;
+    border: 0;
 }
 
 /* Cambia el color del select cuando está enfocado */
