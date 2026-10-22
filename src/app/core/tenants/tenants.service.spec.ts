@@ -451,6 +451,65 @@ describe('TenantService', () => {
     });
   });
 
+  describe('H. Personalización de colores del Footer', () => {
+    it('should apply custom footer_bg, footer_text, and footer_link when present in business settings', async () => {
+      const footerBusiness: BusinessModel = {
+        ...mockBusinessCanonical,
+        id: 'bus-footer-1',
+        settings: {
+          theme_config: {
+            theme: {
+              colors: {
+                footer_bg: '#1a1a1a',
+                footer_text: '#f5f5f5',
+                footer_link: '#ff6600'
+              }
+            }
+          }
+        }
+      };
+      mockBusinessService.getBusinessHost.and.returnValue(of(footerBusiness));
+
+      await service.initialize();
+
+      const styleEl = document.getElementById('site-tenant-tokens');
+      const cssText = styleEl?.textContent || '';
+
+      expect(cssText).toContain('--footer-bg: #1a1a1a');
+      expect(cssText).toContain('--footer-text: #f5f5f5');
+      expect(cssText).toContain('--footer-link: #ff6600');
+      expect(cssText).toContain('--footer-link-hover: color-mix(in srgb, #ff6600 85%, white)');
+    });
+
+    it('should fallback to default active theme tokens when footer attributes are missing or invalid', async () => {
+      const missingFooterBusiness: BusinessModel = {
+        ...mockBusinessCanonical,
+        settings: {
+          theme_config: {
+            theme: {
+              colors: {
+                primary: '#917f6e',
+                footer_bg: 'invalid-color-value; body{display:none}'
+              }
+            }
+          }
+        }
+      };
+      mockBusinessService.getBusinessHost.and.returnValue(of(missingFooterBusiness));
+
+      await service.initialize();
+
+      const styleEl = document.getElementById('site-tenant-tokens');
+      const cssText = styleEl?.textContent || '';
+
+      expect(cssText).not.toContain('display:none');
+      expect(cssText).toContain('--footer-bg: var(--neutral-900)');
+      expect(cssText).toContain('--footer-text: var(--neutral-100)');
+      expect(cssText).toContain('--footer-link: var(--color-action-primary)');
+      expect(cssText).toContain('--footer-link-hover: var(--color-action-primary-hover)');
+    });
+  });
+
   describe('TransferState', () => {
     it('should load business from TransferState in browser platform when available', async () => {
       const transferBusiness: BusinessModel = {
@@ -486,7 +545,7 @@ describe('TenantService', () => {
       await service.initialize();
     });
 
-    it('1. should accept a valid THEME_UPDATE message from an authorized origin', () => {
+    it('1. should accept a valid THEME_UPDATE message from an authorized origin', (done) => {
       const validMessage = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: {
@@ -505,11 +564,14 @@ describe('TenantService', () => {
 
       window.dispatchEvent(validMessage);
 
-      const styleEl = document.getElementById('site-tenant-tokens');
-      const cssText = styleEl?.textContent || '';
-      expect(cssText).toContain('--color-primary: #123456');
-      expect(cssText).toContain('--font-family-main: "Open Sans", sans-serif');
-      expect(cssText).toContain('--card-radius: 16px');
+      requestAnimationFrame(() => {
+        const styleEl = document.getElementById('site-tenant-tokens');
+        const cssText = styleEl?.textContent || '';
+        expect(cssText).toContain('--brand-primary: #123456');
+        expect(cssText).toContain('--font-family-main: "Open Sans", sans-serif');
+        expect(cssText).toContain('--card-radius: 16px');
+        done();
+      });
     });
 
     it('2. should reject a message from an unauthorized origin', () => {
@@ -577,7 +639,7 @@ describe('TenantService', () => {
       expect(styleElAfter).not.toContain('--color-primary: #00FF00');
     });
 
-    it('5. should accept valid 3, 4, 6, and 8 digit Hex colors, rgb/a, and hsl/a', () => {
+    it('5. should accept valid 3, 4, 6, and 8 digit Hex colors, rgb/a, and hsl/a', (done) => {
       const validColorsMsg = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: {
@@ -599,19 +661,22 @@ describe('TenantService', () => {
 
       window.dispatchEvent(validColorsMsg);
 
-      const styleEl = document.getElementById('site-tenant-tokens');
-      const cssText = styleEl?.textContent || '';
-      expect(cssText).toContain('--color-primary: #FFF');
-      expect(cssText).toContain('--color-secondary: #123F');
-      expect(cssText).toContain('--color-tertiary: #FFFFFF');
-      expect(cssText).toContain('--color-quaternary: #123456FF');
-      expect(cssText).toContain('--color-price-1: rgb(255, 0, 0)');
-      expect(cssText).toContain('--color-price-2: rgba(255, 0, 0, 0.5)');
-      expect(cssText).toContain('--color-warning: hsl(120, 100%, 50%)');
-      expect(cssText).toContain('--color-link: hsla(120, 100%, 50%, 0.3)');
+      requestAnimationFrame(() => {
+        const styleEl = document.getElementById('site-tenant-tokens');
+        const cssText = styleEl?.textContent || '';
+        expect(cssText).toContain('--brand-primary: #FFF');
+        expect(cssText).toContain('--brand-secondary: #123F');
+        expect(cssText).toContain('--brand-tertiary: #FFFFFF');
+        expect(cssText).toContain('--brand-quaternary: #123456FF');
+        expect(cssText).toContain('--color-price-1: rgb(255, 0, 0)');
+        expect(cssText).toContain('--color-price-2: rgba(255, 0, 0, 0.5)');
+        expect(cssText).toContain('--color-state-warning: hsl(120, 100%, 50%)');
+        expect(cssText).toContain('--color-link: hsla(120, 100%, 50%, 0.3)');
+        done();
+      });
     });
 
-    it('6. should reject invalid or incomplete hex strings (#1, #12, #12345, #1234567)', () => {
+    it('6. should reject invalid or incomplete hex strings (#1, #12, #12345, #1234567)', (done) => {
       const invalidHexMsg = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: {
@@ -629,15 +694,18 @@ describe('TenantService', () => {
 
       window.dispatchEvent(invalidHexMsg);
 
-      const styleEl = document.getElementById('site-tenant-tokens');
-      const cssText = styleEl?.textContent || '';
-      expect(cssText).toContain('--color-primary: #917f6e');
-      expect(cssText).toContain('--color-secondary: #efbc98');
-      expect(cssText).toContain('--color-tertiary: #efd2be');
-      expect(cssText).toContain('--color-quaternary: #efe1d1');
+      requestAnimationFrame(() => {
+        const styleEl = document.getElementById('site-tenant-tokens');
+        const cssText = styleEl?.textContent || '';
+        expect(cssText).toContain('--brand-primary: #917f6e');
+        expect(cssText).toContain('--brand-secondary: #efbc98');
+        expect(cssText).toContain('--brand-tertiary: #efd2be');
+        expect(cssText).toContain('--brand-quaternary: #efe1d1');
+        done();
+      });
     });
 
-    it('7. should reject values trying to inject CSS rules via expression(), url(), ;, }, or javascript:', () => {
+    it('7. should reject values trying to inject CSS rules via expression(), url(), ;, }, or javascript:', (done) => {
       const maliciousMessage = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: {
@@ -655,16 +723,19 @@ describe('TenantService', () => {
 
       window.dispatchEvent(maliciousMessage);
 
-      const styleEl = document.getElementById('site-tenant-tokens');
-      const cssText = styleEl?.textContent || '';
-      expect(cssText).not.toContain('display: none');
-      expect(cssText).not.toContain('expression');
-      expect(cssText).not.toContain('script');
-      expect(cssText).toContain('--color-primary: #917f6e');
-      expect(cssText).toContain('--color-secondary: #efbc98');
+      requestAnimationFrame(() => {
+        const styleEl = document.getElementById('site-tenant-tokens');
+        const cssText = styleEl?.textContent || '';
+        expect(cssText).not.toContain('display: none');
+        expect(cssText).not.toContain('expression');
+        expect(cssText).not.toContain('script');
+        expect(cssText).toContain('--brand-primary: #917f6e');
+        expect(cssText).toContain('--brand-secondary: #efbc98');
+        done();
+      });
     });
 
-    it('8. should support partial theme updates without resetting existing valid variables', () => {
+    it('8. should support partial theme updates without resetting existing valid variables', (done) => {
       // 1. Initial valid theme
       window.dispatchEvent(new MessageEvent('message', {
         origin: authorizedOrigin,
@@ -677,29 +748,34 @@ describe('TenantService', () => {
         }
       }));
 
-      let cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
-      expect(cssText).toContain('--color-primary: #111111');
-      expect(cssText).toContain('--color-secondary: #222222');
-      expect(cssText).toContain('--font-family-main: "Open Sans", sans-serif');
+      requestAnimationFrame(() => {
+        let cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
+        expect(cssText).toContain('--brand-primary: #111111');
+        expect(cssText).toContain('--brand-secondary: #222222');
+        expect(cssText).toContain('--font-family-main: "Open Sans", sans-serif');
 
-      // 2. Partial update containing only typography
-      window.dispatchEvent(new MessageEvent('message', {
-        origin: authorizedOrigin,
-        data: {
-          type: 'THEME_UPDATE',
-          payload: {
-            typography: { font_family_main: '"Roboto", sans-serif' }
+        // 2. Partial update containing only typography
+        window.dispatchEvent(new MessageEvent('message', {
+          origin: authorizedOrigin,
+          data: {
+            type: 'THEME_UPDATE',
+            payload: {
+              typography: { font_family_main: '"Roboto", sans-serif' }
+            }
           }
-        }
-      }));
+        }));
 
-      cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
-      expect(cssText).toContain('--font-family-main: "Roboto", sans-serif');
-      // Unspecified primary in second message falls back gracefully without breaking
-      expect(cssText).toContain('--color-primary: #917f6e');
+        requestAnimationFrame(() => {
+          cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
+          expect(cssText).toContain('--font-family-main: "Roboto", sans-serif');
+          // Unspecified primary in second message falls back gracefully without breaking
+          expect(cssText).toContain('--brand-primary: #917f6e');
+          done();
+        });
+      });
     });
 
-    it('9. should validate and sanitize typography, card radius, and box shadow when received', () => {
+    it('9. should validate and sanitize typography, card radius, and box shadow when received', (done) => {
       const validCustomsMessage = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: {
@@ -713,32 +789,37 @@ describe('TenantService', () => {
 
       window.dispatchEvent(validCustomsMessage);
 
-      let cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
-      expect(cssText).toContain('--font-family-main: "Poppins", sans-serif');
-      expect(cssText).toContain('--card-radius: 10px');
-      expect(cssText).toContain('--card-shadow: none');
+      requestAnimationFrame(() => {
+        let cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
+        expect(cssText).toContain('--font-family-main: "Poppins", sans-serif');
+        expect(cssText).toContain('--card-radius: 10px');
+        expect(cssText).toContain('--card-shadow: none');
 
-      // Malicious typography & ui values
-      const maliciousUiMessage = new MessageEvent('message', {
-        origin: authorizedOrigin,
-        data: {
-          type: 'THEME_UPDATE',
-          payload: {
-            typography: { font_family_main: 'Arial; body{color:red}' },
-            ui: { card_radius: '10px; background:red', card_shadow: 'url(javascript:alert(1))' }
+        // Malicious typography & ui values
+        const maliciousUiMessage = new MessageEvent('message', {
+          origin: authorizedOrigin,
+          data: {
+            type: 'THEME_UPDATE',
+            payload: {
+              typography: { font_family_main: 'Arial; body{color:red}' },
+              ui: { card_radius: '10px; background:red', card_shadow: 'url(javascript:alert(1))' }
+            }
           }
-        }
+        });
+
+        window.dispatchEvent(maliciousUiMessage);
+
+        requestAnimationFrame(() => {
+          cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
+          expect(cssText).toContain('--font-family-main: "Montserrat", sans-serif');
+          expect(cssText).toContain('--card-radius: 8px');
+          expect(cssText).toContain('--card-shadow: 0 2px 8px rgba(0,0,0,0.06)');
+          done();
+        });
       });
-
-      window.dispatchEvent(maliciousUiMessage);
-
-      cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
-      expect(cssText).toContain('--font-family-main: "Montserrat", sans-serif');
-      expect(cssText).toContain('--card-radius: 8px');
-      expect(cssText).toContain('--card-shadow: 0 2px 8px rgba(0,0,0,0.06)');
     });
 
-    it('10. should update existing site-tenant-tokens element in-place without duplicating style tags', () => {
+    it('10. should update existing site-tenant-tokens element in-place without duplicating style tags', (done) => {
       const msg1 = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#111111' } } }
@@ -751,29 +832,37 @@ describe('TenantService', () => {
       window.dispatchEvent(msg1);
       window.dispatchEvent(msg2);
 
-      const styleTags = document.querySelectorAll('#site-tenant-tokens');
-      expect(styleTags.length).toBe(1);
-      expect(styleTags[0].textContent).toContain('--color-primary: #222222');
+      requestAnimationFrame(() => {
+        const styleTags = document.querySelectorAll('#site-tenant-tokens');
+        expect(styleTags.length).toBe(1);
+        expect(styleTags[0].textContent).toContain('--brand-primary: #222222');
+        done();
+      });
     });
 
-    it('11. should ensure invalid messages do not alter existing styles', () => {
+    it('11. should ensure invalid messages do not alter existing styles', (done) => {
       const msgValid = new MessageEvent('message', {
         origin: authorizedOrigin,
         data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#123456' } } }
       });
       window.dispatchEvent(msgValid);
 
-      let cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
-      expect(cssText).toContain('--color-primary: #123456');
+      requestAnimationFrame(() => {
+        let cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
+        expect(cssText).toContain('--brand-primary: #123456');
 
-      const msgInvalid = new MessageEvent('message', {
-        origin: 'http://evil.com',
-        data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#FFFFFF' } } }
+        const msgInvalid = new MessageEvent('message', {
+          origin: 'http://evil.com',
+          data: { type: 'THEME_UPDATE', payload: { colors: { primary: '#FFFFFF' } } }
+        });
+        window.dispatchEvent(msgInvalid);
+
+        requestAnimationFrame(() => {
+          cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
+          expect(cssText).toContain('--brand-primary: #123456');
+          done();
+        });
       });
-      window.dispatchEvent(msgInvalid);
-
-      cssText = document.getElementById('site-tenant-tokens')?.textContent || '';
-      expect(cssText).toContain('--color-primary: #123456');
     });
 
     it('12. should ensure preview does not mutate currentBusiness or domainCache', () => {

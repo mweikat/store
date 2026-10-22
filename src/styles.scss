@@ -1068,10 +1068,15 @@ a:hover{
 }
 /***************footer********************************/
 footer.footer {
-    background-color: vars.$footer-background;
-    color: vars.$footer-text;
+    background-color: var(--footer-bg, #{vars.$footer-background});
+    color: var(--footer-text, #{vars.$footer-text});
 
-    a{
-        color: vars.$footer-link;
+    a {
+        color: var(--footer-link, #{vars.$footer-link});
+        transition: color 0.3s ease;
+
+        &:hover {
+            color: var(--footer-link-hover, var(--color-action-primary-hover, #6d5742));
+        }
     }
 }

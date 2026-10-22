@@ -266,6 +266,10 @@ export class TenantService implements OnDestroy {
     const price1Color = colors.price_1 || colors.price_color_1 || colors.price_sale || '#e74c3c';
     const price2Color = colors.price_2 || '#dc3545';
     const linkColor = colors.link || colors.link_color || '#efbc98';
+    const footerBgColor = colors.footer_bg || 'var(--neutral-900)';
+    const footerTextColor = colors.footer_text || 'var(--neutral-100)';
+    const footerLinkColor = colors.footer_link || 'var(--color-action-primary)';
+    const footerLinkHoverColor = colors.footer_link ? `color-mix(in srgb, ${colors.footer_link} 85%, white)` : 'var(--color-action-primary-hover)';
     const invalidFormColor = colors.invalid_form || colors.invalid_form_color || '#ff0000';
     const checkFailColor = colors.check_fail || '#d9534f';
     const cardListTotalColor = colors.card_list_total || '#fff3cd';
@@ -339,10 +343,10 @@ export class TenantService implements OnDestroy {
         --header-sidebar-overlay: ${rgba4};
 
         /* Footer Component Tokens */
-        --footer-bg: var(--neutral-900);
-        --footer-text: var(--neutral-100);
-        --footer-link: var(--color-action-primary);
-        --footer-link-hover: var(--color-action-primary-hover);
+        --footer-bg: ${footerBgColor};
+        --footer-text: ${footerTextColor};
+        --footer-link: ${footerLinkColor};
+        --footer-link-hover: ${footerLinkHoverColor};
 
         /* Cart Component Tokens */
         --cart-title: var(--color-action-primary);
