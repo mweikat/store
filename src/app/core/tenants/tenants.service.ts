@@ -1,7 +1,7 @@
 // src/app/core/tenants/tenants.service.ts
 import { Injectable, Inject, PLATFORM_ID, DOCUMENT, TransferState, makeStateKey, OnDestroy } from '@angular/core';
 import { isPlatformBrowser, isPlatformServer } from '@angular/common';
-import { BusinessModel, BusinessThemeTypographyModel, BusinessThemeUIModel, BusinessThemeColorsModel } from '@models/business.model';
+import { BusinessModel, BusinessThemeTypographyModel, BusinessThemeUIModel, BusinessThemeColorsModel, BusinessSettingsModel, BusinessThemeModel } from '@models/business.model';
 import { BusinessService } from '@services/business.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
