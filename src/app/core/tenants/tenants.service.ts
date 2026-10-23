@@ -269,7 +269,7 @@ export class TenantService implements OnDestroy {
     const footerBgColor = colors.footer_bg || 'var(--neutral-900)';
     const footerTextColor = colors.footer_text || 'var(--neutral-100)';
     const footerLinkColor = colors.footer_link || 'var(--color-action-primary)';
-    const footerLinkHoverColor = colors.footer_link ? `color-mix(in srgb, ${colors.footer_link} 85%, white)` : 'var(--color-action-primary-hover)';
+    const footerLinkHoverColor = colors.footer_link_hover || (colors.footer_link ? `color-mix(in srgb, ${colors.footer_link} 85%, white)` : 'var(--color-action-primary-hover)');
     const invalidFormColor = colors.invalid_form || colors.invalid_form_color || '#ff0000';
     const checkFailColor = colors.check_fail || '#d9534f';
     const cardListTotalColor = colors.card_list_total || '#fff3cd';

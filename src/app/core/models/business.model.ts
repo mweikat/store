@@ -24,6 +24,7 @@ export interface BusinessThemeColorsModel {
     footer_bg?: string;
     footer_text?: string;
     footer_link?: string;
+    footer_link_hover?: string;
     invalid_form?: string;
     invalid_form_color?: string;
     check_fail?: string;

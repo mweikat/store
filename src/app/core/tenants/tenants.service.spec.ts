@@ -452,7 +452,7 @@ describe('TenantService', () => {
   });
 
   describe('H. Personalización de colores del Footer', () => {
-    it('should apply custom footer_bg, footer_text, and footer_link when present in business settings', async () => {
+    it('should apply custom footer_bg, footer_text, footer_link, and footer_link_hover when present in business settings', async () => {
       const footerBusiness: BusinessModel = {
         ...mockBusinessCanonical,
         id: 'bus-footer-1',
@@ -462,7 +462,8 @@ describe('TenantService', () => {
               colors: {
                 footer_bg: '#1a1a1a',
                 footer_text: '#f5f5f5',
-                footer_link: '#ff6600'
+                footer_link: '#ff6600',
+                footer_link_hover: '#ff9933'
               }
             }
           }
@@ -478,7 +479,7 @@ describe('TenantService', () => {
       expect(cssText).toContain('--footer-bg: #1a1a1a');
       expect(cssText).toContain('--footer-text: #f5f5f5');
       expect(cssText).toContain('--footer-link: #ff6600');
-      expect(cssText).toContain('--footer-link-hover: color-mix(in srgb, #ff6600 85%, white)');
+      expect(cssText).toContain('--footer-link-hover: #ff9933');
     });
 
     it('should fallback to default active theme tokens when footer attributes are missing or invalid', async () => {
