@@ -146,7 +146,6 @@
   --color-quaternary: #efe1d1;
   --color-quaternary-v2: #ffedd9;
   --color-light-bg: white;
-  --color-dark-text: black;
   --color-warning: #ffbd59;
   --color-price-1: #e74c3c;
   --color-price-2: #dc3545;
@@ -169,10 +168,10 @@ body {
     margin: auto;
 }
 a{
-    color: vars.$primary-color !important;
+    color: vars.$primary-color ;
 }
 a:hover{
-    color: vars.$primary-color-v1 !important;
+    color: vars.$primary-color-v1 ;
 }
 
 .card{

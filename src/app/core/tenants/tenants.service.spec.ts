@@ -344,7 +344,6 @@ describe('TenantService', () => {
       expect(cssText).toContain('--color-primary-v1: #AAAAAA');
       expect(cssText).toContain('--color-quaternary-v2: #CCCCCC');
       expect(cssText).toContain('--color-light-bg: #EEEEEE');
-      expect(cssText).toContain('--color-dark-text: #222222');
       expect(cssText).toContain('--color-price-1: #444444');
     });
 
@@ -377,7 +376,6 @@ describe('TenantService', () => {
       expect(cssText).toContain('--color-primary-v1: #BBBBBB');
       expect(cssText).toContain('--color-quaternary-v2: #DDDDDD');
       expect(cssText).toContain('--color-light-bg: #111111');
-      expect(cssText).toContain('--color-dark-text: #333333');
       expect(cssText).toContain('--color-price-1: #555555');
     });
   });

@@ -423,7 +423,6 @@ export class TenantService implements OnDestroy {
         --color-quaternary: ${quaternaryColor};
         --color-quaternary-v2: ${quaternaryV2Color};
         --color-light-bg: ${lightBgColor};
-        --color-dark-text: ${darkTextColor};
         --color-warning: ${warningColor};
         --color-warning-v1: ${warningV1Color};
         --color-price-1: ${price1Color};
