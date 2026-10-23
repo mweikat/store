@@ -4,11 +4,11 @@
     color: var(--footer-text, var(--neutral-100, #ffffff));
 
     a {
-      color: var(--footer-link, var(--color-action-primary, #917f6e));
+      color: var(--footer-link, var(--color-action-primary, #917f6e)) !important; 
       transition: color 0.3s ease;
 
       &:hover {
-        color: var(--footer-link-hover, var(--color-action-primary-hover, #6d5742));
+        color: var(--footer-link-hover, var(--color-action-primary-hover, #6d5742)) !important;
       }
     }
   }

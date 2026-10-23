@@ -146,7 +146,6 @@
   --color-quaternary: #efe1d1;
   --color-quaternary-v2: #ffedd9;
   --color-light-bg: white;
-  --color-dark-text: black;
   --color-warning: #ffbd59;
   --color-price-1: #e74c3c;
   --color-price-2: #dc3545;
@@ -169,10 +168,10 @@ body {
     margin: auto;
 }
 a{
-    color: vars.$primary-color !important;
+    color: vars.$primary-color ;
 }
 a:hover{
-    color: vars.$primary-color-v1 !important;
+    color: vars.$primary-color-v1 ;
 }
 
 .card{
@@ -1068,10 +1067,15 @@ a:hover{
 }
 /***************footer********************************/
 footer.footer {
-    background-color: vars.$footer-background;
-    color: vars.$footer-text;
+    background-color: var(--footer-bg, #{vars.$footer-background});
+    color: var(--footer-text, #{vars.$footer-text});
 
-    a{
-        color: vars.$footer-link;
+    a {
+        color: var(--footer-link, #{vars.$footer-link});
+        transition: color 0.3s ease;
+
+        &:hover {
+            color: var(--footer-link-hover, var(--color-action-primary-hover, #6d5742));
+        }
     }
 }

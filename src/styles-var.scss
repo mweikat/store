@@ -11,7 +11,6 @@ $tertiary-color: var(--color-border-default, var(--color-tertiary, #efd2be));
 $quaternary-color: var(--color-surface-subtle, var(--color-quaternary, #efe1d1));
 $quaternary-color2: var(--color-surface-variant, var(--color-quaternary-v2, #ffedd9));
 $light-bg: var(--color-surface-base, var(--color-light-bg, white));
-$dark-text: var(--color-text-dark, var(--color-dark-text, black));
 $warning-color: var(--color-state-warning, var(--color-warning, #ffbd59));
 $warning-color-v1: var(--color-state-warning-soft, var(--color-warning-v1, rgba(253, 201, 13, .25)));
 $price-color-1: var(--color-price-1, #e74c3c);
@@ -43,8 +42,8 @@ $header-dropdown-active-border: $primary-color;
 $header-sidebar-background:  $light-bg;
 $header-sidebar-header: $tertiary-color;
 $header-sidebar-header-tilte: $primary-color;
-$header-sidebar-header-btn-close: $dark-text;
-$header-sidebar-nav-link: $dark-text;
+$header-sidebar-header-btn-close: $primary-color;
+$header-sidebar-nav-link: $primary-color;
 $header-sidebar-nav-link-hover: $primary-color;
 $header-sidebar-overlay: $rgba-4;
 
@@ -53,7 +52,7 @@ $autn-input-group-text-b: $quaternary-color;
 $autn-input-group-text-c: $primary-color;
 $autn-input-forgot-link: $link-color;
 $auth-toggle-password: $primary-color;
-$auth-form-check-label:$dark-text;
+$auth-form-check-label:$primary-color;
 $auth-terms-conditions-link:$link-color;
 $auth-back-link:$link-color;
 
@@ -90,15 +89,15 @@ $check-payment-section: $quaternary-color;
 $check-payment-section-accordion-collapse: $primary-color;
 $check-confirm-card: $light-bg;
 $check-confirm-h1: $primary-color;
-$check-confirm-text: $dark-text;
+$check-confirm-text: $primary-color;
 $check-confirm-order: $tertiary-color;
-$check-confirm-order-item: $dark-text;
+$check-confirm-order-item: $primary-color;
 $check-confirm-order-item-detail: $primary-color;
 $check-fail-card-back: $light-bg;
-$check-fail-card-text:$dark-text;
+$check-fail-card-text:$primary-color;
 $check-fail-card-h1: $check-fail;
 $check-fail-card-error-back: $tertiary-color;
-$check-fail-card-item: $dark-text;
+$check-fail-card-item: $primary-color;
 
 $checkout-discount-iterate-backgorund-msg: $quaternary-color2;
 $checkout-discount-iterate-color-msg: $primary-color-v1;
@@ -150,7 +149,7 @@ $prod-bundle-price-free: $price-color-1;
 $prod-bundle-old-price: $primary-color;
 
 $prod-attr-border:$quaternary-color2;
-$prod-attr-title: $dark-text;
+$prod-attr-title: $primary-color;
 
 $prod-attr-color-border: $quaternary-color2;
 $prod-attr-color-selected: $primary-color-v1;
@@ -189,8 +188,8 @@ $steps-list-item-cir-background: $primary-color;
 $steps-list-item-cir-color: $light-bg;
 $steps-list-item-label: $primary-color;
 $steps-list-circ-background: $quaternary-color;
-$steps-list-circ-text: $dark-text;
-$steps-list-circ-label: $dark-text;
+$steps-list-circ-text: $primary-color;
+$steps-list-circ-label: $primary-color;
 
 //header user menu
 $header-user-menu-icon: $primary-color;
@@ -200,7 +199,7 @@ $header-user-menu-dropdown-toggle: $primary-color;
 $header-user-menu-dropdown-toggle-hover: $primary-color;
 $header-user-menu-dropdown-border: $tertiary-color;
 $header-user-menu-dropdown-background: $light-bg;
-$header-user-menu-dropdown-text: $dark-text;
+$header-user-menu-dropdown-text: $primary-color;
 $header-user-menu-dropdown-background-hover: $tertiary-color;
 $header-user-menu-dropdown-color-hover: $primary-color;
 
@@ -223,6 +222,6 @@ $user-orders-badge-danger-background: $price-color-1;
 $user-orders-badge-danger-text: $light-bg;
 
 //footer
-$footer-background: $dark-text;
+$footer-background: $primary-color;
 $footer-text: $light-bg;
 $footer-link: $primary-color;
