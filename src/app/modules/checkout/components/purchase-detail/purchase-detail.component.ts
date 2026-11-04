@@ -1,4 +1,6 @@
 import { Component, inject, Input } from '@angular/core';
+import { DeliveryScheduleSlot } from '@models/deliverySchedule.model';
+import { PickupLocationModel } from '@models/pickupLocation.model';
 import { ShippingAddress } from '@models/shippingAddress.model';
 import { ShippingBusiness } from '@models/shippingBusiness.model';
 import { CartService } from '@services/cart.service';
@@ -23,6 +25,9 @@ export class PurchaseDetailComponent {
  @Input('totalOrderPrice') totalOrderPrice:number = 0;
  @Input('shippingAddress') shipingAddress:ShippingAddress = {} as ShippingAddress;
  @Input('contact') contact:string = '';
+ @Input('pickupLocation') pickupLocation: PickupLocationModel | null = null;
+ @Input('selectedDeliveryDate') selectedDeliveryDate: string = '';
+ @Input('selectedDeliverySlot') selectedDeliverySlot: DeliveryScheduleSlot | null = null;
 
  private deliveryService = inject(DeliveryService);
  deliveryData = this.deliveryService.deliveryDataSignal;
@@ -32,5 +37,20 @@ export class PurchaseDetailComponent {
 
  extraerValor(texto: string): string {
     return this.cartService.extraerDatoVariant(texto);
+  }
+
+  isStorePickup(): boolean {
+    return this.shippingBusiness?.shipping_type_id === 1 || this.shippingBusiness?.shipping_type === 'store_pickup';
+  }
+
+  isScheduledDelivery(): boolean {
+    return this.shippingBusiness?.shipping_type_id === 4 || this.shippingBusiness?.shipping_type === 'scheduled_local_delivery';
+  }
+
+  formatSlotTime(slot: DeliveryScheduleSlot | null): string {
+    if (!slot) return '';
+    const start = (slot.start_time || '').slice(0, 5);
+    const end = (slot.end_time || '').slice(0, 5);
+    return `${start} - ${end}`;
   }
 }

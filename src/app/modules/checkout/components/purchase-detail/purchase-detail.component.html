@@ -100,15 +100,40 @@
                 }
             </p>
         </div>
-        <div class="d-flex justify-content-between">
-            <p class="m-0">
-                {{shipingAddress.address_line1}} {{shipingAddress.address_line2}} {{shipingAddress.nro}} {{shipingAddress.obs}}
-            </p>
-        </div>
-        <div class="d-flex justify-content-between alert delivery-msg mt-2">
-            <b>{{deliveryData()?.delivery_text}} </b>
-                {{deliveryData()?.arrival_estimated_time}}
-        </div>
+        @if(isStorePickup()) {
+            <div class="pickup-summary-detail mt-2 p-2 border rounded bg-light">
+                <p class="m-0 fw-bold"><i class="bi bi-shop me-1 text-primary"></i>Punto de Retiro:</p>
+                @if(pickupLocation) {
+                    <p class="m-0 small"><strong>{{pickupLocation.name}}</strong></p>
+                    <p class="m-0 small text-muted">{{pickupLocation.address}}<span *ngIf="pickupLocation.city_name">, {{pickupLocation.city_name}}</span></p>
+                    <p *ngIf="pickupLocation.schedule_desc" class="m-0 small text-muted"><i class="bi bi-clock me-1"></i>{{pickupLocation.schedule_desc}}</p>
+                } @else {
+                    <p class="m-0 small text-muted fst-italic">No has seleccionado punto de retiro</p>
+                }
+            </div>
+        } @else {
+            <div class="d-flex justify-content-between">
+                <p class="m-0">
+                    {{shipingAddress.address_line1}} {{shipingAddress.address_line2}} {{shipingAddress.nro}} {{shipingAddress.obs}}
+                </p>
+            </div>
+            @if(isScheduledDelivery()) {
+                <div class="scheduled-summary-detail mt-2 p-2 border rounded bg-light">
+                    <p class="m-0 fw-bold"><i class="bi bi-calendar-check me-1 text-primary"></i>Entrega Programada:</p>
+                    @if(selectedDeliveryDate && selectedDeliverySlot) {
+                        <p class="m-0 small"><strong>Fecha:</strong> {{selectedDeliveryDate}}</p>
+                        <p class="m-0 small"><strong>Horario:</strong> {{formatSlotTime(selectedDeliverySlot)}}</p>
+                    } @else {
+                        <p class="m-0 small text-muted fst-italic">Selecciona fecha y franja horaria</p>
+                    }
+                </div>
+            } @else {
+                <div class="d-flex justify-content-between alert delivery-msg mt-2">
+                    <b>{{deliveryData()?.delivery_text}} </b>
+                        {{deliveryData()?.arrival_estimated_time}}
+                </div>
+            }
+        }
         <div class="d-flex justify-content-between">
             <p><b>Contacto:</b></p>
             <p class="text-success">{{contact}}</p>

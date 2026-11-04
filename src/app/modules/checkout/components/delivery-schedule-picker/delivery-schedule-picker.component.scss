@@ -1,0 +1,74 @@
+.delivery-schedule-container {
+  .days-scroll {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--checkout-section-border, #dee2e6);
+      border-radius: 4px;
+    }
+  }
+
+  .day-chip {
+    min-height: 44px;
+    min-width: 90px;
+    border: 1px solid var(--checkout-section-border, #dee2e6);
+    border-radius: var(--card-radius, 8px);
+    background-color: var(--card-bg, #ffffff);
+    color: var(--neutral-800, #333333);
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      border-color: var(--color-primary, #6d5742);
+      color: var(--color-primary, #6d5742);
+    }
+
+    &.active {
+      background-color: var(--color-primary, #6d5742);
+      border-color: var(--color-primary, #6d5742);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  .slot-card {
+    min-height: 44px;
+    border: 1px solid var(--checkout-section-border, #dee2e6);
+    border-radius: var(--card-radius, 8px);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background-color: var(--card-bg, #ffffff);
+
+    &:hover:not(.disabled) {
+      border-color: var(--color-primary, #6d5742);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    &.selected {
+      border: 2px solid var(--color-primary, #6d5742);
+      background-color: rgba(var(--color-primary-rgb, 109, 87, 66), 0.05);
+    }
+
+    &.disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+      background-color: #f8f9fa;
+      border-color: #e9ecef;
+    }
+
+    .slot-radio {
+      cursor: pointer;
+      width: 1.15rem;
+      height: 1.15rem;
+    }
+
+    .slot-time {
+      font-size: 0.95rem;
+      color: var(--product-card-title, #212529);
+    }
+  }
+}

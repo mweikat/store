@@ -1,7 +1,9 @@
 import { Component, computed, effect, inject, Inject, OnDestroy, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { CartModel } from '@models/cart.model';
+import { DeliveryScheduleSlot } from '@models/deliverySchedule.model';
 import { PaymentModel } from '@models/payment.model';
+import { PickupLocationModel } from '@models/pickupLocation.model';
 import { ShippingAddress } from '@models/shippingAddress.model';
 import { ShippingBusiness } from '@models/shippingBusiness.model';
 import { CartService } from '@services/cart.service';
@@ -29,6 +31,7 @@ export class CheckoutComponent implements OnInit, OnDestroy{
   //destroys
   private destroyShipBusiness?:Subscription;
   private destroyLastOrder?:Subscription;
+  private destroyAvailabilityError?:Subscription;
   private destroyPostOk?:Subscription;
   private destroy$ = new Subject<void>();
   private destroy2$ = new Subject<void>();
@@ -48,6 +51,16 @@ export class CheckoutComponent implements OnInit, OnDestroy{
   shipping_price:number = 0;
   shippingAddress:ShippingAddress = {} as ShippingAddress;
   step1Error = signal<string>('');
+  orderErrorMessage = signal<string>('');
+
+  // Tipo 1: Retiro en tienda
+  selectedPickupLocation: PickupLocationModel | null = null;
+  selectedPickupLocationId: number | string | null = null;
+
+  // Tipo 4: Despacho programado
+  selectedDeliveryDate: string = '';
+  selectedDeliverySlot: DeliveryScheduleSlot | null = null;
+  selectedDeliverySlotId: number | string | null = null;
   
   //step2
   selectedPaymentMethodSignal = signal<PaymentModel>({} as PaymentModel);
@@ -120,6 +133,8 @@ export class CheckoutComponent implements OnInit, OnDestroy{
       this.destroyShipBusiness.unsubscribe();
     if(this.destroyLastOrder)
       this.destroyLastOrder.unsubscribe();
+    if(this.destroyAvailabilityError)
+      this.destroyAvailabilityError.unsubscribe();
     if(this.destroyPostOk)
       this.destroyPostOk.unsubscribe();
     this.destroy$.next(); 
@@ -143,9 +158,22 @@ export class CheckoutComponent implements OnInit, OnDestroy{
     this.destroyLastOrder = this.orderService.lastOrder.subscribe( lastOrder => {
 
       if(lastOrder.shipping_address_id!= undefined && this.currentStep==1){
-        this.currentStep++;
+        // Solo avanzar automáticamente si el método de la última compra fue Tipo 2 (Despacho a Domicilio Local tradicional)
+        const shippingMethods = this.shippingBusinessService.shippingMethodsSignal();
+        const matchedMethod = shippingMethods.find(m => m.id === lastOrder.business_shiping_id);
+        const isLocalDelivery = matchedMethod
+          ? (matchedMethod.shipping_type_id === 2 || matchedMethod.shipping_type === 'local_delivery' || (!matchedMethod.shipping_type_id && !matchedMethod.shipping_type))
+          : false;
+
+        if (isLocalDelivery) {
+          this.currentStep++;
+        }
       }
 
+    });
+
+    this.destroyAvailabilityError = this.orderService.orderAvailabilityError.subscribe(errMsg => {
+      this.orderErrorMessage.set(errMsg);
     });
 
     this.destroyPostOk = this.orderService.postOk.subscribe(postOk => {
@@ -160,25 +188,70 @@ export class CheckoutComponent implements OnInit, OnDestroy{
   //select shippingMetdod
   selectedShippingMethodFunc($event:ShippingBusiness){
     
-    this.selectedShippingMethod = $event
+    this.selectedShippingMethod = $event;
+    this.orderErrorMessage.set('');
     //console.log('sub_total_price: ', this.cart().id);
     if(this.cart().id!=undefined && this.sub_total_price()!=undefined)
       this.shippingBusinessService.getCost(this.cart().id, this.selectedShippingMethod.id, this.sub_total_price());
   }
 
+  isStorePickup(): boolean {
+    return this.selectedShippingMethod?.shipping_type_id === 1 || this.selectedShippingMethod?.shipping_type === 'store_pickup';
+  }
+
+  isScheduledDelivery(): boolean {
+    return this.selectedShippingMethod?.shipping_type_id === 4 || this.selectedShippingMethod?.shipping_type === 'scheduled_local_delivery';
+  }
+
+  onPickupLocationSelected(location: PickupLocationModel): void {
+    this.selectedPickupLocation = location;
+    this.selectedPickupLocationId = location.id;
+  }
+
+  onDeliveryScheduleSelected(event: { date: string; slot: DeliveryScheduleSlot }): void {
+    this.selectedDeliveryDate = event.date;
+    this.selectedDeliverySlot = event.slot;
+    this.selectedDeliverySlotId = event.slot.id;
+  }
+
   next(){
     if(this.currentStep==1){
+      this.orderErrorMessage.set('');
+
       if (!this.selectedShippingMethod || this.selectedShippingMethod.id === undefined || this.selectedShippingMethod.id === -1) {
         this.step1Error.set('Por favor seleccione un método de envío.');
         return;
       }
-      if (!this.selectedAddress || this.selectedAddress === '') {
-        this.step1Error.set('Por favor seleccione o ingrese una dirección de despacho.');
-        return;
-      }
-      if (!this.whatsappNumber || this.whatsappNumber.trim() === '') {
-        this.step1Error.set('Por favor ingrese un teléfono de contacto / WhatsApp.');
-        return;
+
+      // Tipo 1: Retiro en tienda
+      if (this.isStorePickup()) {
+        if (!this.selectedPickupLocationId) {
+          this.step1Error.set('Por favor seleccione un punto de retiro.');
+          return;
+        }
+        if (!this.whatsappNumber || this.whatsappNumber.trim() === '') {
+          this.step1Error.set('Por favor ingrese un teléfono de contacto / WhatsApp.');
+          return;
+        }
+      } else {
+        // Tipos 2 y 4: Despacho a domicilio
+        if (!this.selectedAddress || this.selectedAddress === '') {
+          this.step1Error.set('Por favor seleccione o ingrese una dirección de despacho.');
+          return;
+        }
+
+        // Tipo 4: Despacho programado
+        if (this.isScheduledDelivery()) {
+          if (!this.selectedDeliveryDate || !this.selectedDeliverySlotId) {
+            this.step1Error.set('Por favor seleccione una fecha y franja horaria para la entrega.');
+            return;
+          }
+        }
+
+        if (!this.whatsappNumber || this.whatsappNumber.trim() === '') {
+          this.step1Error.set('Por favor ingrese un teléfono de contacto / WhatsApp.');
+          return;
+        }
       }
 
       this.step1Error.set('');
@@ -197,8 +270,43 @@ export class CheckoutComponent implements OnInit, OnDestroy{
     if (this.isSubmitting) return;
 
     this.isSubmitting = true;
+    this.orderErrorMessage.set('');
 
-    this.orderService.storeOrder(this.cart().id, this.selectedAddress, this.selectedShippingMethod.id, this.selectedPaymentMethod, this.whatsappNumber);
+    if (this.isStorePickup()) {
+      // Tipo 1: Retiro en tienda
+      this.orderService.storeOrder(
+        this.cart().id,
+        null,
+        this.selectedShippingMethod.id,
+        this.selectedPaymentMethod,
+        this.whatsappNumber,
+        {
+          pickup_location_id: this.selectedPickupLocationId
+        }
+      );
+    } else if (this.isScheduledDelivery()) {
+      // Tipo 4: Despacho programado
+      this.orderService.storeOrder(
+        this.cart().id,
+        this.selectedAddress,
+        this.selectedShippingMethod.id,
+        this.selectedPaymentMethod,
+        this.whatsappNumber,
+        {
+          delivery_date: this.selectedDeliveryDate,
+          time_slot_id: this.selectedDeliverySlotId!
+        }
+      );
+    } else {
+      // Tipo 2: Despacho tradicional
+      this.orderService.storeOrder(
+        this.cart().id,
+        this.selectedAddress,
+        this.selectedShippingMethod.id,
+        this.selectedPaymentMethod,
+        this.whatsappNumber
+      );
+    }
   }
 
   getPaymentMethod($event:PaymentModel){
@@ -208,6 +316,11 @@ export class CheckoutComponent implements OnInit, OnDestroy{
   setSelectedAddress(event:ShippingAddress){
     this.shippingAddress = event;
     this.selectedAddress = event.id;
+
+    if (this.cart().id != undefined && this.selectedShippingMethod.id != undefined && this.sub_total_price() != undefined) {
+      this.shippingBusinessService.getCost(this.cart().id, this.selectedShippingMethod.id, this.sub_total_price());
+      this.orderService.getTotalAmount(this.cart().id, this.selectedShippingMethod.id);
+    }
   }
 
   scrollToTop(): void {

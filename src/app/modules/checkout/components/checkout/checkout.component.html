@@ -13,12 +13,45 @@
         <!-- Shipping Method Selection -->
         <div [hidden]="currentStep !== 1">
           <app-shipping-method (methodSelected)="selectedShippingMethodFunc($event)"></app-shipping-method>
-          <app-address (addressSelected)="setSelectedAddress($event)" (whatsappUpdated)="whatsappNumber = $event"></app-address>
+
+          <!-- Tipo 1: Retiro en tienda -->
+          @if(isStorePickup()) {
+            <app-pickup-location
+              [selectedLocationId]="selectedPickupLocationId"
+              [contactPhone]="whatsappNumber"
+              (locationSelected)="onPickupLocationSelected($event)"
+              (contactPhoneChange)="whatsappNumber = $event">
+            </app-pickup-location>
+          } @else {
+            <!-- Tipo 2 y Tipo 4: Despacho a domicilio -->
+            <app-address (addressSelected)="setSelectedAddress($event)" (whatsappUpdated)="whatsappNumber = $event"></app-address>
+
+            <!-- Tipo 4: Selector de fecha y franja horaria -->
+            @if(isScheduledDelivery()) {
+              <app-delivery-schedule-picker
+                [selectedDate]="selectedDeliveryDate"
+                [selectedSlotId]="selectedDeliverySlotId"
+                (scheduleSelected)="onDeliveryScheduleSelected($event)">
+              </app-delivery-schedule-picker>
+            }
+          }
         </div>
 
         <!-- Payment Selection -->
         <div [hidden]="currentStep !== 2"> 
           <app-payment (paymentSelected)="getPaymentMethod($event)"></app-payment>
+
+          <!-- Alerta de disponibilidad en Paso 2 -->
+          @if(orderErrorMessage()) {
+            <div class="alert alert-danger my-3 alert-dismissible fade show" role="alert">
+              <i class="bi bi-exclamation-circle-fill me-2"></i>{{ orderErrorMessage() }}
+              <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="back()">
+                  <i class="bi bi-arrow-left me-1"></i>Modificar entrega
+                </button>
+              </div>
+            </div>
+          }
         </div>
        
       </div>
@@ -27,7 +60,10 @@
                              [shippingBusiness]="selectedShippingMethod" [totalOrderPrice]="totalOrderPrice()" 
                              [discountValue]="discountValue()" [applyDiscountText]="applyDiscountText()" [disc_amount]="disc_amount()"
                              [shippingAddress]="shippingAddress" 
-                             [contact]="whatsappNumber"></app-purchase-detail>
+                             [contact]="whatsappNumber"
+                             [pickupLocation]="selectedPickupLocation"
+                             [selectedDeliveryDate]="selectedDeliveryDate"
+                             [selectedDeliverySlot]="selectedDeliverySlot"></app-purchase-detail>
       </div>
 
       <div class="text-center">

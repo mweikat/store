@@ -34,6 +34,9 @@ export class OrderService {
   private readonly paymentError$: Subject<boolean> = new Subject();
   public readonly paymentError: Observable<boolean> = this.paymentError$.asObservable();
 
+  private readonly orderAvailabilityError$: Subject<string> = new Subject();
+  public readonly orderAvailabilityError: Observable<string> = this.orderAvailabilityError$.asObservable();
+
   private readonly MY_ORDERS = makeStateKey<any>('myorders');
   private readonly myOrders$: Subject<any> = new Subject();
   public readonly myOrders: Observable<any> = this.myOrders$.asObservable();
@@ -78,14 +81,35 @@ export class OrderService {
 
   }
 
-  storeOrder(cartId:string, shipping_id:string, business_shipping_id:number, payment:PaymentModel, contact:string){
+  storeOrder(
+    cartId: string,
+    shipping_id: string | null,
+    business_shipping_id: number,
+    payment: PaymentModel,
+    contact: string,
+    options?: {
+      pickup_location_id?: number | string | null;
+      delivery_date?: string;
+      time_slot_id?: number | string;
+    }
+  ) {
 
-    let toJson = {
+    let toJson: any = {
       "business_shipping_id": business_shipping_id,
-      "cart_id":cartId,
-      "shipping_id":shipping_id,
-      "payment_id":payment.id,
-      "contact":contact
+      "cart_id": cartId,
+      "shipping_id": shipping_id,
+      "payment_id": payment.id,
+      "contact": contact
+    };
+
+    if (options?.pickup_location_id !== undefined && options?.pickup_location_id !== null) {
+      toJson.pickup_location_id = options.pickup_location_id;
+    }
+    if (options?.delivery_date) {
+      toJson.delivery_date = options.delivery_date;
+    }
+    if (options?.time_slot_id !== undefined && options?.time_slot_id !== null) {
+      toJson.time_slot_id = options.time_slot_id;
     }
 
     this.httpClient.post<any>(`${this.URL}`,toJson,{observe: 'response', responseType: 'json'}).subscribe({
@@ -101,8 +125,28 @@ export class OrderService {
       },
       error: (err) => {
         if(err.status==422){
-          this.noStockErrorModel = err.error[0];
-          this.noStockError$.next(this.noStockErrorModel);
+          const errBody = err.error;
+          // Si es un error de stock tradicional con arreglo o errorCode/stockDetails
+          if (Array.isArray(errBody) && errBody.length > 0 && errBody[0].stockDetails) {
+            this.noStockErrorModel = errBody[0];
+            this.noStockError$.next(this.noStockErrorModel);
+          } else if (errBody && (errBody.stockDetails || errBody.errorCode === 'NO_STOCK')) {
+            this.noStockErrorModel = errBody;
+            this.noStockError$.next(this.noStockErrorModel);
+          } else {
+            // Error de disponibilidad de agenda, cupos o punto de retiro
+            let errorMsg = 'No hay disponibilidad para el método de entrega seleccionado o se agotó el cupo. Por favor selecciona otra opción.';
+            if (typeof errBody === 'string') {
+              errorMsg = errBody;
+            } else if (errBody?.message) {
+              errorMsg = errBody.message;
+            } else if (errBody?.error) {
+              errorMsg = typeof errBody.error === 'string' ? errBody.error : JSON.stringify(errBody.error);
+            } else if (Array.isArray(errBody) && errBody.length > 0) {
+              errorMsg = errBody[0]?.errorMessage || errBody[0]?.message || errorMsg;
+            }
+            this.orderAvailabilityError$.next(errorMsg);
+          }
         }
         
         if(err.status==402){

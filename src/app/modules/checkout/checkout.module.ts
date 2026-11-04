@@ -16,6 +16,8 @@ import { NostockComponent } from './components/nostock/nostock.component';
 import { ConfirmComponent } from './components/confirm/confirm.component';
 import { OrderErrorComponent } from './components/order-error/order-error.component';
 import { OrderIteratePurchaseComponent } from './components/order-iterate-purchase/order-iterate-purchase.component';
+import { PickupLocationComponent } from './components/pickup-location/pickup-location.component';
+import { DeliverySchedulePickerComponent } from './components/delivery-schedule-picker/delivery-schedule-picker.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +31,8 @@ import { OrderIteratePurchaseComponent } from './components/order-iterate-purcha
     ConfirmComponent,
     OrderErrorComponent,
     OrderIteratePurchaseComponent,
+    PickupLocationComponent,
+    DeliverySchedulePickerComponent,
   ],
   imports: [
     CommonModule,

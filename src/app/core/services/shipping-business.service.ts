@@ -2,6 +2,8 @@ import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Inject, Injectable, makeStateKey, PLATFORM_ID, signal, TransferState } from '@angular/core';
 import { CitiesModel } from '@models/cities.model';
+import { DeliveryScheduleDay, DeliveryScheduleSettings } from '@models/deliverySchedule.model';
+import { PickupLocationModel } from '@models/pickupLocation.model';
 import { RegionModel } from '@models/regions.model';
 import { ShippingBusiness } from '@models/shippingBusiness.model';
 import { Observable, Subject } from 'rxjs';
@@ -92,6 +94,18 @@ export class ShippingBusinessService {
             
     });
 
+  }
+
+  getPickupLocations(): Observable<PickupLocationModel[]> {
+    return this.httpClient.get<PickupLocationModel[]>(`${this.URL}/pickup-locations`);
+  }
+
+  getDeliveryScheduleSettings(): Observable<DeliveryScheduleSettings> {
+    return this.httpClient.get<DeliveryScheduleSettings>(`${this.URL}/delivery-schedule/settings`);
+  }
+
+  getDeliveryScheduleAvailability(from: string, to: string): Observable<DeliveryScheduleDay[]> {
+    return this.httpClient.get<DeliveryScheduleDay[]>(`${this.URL}/delivery-schedule/availability?from=${from}&to=${to}`);
   }
 
 }

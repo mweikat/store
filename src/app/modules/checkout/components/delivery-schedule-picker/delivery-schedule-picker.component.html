@@ -1,0 +1,96 @@
+<div class="delivery-schedule-container mt-4">
+  <h5 class="mb-3">
+    <i class="bi bi-calendar-event me-2 text-primary"></i>Programa la fecha y hora de entrega
+  </h5>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando fechas disponibles...</span>
+    </div>
+    <p class="text-muted mt-2">Consultando disponibilidad de agenda...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading() && errorMessage()" class="alert alert-warning" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ errorMessage() }}
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading() && !errorMessage() && days().length === 0" class="alert alert-info" role="alert">
+    <i class="bi bi-info-circle-fill me-2"></i>No hay fechas de entrega programada disponibles para los próximos días.
+  </div>
+
+  <div *ngIf="!isLoading() && days().length > 0">
+    <!-- Horizontal Day Chips / Slider -->
+    <div class="days-slider-container mb-3 pb-2">
+      <div class="d-flex flex-row flex-nowrap overflow-auto gap-2 py-1 days-scroll">
+        @for(day of days(); track day.date) {
+          <button
+            type="button"
+            class="btn day-chip flex-shrink-0 text-center py-2 px-3"
+            [class.active]="selectedDay()?.date === day.date"
+            (click)="selectDay(day)">
+            <span class="d-block fw-bold text-nowrap">{{ day.day_name }}</span>
+            <small class="d-block text-nowrap">{{ day.date }}</small>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Slots Selection for the Selected Day -->
+    <div *ngIf="selectedDay() as activeDay" class="slots-container mt-3">
+      <h6 class="fw-bold mb-3">
+        Franjas disponibles para {{ activeDay.day_name || activeDay.date }}:
+      </h6>
+
+      <div *ngIf="!activeDay.slots || activeDay.slots.length === 0" class="alert alert-secondary">
+        No hay franjas horarias configuradas para este día.
+      </div>
+
+      <div *ngIf="activeDay.slots && activeDay.slots.length > 0" class="row g-2">
+        @for(slot of activeDay.slots; track slot.id) {
+          <div class="col-12 col-sm-6">
+            <div
+              class="card slot-card p-3 h-100"
+              [class.selected]="selectedSlotId === slot.id && slot.available_quota > 0"
+              [class.disabled]="slot.available_quota <= 0"
+              (click)="selectSlot(slot)"
+              role="button"
+              tabindex="0"
+              [attr.aria-disabled]="slot.available_quota <= 0">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                  <div class="form-check me-2" *ngIf="slot.available_quota > 0">
+                    <input
+                      class="form-check-input slot-radio"
+                      type="radio"
+                      name="slotRadio"
+                      [id]="'slot_' + slot.id"
+                      [checked]="selectedSlotId === slot.id">
+                  </div>
+                  <div>
+                    <span class="slot-time fw-bold d-block">
+                      <i class="bi bi-clock me-1"></i>{{ formatTime(slot.start_time) }} - {{ formatTime(slot.end_time) }}
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  @if(slot.available_quota > 0) {
+                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                      {{ slot.available_quota }} cupo{{ slot.available_quota > 1 ? 's' : '' }}
+                    </span>
+                  } @else {
+                    <span class="badge bg-secondary text-white">
+                      Agotado
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

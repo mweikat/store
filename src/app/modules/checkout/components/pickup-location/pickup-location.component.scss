@@ -1,0 +1,34 @@
+.pickup-location-container {
+  .pickup-card {
+    min-height: 44px;
+    border: 1px solid var(--checkout-section-border, #dee2e6);
+    border-radius: var(--card-radius, 8px);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background-color: var(--card-bg, #ffffff);
+
+    &:hover {
+      border-color: var(--color-primary, #6d5742);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    &.selected {
+      border: 2px solid var(--color-primary, #6d5742);
+      background-color: rgba(var(--color-primary-rgb, 109, 87, 66), 0.05);
+    }
+
+    .pickup-radio {
+      cursor: pointer;
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    .pickup-name {
+      color: var(--product-card-title, #212529);
+    }
+  }
+
+  .contact-section {
+    min-height: 44px;
+  }
+}
